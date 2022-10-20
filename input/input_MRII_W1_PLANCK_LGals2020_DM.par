@@ -2,9 +2,9 @@
 %----- SA model inputs       --------------
 %------------------------------------------
 
-FileNameGalaxies          SA_MM_test1
-FirstFile         	  5
-LastFile          	  5
+FileNameGalaxies          SA_MRII_DM_test1
+FirstFile         	  40
+LastFile          	  79
 
 FileWithOutputRedshifts   ./input/desired_output_redshifts.txt
 McFile			  ./input/Mc.txt
@@ -20,41 +20,41 @@ FileWithFilterNames       ./input/Filter_Sloan.txt
 %----- Simulation input/output files  ------------
 %-------------------------------------------------
 
-SimulationDir		  ./MergerTrees/MR/
+SimulationDir		  ./MergerTrees/MRII/
 OutputDir		  ./output
 
-LastDarkMatterSnapShot    63
+LastDarkMatterSnapShot    67
 Hashbits                  8    ;needed for Peano hilbert key output with the GALAXYTREE option
 
-MinGalOutputMass	  0.01
+MinGalOutputMass	  0.00001
 
-MaxMemSize                6000
+MaxMemSize                50000
 
-%-----------------------------------
+%-------------------------------------------------
 %----- Scaling options  ------------
-%-----------------------------------
+%-------------------------------------------------
 
 ScalePos		  0.960558
 ScaleMass           	  1.11671
  
 %------------------------------------------
-%----- Cosmological parameters (MR) -------
+%----- Cosmological parameters (MRII) -----
 %------------------------------------------
 
 %NEW COSMOLOGY: PLANCK1
 BaryonFrac      	  0.155
 Sigma8          	  0.826
-FileWithZList   	  ./input/zlists/zlist_planck_MR.txt
-PartMass        	  0.0961104
-BoxSize         	  480.279  
+FileWithZList   	  ./input/zlists/zlist_planck_MRII.txt 
+PartMass        	  0.000768884
+BoxSize         	  96.0558   
 Omega           	  0.315 
 OmegaLambda     	  0.685 
 Hubble_h        	  0.673
 
 %ORIGINAL COSMOLOGY: WMAP1
-FileWithZList_OriginalCosm    ./input/zlists/zlist_MR.txt
-PartMass_OriginalCosm         0.0860657
-BoxSize_OriginalCosm          500.
+FileWithZList_OriginalCosm    ./input/zlists/zlist_MRII.txt
+PartMass_OriginalCosm         0.000688526
+BoxSize_OriginalCosm          100.
 Omega_OriginalCosm            0.25 
 OmegaLambda_OriginalCosm      0.75 
 Hubble_h_OriginalCosm         0.73
@@ -185,7 +185,7 @@ Clumpingfactor              		1.0      ;clumping factor in Krumholz' H2 fraction
 									   % for KMT09 H2 formation there is an additional pow((1.0/metallicityr),0.7)
 									   % dependence to solve issues with low-metallicity galaxies
 
-GasInflowVel                		600.	;km/s/Mpc
+GasInflowVel                		1000.	;km/s/Mpc
 
 %-------------------------------------------
 %% Star formation bursts during mergers
@@ -218,12 +218,12 @@ ReIncorporationFactor	    		1.2e+10	;(eq. S22 in Henriques15) Fraction of ejecte
 %-------------------------------------------
 %% Metal enrichment parameters
 %-------------------------------------------
-FracZSNIItoHot				0.9 	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNII metals put into hot gas from the disc
+FracZSNIItoHot				0.3 	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNII metals put into hot gas from the disc
 									%(in situations where DETAILED_METALS_AND_MASS_RETURN is OFF, FracSNIItoHot is assumed for all metals)
-FracZSNIatoHot				0.8  	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNIa metals put into hot gas from the disc
-FracZAGBtoHot				0.25    	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNIa metals put into hot gas from the disc
+FracZSNIatoHot				0.3  	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNIa metals put into hot gas from the disc
+FracZAGBtoHot				0.0    	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNIa metals put into hot gas from the disc
 
-A_FACTOR 				0.035	;Fraction of mass from all objects between SNIa_MIN_MASS and SNIA_MAX_MASS that comes from SN-Ia
+A_FACTOR 				0.04	;Fraction of mass from all objects between SNIa_MIN_MASS and SNIA_MAX_MASS that comes from SN-Ia
 
 %-------------------------------------------
 %% IMF
