@@ -187,6 +187,7 @@ double ReincVelocitypower;
 double FracZSNIItoHot;
 double FracZSNIatoHot;
 double FracZAGBtoHot;
+double A_FACTOR;
 #ifdef FEEDBACK_COUPLED_WITH_MASS_RETURN
 double EnergySNcode, EnergySN;
 double EnergySNIIcode, EnergySNII;

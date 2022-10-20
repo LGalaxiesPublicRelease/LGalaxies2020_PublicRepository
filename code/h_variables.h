@@ -176,6 +176,7 @@ extern double ReincVelocitypower;
 extern double FracZSNIItoHot;
 extern double FracZSNIatoHot;
 extern double FracZAGBtoHot;
+extern double A_FACTOR;
 #ifdef H2_AND_RINGS
 extern double Clumpingfactor;
 extern double Warmphasefactor;
@@ -351,7 +352,6 @@ double AGBRate2[STEPS*MAXSNAPS][LIFETIME_Z_NUM];
 //For consistency with yields_integrals.c, IMF_SLOPE must equal either: 2.0, 2.15, 2.3, or 2.6.
 
 //SNIa parameters:
-#define A_FACTOR 0.04 //0.028 //0.035 //Fraction of mass from all objects between SNIa_MIN_MASS and SNIA_MAX_MASS that comes from SN-Ia. //0.028 preferred in Yates+13.
 //#define FRAC2HOT 0.9 //Fraction of material released by disk stars that goes straight into the HotGas. Res goes in ColdGas.
 #ifdef DTD
 //#define KALPHA 1.4765 //1.59203 //Now set in yield_integrals.c

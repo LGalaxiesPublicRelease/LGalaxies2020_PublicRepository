@@ -577,6 +577,10 @@ void read_parameter_file(char *fname)
   addr[nt] = &FracZAGBtoHot;
   id[nt++] = DOUBLE;
 
+  strcpy(tag[nt], "A_FACTOR");
+  addr[nt] = &A_FACTOR;
+  id[nt++] = DOUBLE;
+
 //in the future ready in different energies for each type of SN
 //#ifdef FEEDBACK_COUPLED_WITH_MASS_RETURN
 //#else
