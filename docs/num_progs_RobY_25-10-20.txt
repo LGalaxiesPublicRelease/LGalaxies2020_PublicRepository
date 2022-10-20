@@ -1,0 +1,277 @@
+-------------------------------------------------------------
+Mil-I, treefiles 0-9, SFing galaxies selected by mass at z=0 (lowerMass = 6.0):
+
+Linked evo of O/H slope: Galaxy count:
+Mass bin [9.00-9.60]:   Redshift bin [0.00]:        25301
+                        Redshift bin [0.50]:        25216
+                        Redshift bin [1.00]:        25164
+                        Redshift bin [2.00]:        22710
+                        Redshift bin [3.00]:        15596
+                        Redshift bin [4.00]:         8005
+                        Redshift bin [5.00]:         1977
+                        Redshift bin [6.00]:          423
+                        Redshift bin [7.00]:           51
+ 
+Mass bin [9.60-10.20]:  Redshift bin [0.00]:        13840
+                        Redshift bin [0.50]:        13715
+                        Redshift bin [1.00]:        13570
+                        Redshift bin [2.00]:        13386
+                        Redshift bin [3.00]:        11637
+                        Redshift bin [4.00]:         8196
+                        Redshift bin [5.00]:         3488
+                        Redshift bin [6.00]:         1202
+                        Redshift bin [7.00]:          201
+ 
+Mass bin [10.20-10.80]: Redshift bin [0.00]:         4533
+                        Redshift bin [0.50]:         4508
+                        Redshift bin [1.00]:         4443
+                        Redshift bin [2.00]:         4440
+                        Redshift bin [3.00]:         4328
+                        Redshift bin [4.00]:         3777
+                        Redshift bin [5.00]:         2372
+                        Redshift bin [6.00]:         1207
+                        Redshift bin [7.00]:          334
+ 
+Mass bin [10.80-11.40]: Redshift bin [0.00]:          334
+                        Redshift bin [0.50]:          316
+                        Redshift bin [1.00]:          326
+                        Redshift bin [2.00]:          332
+                        Redshift bin [3.00]:          327
+                        Redshift bin [4.00]:          327
+                        Redshift bin [5.00]:          274
+                        Redshift bin [6.00]:          204
+                        Redshift bin [7.00]:           97
+
+
+
+-------------------------------------------------------------
+Mil-II, treefiles 40-79, SFing galaxies selected by mass at z=0 (lowerMass = 6.0):
+
+Linked evo of O/H slope: Galaxy count:
+Mass bin [9.00-9.60]: Redshift bin [0.00]:         1387
+                        Redshift bin [0.50]:         1269
+                        Redshift bin [1.00]:         1082
+                        Redshift bin [2.00]:          831
+                        Redshift bin [3.00]:          489
+                        Redshift bin [4.00]:          239
+                        Redshift bin [5.00]:           72
+                        Redshift bin [6.00]:           31
+                        Redshift bin [7.00]:            3
+ 
+Mass bin [9.60-10.20]: Redshift bin [0.00]:          702
+                        Redshift bin [0.50]:          664
+                        Redshift bin [1.00]:          586
+                        Redshift bin [2.00]:          522
+                        Redshift bin [3.00]:          352
+                        Redshift bin [4.00]:          213
+                        Redshift bin [5.00]:           76
+                        Redshift bin [6.00]:           33
+                        Redshift bin [7.00]:            8
+ 
+Mass bin [10.20-10.80]: Redshift bin [0.00]:          279
+                        Redshift bin [0.50]:          272
+                        Redshift bin [1.00]:          254
+                        Redshift bin [2.00]:          236
+                        Redshift bin [3.00]:          177
+                        Redshift bin [4.00]:          125
+                        Redshift bin [5.00]:           56
+                        Redshift bin [6.00]:           20
+                        Redshift bin [7.00]:            6
+ 
+Mass bin [10.80-11.40]: Redshift bin [0.00]:           36
+                        Redshift bin [0.50]:           33
+                        Redshift bin [1.00]:           32
+                        Redshift bin [2.00]:           33
+                        Redshift bin [3.00]:           29
+                        Redshift bin [4.00]:           25
+                        Redshift bin [5.00]:           11
+                        Redshift bin [6.00]:            5
+                        Redshift bin [7.00]:            1
+
+
+
+-------------------------------------------------------------
+Mil-II, treefiles 40-79, SFing galaxies selected by mass at z=0 (lowerMass = 3.0):
+
+Linked evo of O/H slope: Galaxy count:
+Mass bin [9.00-9.60]: Redshift bin [0.00]:         1387
+                        Redshift bin [0.50]:         1269
+                        Redshift bin [1.00]:         1082
+                        Redshift bin [2.00]:          831
+                        Redshift bin [3.00]:          489
+                        Redshift bin [4.00]:          239
+                        Redshift bin [5.00]:           72
+                        Redshift bin [6.00]:           31
+                        Redshift bin [7.00]:            3
+ 
+Mass bin [9.60-10.20]: Redshift bin [0.00]:          702
+                        Redshift bin [0.50]:          664
+                        Redshift bin [1.00]:          586
+                        Redshift bin [2.00]:          522
+                        Redshift bin [3.00]:          352
+                        Redshift bin [4.00]:          213
+                        Redshift bin [5.00]:           76
+                        Redshift bin [6.00]:           33
+                        Redshift bin [7.00]:            8
+ 
+Mass bin [10.20-10.80]: Redshift bin [0.00]:          279
+                        Redshift bin [0.50]:          272
+                        Redshift bin [1.00]:          254
+                        Redshift bin [2.00]:          236
+                        Redshift bin [3.00]:          177
+                        Redshift bin [4.00]:          125
+                        Redshift bin [5.00]:           56
+                        Redshift bin [6.00]:           20
+                        Redshift bin [7.00]:            6
+ 
+Mass bin [10.80-11.40]: Redshift bin [0.00]:           36
+                        Redshift bin [0.50]:           33
+                        Redshift bin [1.00]:           32
+                        Redshift bin [2.00]:           33
+                        Redshift bin [3.00]:           29
+                        Redshift bin [4.00]:           25
+                        Redshift bin [5.00]:           11
+                        Redshift bin [6.00]:            5
+                        Redshift bin [7.00]:            1
+
+
+-------------------------------------------------------------
+Mil-II, treefiles 30-79, SFing galaxies selected by mass at z=0 (lowerMass = 6.0):
+
+Max. number of z=0 disc galaxies (for gradient metallicity plots) (i.e: ww cut):         6032
+
+Linked evo of O/H slope: Galaxy count:
+Mass bin [9.00-9.60]:   Redshift bin [0.00]:         1817
+                        Redshift bin [0.50]:         1676
+                        Redshift bin [1.00]:         1438
+                        Redshift bin [2.00]:         1112
+                        Redshift bin [3.00]:          653
+                        Redshift bin [4.00]:          329
+                        Redshift bin [5.00]:          107
+                        Redshift bin [6.00]:           44
+                        Redshift bin [7.00]:            5
+ 
+Mass bin [9.60-10.20]:  Redshift bin [0.00]:          953
+                        Redshift bin [0.50]:          900
+                        Redshift bin [1.00]:          800
+                        Redshift bin [2.00]:          717
+                        Redshift bin [3.00]:          493
+                        Redshift bin [4.00]:          296
+                        Redshift bin [5.00]:          119
+                        Redshift bin [6.00]:           47
+                        Redshift bin [7.00]:           13
+ 
+Mass bin [10.20-10.80]: Redshift bin [0.00]:          379
+                        Redshift bin [0.50]:          369
+                        Redshift bin [1.00]:          343
+                        Redshift bin [2.00]:          322
+                        Redshift bin [3.00]:          244
+                        Redshift bin [4.00]:          167
+                        Redshift bin [5.00]:           77
+                        Redshift bin [6.00]:           28
+                        Redshift bin [7.00]:           12
+ 
+Mass bin [10.80-11.40]: Redshift bin [0.00]:           49
+                        Redshift bin [0.50]:           45
+                        Redshift bin [1.00]:           43
+                        Redshift bin [2.00]:           45
+                        Redshift bin [3.00]:           40
+                        Redshift bin [4.00]:           36
+                        Redshift bin [5.00]:           15
+                        Redshift bin [6.00]:            5
+                        Redshift bin [7.00]:            1
+
+
+-------------------------------------------------------------
+Mil-II, treefiles 20-79, SFing galaxies selected by mass at z=0 (lowerMass = 6.0):
+
+Max. number of z=0 disc galaxies (for gradient metallicity plots) (i.e: ww cut):         7687
+
+Linked evo of O/H slope: Galaxy count:
+Mass bin [9.00-9.60]: Redshift bin [0.00]:         2312
+                        Redshift bin [0.50]:         2141
+                        Redshift bin [1.00]:         1828
+                        Redshift bin [2.00]:         1414
+                        Redshift bin [3.00]:          830
+                        Redshift bin [4.00]:          421
+                        Redshift bin [5.00]:          139
+                        Redshift bin [6.00]:           58
+                        Redshift bin [7.00]:            7
+ 
+Mass bin [9.60-10.20]: Redshift bin [0.00]:         1220
+                        Redshift bin [0.50]:         1155
+                        Redshift bin [1.00]:         1027
+                        Redshift bin [2.00]:          919
+                        Redshift bin [3.00]:          640
+                        Redshift bin [4.00]:          390
+                        Redshift bin [5.00]:          155
+                        Redshift bin [6.00]:           59
+                        Redshift bin [7.00]:           16
+ 
+Mass bin [10.20-10.80]: Redshift bin [0.00]:          489
+                        Redshift bin [0.50]:          471
+                        Redshift bin [1.00]:          442
+                        Redshift bin [2.00]:          419
+                        Redshift bin [3.00]:          327
+                        Redshift bin [4.00]:          228
+                        Redshift bin [5.00]:           99
+                        Redshift bin [6.00]:           35
+                        Redshift bin [7.00]:           12
+ 
+Mass bin [10.80-11.40]: Redshift bin [0.00]:           59
+                        Redshift bin [0.50]:           55
+                        Redshift bin [1.00]:           53
+                        Redshift bin [2.00]:           54
+                        Redshift bin [3.00]:           49
+                        Redshift bin [4.00]:           43
+                        Redshift bin [5.00]:           17
+                        Redshift bin [6.00]:            8
+                        Redshift bin [7.00]:            1
+
+
+-------------------------------------------------------------
+Mil-II, treefiles 10-79, SFing galaxies selected by mass at z=0 (lowerMass = 6.0):
+
+Max. number of z=0 disc galaxies (for gradient metallicity plots) (i.e: ww cut):         9755
+
+Linked evo of O/H slope: Galaxy count:
+Mass bin [9.00-9.60]: Redshift bin [0.00]:         2886
+                        Redshift bin [0.50]:         2672
+                        Redshift bin [1.00]:         2293
+                        Redshift bin [2.00]:         1773
+                        Redshift bin [3.00]:         1039
+                        Redshift bin [4.00]:          539
+                        Redshift bin [5.00]:          184
+                        Redshift bin [6.00]:           69
+                        Redshift bin [7.00]:            9
+ 
+Mass bin [9.60-10.20]: Redshift bin [0.00]:         1587
+                        Redshift bin [0.50]:         1508
+                        Redshift bin [1.00]:         1344
+                        Redshift bin [2.00]:         1210
+                        Redshift bin [3.00]:          828
+                        Redshift bin [4.00]:          509
+                        Redshift bin [5.00]:          197
+                        Redshift bin [6.00]:           74
+                        Redshift bin [7.00]:           17
+ 
+Mass bin [10.20-10.80]: Redshift bin [0.00]:          614
+                        Redshift bin [0.50]:          588
+                        Redshift bin [1.00]:          551
+                        Redshift bin [2.00]:          521
+                        Redshift bin [3.00]:          406
+                        Redshift bin [4.00]:          279
+                        Redshift bin [5.00]:          130
+                        Redshift bin [6.00]:           48
+                        Redshift bin [7.00]:           14
+ 
+Mass bin [10.80-11.40]: Redshift bin [0.00]:           73
+                        Redshift bin [0.50]:           68
+                        Redshift bin [1.00]:           67
+                        Redshift bin [2.00]:           67
+                        Redshift bin [3.00]:           60
+                        Redshift bin [4.00]:           52
+                        Redshift bin [5.00]:           22
+                        Redshift bin [6.00]:           10
+                        Redshift bin [7.00]:            1
+			
