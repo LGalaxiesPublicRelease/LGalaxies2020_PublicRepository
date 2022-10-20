@@ -2,7 +2,7 @@
 %----- SA model inputs       --------------
 %------------------------------------------
 
-FileNameGalaxies          SA_DM_test1
+FileNameGalaxies          SA_MM_test1
 FirstFile         	  5
 LastFile          	  5
 
@@ -185,7 +185,7 @@ Clumpingfactor              		1.0      ;clumping factor in Krumholz' H2 fraction
 									   % for KMT09 H2 formation there is an additional pow((1.0/metallicityr),0.7)
 									   % dependence to solve issues with low-metallicity galaxies
 
-GasInflowVel                		1000.	;km/s/Mpc
+GasInflowVel                		600.	;km/s/Mpc
 
 %-------------------------------------------
 %% Star formation bursts during mergers
@@ -218,12 +218,12 @@ ReIncorporationFactor	    		1.2e+10	;(eq. S22 in Henriques15) Fraction of ejecte
 %-------------------------------------------
 %% Metal enrichment parameters
 %-------------------------------------------
-FracZSNIItoHot				0.3 	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNII metals put into hot gas from the disc
+FracZSNIItoHot				0.9 	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNII metals put into hot gas from the disc
 									%(in situations where DETAILED_METALS_AND_MASS_RETURN is OFF, FracSNIItoHot is assumed for all metals)
-FracZSNIatoHot				0.3  	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNIa metals put into hot gas from the disc
-FracZAGBtoHot				0.0    	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNIa metals put into hot gas from the disc
+FracZSNIatoHot				0.8  	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNIa metals put into hot gas from the disc
+FracZAGBtoHot				0.25    	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNIa metals put into hot gas from the disc
 
-A_FACTOR 				0.04	;Fraction of mass from all objects between SNIa_MIN_MASS and SNIA_MAX_MASS that comes from SN-Ia
+A_FACTOR 				0.035	;Fraction of mass from all objects between SNIa_MIN_MASS and SNIA_MAX_MASS that comes from SN-Ia
 
 %-------------------------------------------
 %% IMF
