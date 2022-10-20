@@ -1,0 +1,2 @@
+#Ignore all files in the /output directory (and its sub-directories), as L-Galaxies output files are too big for GitHub
+output/
