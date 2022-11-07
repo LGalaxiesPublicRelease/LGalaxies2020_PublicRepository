@@ -21,7 +21,7 @@ FileWithFilterNames       ./input/Filter_Sloan.txt
 %-------------------------------------------------
 
 SimulationDir		  ./MergerTrees/MR/
-OutputDir		  ./output
+OutputDir		  ./output/
 
 LastDarkMatterSnapShot    63
 Hashbits                  8    ;needed for Peano hilbert key output with the GALAXYTREE option
