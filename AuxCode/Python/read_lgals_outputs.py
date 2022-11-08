@@ -142,7 +142,7 @@ def read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRU
     
     #################
     #Read-in SFH bin info:
-    SFH_bins = astropy.io.fits.open(BaseDir+'AuxCode/'+'Database_SFH_table.fits')
+    SFH_bins = astropy.io.fits.open(BaseDir+'AuxCode/Python/'+'Database_SFH_table.fits')
     SFH_bins = SFH_bins[1].data
     
     print('SFH bins read')

@@ -189,7 +189,7 @@ for ii in range(RNUM) :
 #################
 #Calculate SFH properties:
 #N.B. If making new samples, SFH_bins IS ALREADY STORED IN THE DICTIONARY BELOW
-SFH_bins = astropy.io.fits.open(BaseDir+'AuxCode/'+'Database_SFH_table.fits')
+SFH_bins = astropy.io.fits.open(BaseDir+'AuxCode/Python/'+'Database_SFH_table.fits')
 SFH_bins = SFH_bins[1].data    
 if FILE_TYPE == 'snapshots' :
     theSnap = G_samp1['SnapNum'][0] #The snapshot number corresponding to this snapshot file
