@@ -38,7 +38,7 @@ plt.rcParams['font.serif'] = 'Times'
 
 #################
 #Directories:
-BaseDir = '../../../' #project root directory
+BaseDir = '../../' #project root directory
 OutputDir = BaseDir+'output/' #where the L-Galaxies output files are kept
 PlotDir = BaseDir+'figures/' #where plots created by this script are sent
 
