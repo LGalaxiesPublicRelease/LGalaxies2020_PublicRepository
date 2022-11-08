@@ -15,7 +15,7 @@ make_lgals_dictionary.py
   ;
 """
 
-def make_lgals_dictionary(mod, LABEL, G_samp, PlotDir, COSMOLOGY, SIMULATION, FILE_TYPE, MODEL, \
+def make_lgals_dictionary(LABEL, G_samp, PlotDir, COSMOLOGY, SIMULATION, FILE_TYPE, MODEL, \
                           VERSION, NumGals, SAMPLE_TYPE, char_lower_redshift, char_upper_redshift, \
                           RNUM, RingRadii, RReRings, RReSFHRings, RingArea, \
                           SFH_bins_num, SFH_bins_lbt_allGals) : 

@@ -60,7 +60,7 @@ SIMULATION  = 'Mil-I' #Choose from: 'Mil-I', 'Mil-II'
 FILE_TYPE = 'snapshots' #Choose from: 'snapshots', 'galtree'
 STRUCT_TYPE = 'snapshots' #Choose from: 'snapshots', 'galtree'
 MODEL = 'default' #Choose from: 'default', 'modified'
-VERSION = 'myTestModel' #Pick a memorable name
+VERSION = 'test1' #Pick a memorable name
 LABEL = MODEL+' model '+VERSION #NEEDS TO BE IN SIMPLE ASCII (so it can be used in a filename ok in Linux, and read by latex). White space is ok [removed later]). A label that wll be added to plots to denote this model if MULTIPLE_MODELS is on.
     
 #################       
@@ -77,7 +77,7 @@ TotTreeFiles = 512
 
 ################# 
 #Select sample type:
-SAMPLE_TYPE = 'Discs' #Select from: 'All', 'Discs', 'Dwarfs'
+SAMPLE_TYPE = 'All' #Select from: 'All', 'Discs', 'Dwarfs'
    
 #################  
 #Plot suffix:
@@ -140,7 +140,7 @@ print('\n***************')
 print('L-GALAXIES 2020')
 print('***************')  
 print('MODEL:'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+'\n') 
-print(str(mod+1)+' of '+str(modcount))    
+ 
 if LOAD_SAMPLE == 0 :
     G_lgal, SFH_bins = read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
                                           FirstFile, LastFile, FullRedshiftList, RedshiftsToRead)
@@ -152,12 +152,12 @@ if LOAD_SAMPLE == 0 :
     #Make and pickle sample data (NOTE: "mark" is not included in the sample filename, so these will be overwritten if the same model is run again):       
     G_samp1 = make_lgals_sample(G_lgal, FILE_TYPE, SAMPLE_TYPE, Hubble_h, DMParticleMass, ParticleMassRes, StellarMassRes, \
                            FullRedshiftList, RedshiftsToRead)
-    np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE, G_samp1, allow_pickle=True)
+    np.save(OutputDir+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE, G_samp1, allow_pickle=True)
     NumGals = len(G_samp1) #Number of galaxies in the sample selected in make_lgals_sample (not the total number of objects in the treefiles used).
     print('Sample data pickled\n')
 
 elif LOAD_SAMPLE == 1 :
-    G_samp1 = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+".npy")
+    G_samp1 = np.load(OutputDir+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+".npy")
     NumGals = len(G_samp1)
     print('Pickled sample data loaded\n')
 else : print("***** ERROR: No sample calculated or pre-loaded. Please set LOAD_SAMPLE parameter to 0 or 1. *****")
@@ -206,7 +206,7 @@ for ii in range(NumGals) :
             
 #################
 #Make dictionaries for each sample:
-Samp1 = make_lgals_dictionary(mod, LABEL, G_samp1, PlotDir, COSMOLOGY, SIMULATION, FILE_TYPE, MODEL, \
+Samp1 = make_lgals_dictionary(LABEL, G_samp1, PlotDir, COSMOLOGY, SIMULATION, FILE_TYPE, MODEL, \
                               VERSION, NumGals, SAMPLE_TYPE, char_z_low, char_z_high, \
                               RNUM, RingRadii, RReRings, RReSFHRings, RingArea, \
                               SFH_bins_num, SFH_bins_lbt_allGals)

@@ -27,6 +27,8 @@ from astropy.io import fits
 import procedures
 reload (procedures)
 from procedures import read_snap, read_tree
+import sys
+sys.path.append('../awk/output/python/')
 
 
 
