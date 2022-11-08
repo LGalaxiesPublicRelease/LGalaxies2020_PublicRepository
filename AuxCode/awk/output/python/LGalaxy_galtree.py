@@ -131,4 +131,4 @@ LGalaxiesStruct = numpy.dtype([
 ])
 properties_used = {}
 for el in LGalaxiesStruct.names:
-	properties_used[el] = False
+	properties_used[el] = True
