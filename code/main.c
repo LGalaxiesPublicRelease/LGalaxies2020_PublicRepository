@@ -279,15 +279,8 @@ void SAM(int filenr)
 //***************************************************************************************
 //***************************************************************************************
 
-  //for(treenr = 0; treenr < NTrees_Switch_MR_MRII/5.; treenr++)
-  //for(treenr = NTrees_Switch_MR_MRII; treenr < Ntrees; treenr++)
   for(treenr = 0; treenr < Ntrees; treenr++)
-  //for(treenr = 0; treenr <10+1;treenr++)
-  //for(treenr = 0; treenr <100;treenr++)
   {
-      //printf("doing tree %d of %d (MR trees=%d)\n", treenr, Ntrees, NTrees_Switch_MR_MRII);
-      //if(treenr%1000==0)
-    //printf("doing tree %d of %d\n", treenr, Ntrees);
 #ifdef MR_PLUS_MRII
   	if(treenr == NTrees_Switch_MR_MRII)
   		change_dark_matter_sim("MRII");
@@ -543,12 +536,6 @@ int join_galaxies_of_progenitors(int halonr, int ngalstart, int *FOF_centralgal)
 	}
     }
 
-    /* TODO is it true that IF the progenitor halos are sorted by Len
-     * (apart maybe from firstprogenitor), then the first_occupied's FirstGalaxy will also be
-     * the central galaxy of the new halo?*/
-    /* TODO Would it be better ALWAYS to set the most massive galaxy as the first-occupied,
-     * even if the FirstProgenitor halo has a galaxy in it? */
-   
     // Loop through all the progenitors and get the halo mass and ID of the most massive progenitor.
     lenmax = 0;
     prog = Halo[halonr].FirstProgenitor;
@@ -580,13 +567,13 @@ int join_galaxies_of_progenitors(int halonr, int ngalstart, int *FOF_centralgal)
 	    Gal[ngal].DiskSNIIRate = 0.0;
 	    Gal[ngal].BulgeSNIIRate = 0.0;
 	    Gal[ngal].ICMSNIIRate = 0.0;
-	    Gal[ngal].MassReturnRateToColdGas = 0.0; //ROB: Store mass return rate by SNe and stellar winds to the gas phases.
-	    Gal[ngal].MassReturnRateToHotGas = 0.0; //ROB: Store mass return rate by SNe and stellar winds to the gas phases.
-	    Gal[ngal].MetalsReturnRateToHotGas = 0.0; //ROB: Store metals mass return rate by SNe and stellar winds to the gas phases.
+	    Gal[ngal].MassReturnRateToColdGas = 0.0; //Store mass return rate by SNe and stellar winds to the gas phases.
+	    Gal[ngal].MassReturnRateToHotGas = 0.0; //Store mass return rate by SNe and stellar winds to the gas phases.
+	    Gal[ngal].MetalsReturnRateToHotGas = 0.0; //Store metals mass return rate by SNe and stellar winds to the gas phases.
 	    Gal[ngal].PrimordialAccretionRate = 0.0;
-	    Gal[ngal].ReheatingRate = 0.0; //ROB: storing ReheatingRate for outputting (31-03-20)
-	    Gal[ngal].MetalsReheatingRate = 0.0; //ROB: storing MetalsReheatingRate for outputting (14-08-20)
-	    Gal[ngal].EjectionRate = 0.0; //ROB: storing EjectionRate for outputting (31-03-20)
+	    Gal[ngal].ReheatingRate = 0.0; //Store ReheatingRate for outputting
+	    Gal[ngal].MetalsReheatingRate = 0.0; //Store MetalsReheatingRate for outputting
+	    Gal[ngal].EjectionRate = 0.0; //Store EjectionRate for outputting
 	    Gal[ngal].CoolingRate = 0.0;
 	    Gal[ngal].CoolingRate_beforeAGN = 0.0;
 	    Gal[ngal].Sfr = 0.0;
@@ -595,11 +582,11 @@ int join_galaxies_of_progenitors(int halonr, int ngalstart, int *FOF_centralgal)
 	  for(j=0;j<RNUM;j++)
 	  {
 		Gal[ngal].SfrRings[j]=0.0;
-	  	Gal[ngal].SfrInstRings[j] = 0.0; //*****ROB*****//
+	  	Gal[ngal].SfrInstRings[j] = 0.0;
 	  }
 #endif
 	    Gal[ngal].SfrBulge = 0.0;
-	    Gal[ngal].SfrInst = 0.0; //*****ROB*****//
+	    Gal[ngal].SfrInst = 0.0;
 	    Gal[ngal].QuasarAccretionRate=0.0;
 	    Gal[ngal].RadioAccretionRate=0.0;
 #ifdef GALAXYTREE
@@ -787,7 +774,7 @@ void evolve_galaxies(int halonr, int ngal, int treenr)
   /* Update all galaxies to same star-formation history time-bins.
    * Needed in case some galaxy has skipped a snapshot. */
 #ifdef STAR_FORMATION_HISTORY
-    age_in_years=(Age[0]-previoustime)*UnitTime_in_years/Hubble_h; //ROB: age_in_years is in units of "real years"!
+    age_in_years=(Age[0]-previoustime)*UnitTime_in_years/Hubble_h; // age_in_years is in units of "real years"
     nstep=0;
     for (p=0; p<ngal; p++) sfh_update_bins(p,Halo[halonr].SnapNum-1,nstep,age_in_years);
 #endif

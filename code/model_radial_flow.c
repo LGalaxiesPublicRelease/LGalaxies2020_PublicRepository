@@ -72,12 +72,6 @@ void gas_inflow(int p, double time)
       else r_in=RingRadius[j-1]*alpha;
       if(r_in<1.0e-8) r_in=1.0e-8;
 
-      /*****BARS TEST!: What happens if no radial flow is allowed to occur between 940pc and 7.53kpc, due to bars? (05-05-20)
-      if(j >= 6 && j <= 8) {
-  		r_out = RingRadius[j];
-  		r_in = RingRadius[j-1];
-      }*/
-
       //constant inflow velocity
       //vgas=3.0; // km/s
       //r_out=RingRadius[j]-vgas*time; //time unit: (Mpc/h)/(km/s); radius unit: Mpc/h

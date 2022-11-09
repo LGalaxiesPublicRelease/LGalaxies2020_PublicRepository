@@ -135,9 +135,6 @@ void starformation(int p, int centralgal, double time, double dt, int nstep)
 
 	  if(Gal[p].H2fractionRings[j]>=0.0) {
 	      strdotr[j] = sfe * Gal[p].ColdGasRings[j]*Gal[p].H2fractionRings[j] / WARM_PHASE_FACTOR;
-	  	  /*if(j >= 6 && j <= 8) {
-	    	  strdotr[j] = 0.0; //+++++BARS TEST!: What happens if no SF is allowed to occur between 940pc and 7.53kpc, due to bars? (05-05-20)
-	      }*/
 	  }
 	  else strdotr[j]=0.0;
 	}
@@ -228,12 +225,12 @@ void starformation(int p, int centralgal, double time, double dt, int nstep)
   /*  update the star formation rate */
    /*Sfr=stars/(dt*steps)=strdot*dt/(dt*steps)=strdot/steps -> average over the STEPS*/
    Gal[p].Sfr += stars / (dt * STEPS);
-   Gal[p].SfrInst = stars / dt; //*****ROB*****//
+   Gal[p].SfrInst = stars / dt;
  #ifdef H2_AND_RINGS
    for(j=0;j<RNUM;j++)
    {
      Gal[p].SfrRings[j] += starsRings[j] / (dt * STEPS);
-     Gal[p].SfrInstRings[j] = starsRings[j] / dt; //*****ROB*****//
+     Gal[p].SfrInstRings[j] = starsRings[j] / dt;
    }
  #endif
 
@@ -609,10 +606,10 @@ void SN_feedback(int p, int centralgal, double stars, double starsRings[], char 
   if (reheated_mass < 0.0) reheated_mass = 0.0;
   if (ejected_mass < 0.0) ejected_mass = 0.0;
 
-  Gal[p].ReheatingRate += reheated_mass / (dt*STEPS); //ROB: storing ReheatingRate for outputting (31-03-20)
-  Gal[p].EjectionRate += ejected_mass / (dt*STEPS); //ROB: storing EjectionRate for outputting (31-03-20)
+  Gal[p].ReheatingRate += reheated_mass / (dt*STEPS);
+  Gal[p].EjectionRate += ejected_mass / (dt*STEPS);
 
-  //ROB: Calculate the metal mass reheated:
+  //Calculate the metal mass reheated:
 #ifdef H2_AND_RINGS
   for(jj=0;jj<RNUM;jj++) {
       if(Gal[p].ColdGasRings[jj]>0.) {
@@ -726,26 +723,13 @@ double compute_SN_reheat(int p, int centralgal, double stars, double ColdGas, do
   else
     reheated_mass=0.;
 
-  	  //ROB: I have added this ifdef, as David Izquierdo-Villalba found that forcing reheated_mass to ColdGas here messes with results when FEEDBACK_COUPLED_WITH_MASS_RETURN and H2_AND_RINGS are both off. (24-02-22)
+  	  //ifdef added as forcing reheated_mass to equal ColdGas here messes with results when FEEDBACK_COUPLED_WITH_MASS_RETURN and H2_AND_RINGS are both off:
 #ifdef H2_AND_RINGS
   if(reheated_mass > ColdGas) {
 	  //printf("cSr(): CHECK 1: reheated_mass = %e | ColdGas = %e\n", reheated_mass, ColdGas);
 	  reheated_mass = ColdGas;
   }
 #endif
-
- /*
-      double rd, ringtot;
-    int jj;
-     rd=Gal[p].ColdGasRadius;
-    ringtot=1.-(1+RingRadius[RNUM-1]/rd)/exp(RingRadius[RNUM-1]/rd);
-    reheated_massr[0]=(1-(1+RingRadius[0]/rd)/exp(RingRadius[0]/rd))/ringtot*reheated_mass;
-    //aux_mass=reheated_massr[0];
-    for(jj=1; jj<RNUM; jj++)
-      {
-      reheated_massr[jj]= ((1+RingRadius[jj-1]/rd)/exp(RingRadius[jj-1]/rd)-(1+RingRadius[jj]/rd)/exp(RingRadius[jj]/rd))/ringtot*reheated_mass;
-      //aux_mass+=reheated_massr[jj];
-      }*/
 
   return reheated_mass;
 

@@ -145,8 +145,6 @@ void save_galaxy_append(int tree, int i, int n)
 
  /*@brief Copies all the relevant properties from the Galaxy structure
         into the Galaxy output structure, some units are corrected.*/
-/* This is a mess.  It should be organised in exactly the same was as h_galaxy_output.h.
- * (Ideally, all this shoudl be read from a parameter file, but that's another story.) */
 #ifdef NORMALIZEDDB
 void prepare_galaxy_for_output(int n, struct GALAXY *g, struct GALAXY_OUTPUT *o, struct SFH_BIN *sfh_bin)
 #else
@@ -161,7 +159,6 @@ void prepare_galaxy_for_output(int n, struct GALAXY *g, struct GALAXY_OUTPUT *o)
 #endif
 
 #ifndef NO_PROPS_OUTPUTS
-  //o->NumDisr = g->NumDisr; //***** ROB: Geoff's disruption counter (24-03-20) *****
   o->Type = g->Type;
   o->SnapNum = g->SnapNum;
   o->CentralMvir = get_virial_mass(Halo[g->HaloNr].FirstHaloInFOFgroup);
@@ -602,16 +599,15 @@ void prepare_galaxy_for_output(int n, struct GALAXY *g, struct GALAXY_OUTPUT *o)
 #endif //OUTPUT_ELEMENTS
 
   o->DiskSNIIRate = CORRECTDBFLOAT(g->DiskSNIIRate / UnitTime_in_s * SEC_PER_YEAR); //in yr^-1
-  ////o->DiskSNIIRate = CORRECTDBFLOAT(g->DiskSNIIRate * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //in Msun^-1 yr^-1 h^-1
   o->BulgeSNIIRate = CORRECTDBFLOAT(g->BulgeSNIIRate  / UnitTime_in_s * SEC_PER_YEAR); //in yr^-1
   o->ICMSNIIRate = CORRECTDBFLOAT(g->ICMSNIIRate  / UnitTime_in_s * SEC_PER_YEAR); //in yr^-1
-  o->MassReturnRateToColdGas = CORRECTDBFLOAT(g->MassReturnRateToColdGas * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //ROB: Store mass return rate by SNe and stellar winds to the gas phases.
-  o->MassReturnRateToHotGas = CORRECTDBFLOAT(g->MassReturnRateToHotGas * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //ROB: Store mass return rate by SNe and stellar winds to the gas phases.
-  o->MetalsReturnRateToHotGas = CORRECTDBFLOAT(g->MetalsReturnRateToHotGas * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //ROB: Store metal mass return rate by SNe and stellar winds to the gas phases.
+  o->MassReturnRateToColdGas = CORRECTDBFLOAT(g->MassReturnRateToColdGas * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //Store mass return rate by SNe and stellar winds to the gas phases.
+  o->MassReturnRateToHotGas = CORRECTDBFLOAT(g->MassReturnRateToHotGas * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //Store mass return rate by SNe and stellar winds to the gas phases.
+  o->MetalsReturnRateToHotGas = CORRECTDBFLOAT(g->MetalsReturnRateToHotGas * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //Store metal mass return rate by SNe and stellar winds to the gas phases.
   o->PrimordialAccretionRate = CORRECTDBFLOAT(g->PrimordialAccretionRate * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS);
-  o->ReheatingRate = CORRECTDBFLOAT(g->ReheatingRate * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //ROB: storing ReheatingRate for outputting (31-03-20)
-  o->MetalsReheatingRate = CORRECTDBFLOAT(g->MetalsReheatingRate * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //ROB: storing MetalsReheatingRate for outputting (14-08-20)
-  o->EjectionRate = CORRECTDBFLOAT(g->EjectionRate * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //ROB: storing EjectionRate for outputting (31-03-20)
+  o->ReheatingRate = CORRECTDBFLOAT(g->ReheatingRate * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //Store ReheatingRate for outputting
+  o->MetalsReheatingRate = CORRECTDBFLOAT(g->MetalsReheatingRate * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //Store MetalsReheatingRate for outputting
+  o->EjectionRate = CORRECTDBFLOAT(g->EjectionRate * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //Store EjectionRate for outputting
   o->CoolingRate = CORRECTDBFLOAT(g->CoolingRate * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS);
   o->CoolingRate_beforeAGN = CORRECTDBFLOAT(g->CoolingRate_beforeAGN * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS);
 
@@ -624,13 +620,13 @@ void prepare_galaxy_for_output(int n, struct GALAXY *g, struct GALAXY_OUTPUT *o)
 
  //NOTE: in Msun/yr
   o->Sfr = CORRECTDBFLOAT(g->Sfr * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS);
-  o->SfrInst = CORRECTDBFLOAT(g->SfrInst * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS); //*****ROB*****//
+  o->SfrInst = CORRECTDBFLOAT(g->SfrInst * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS);
   o->SfrBulge = CORRECTDBFLOAT(g->SfrBulge * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS);
 #ifdef OUTPUT_RINGS
   for(ll=0; ll<RNUM; ll++)
   {
 	  o->SfrRings[ll] = g->SfrRings[ll] * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS;
-	  o->SfrInstRings[ll] = g->SfrInstRings[ll] * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS; //*****ROB*****//
+	  o->SfrInstRings[ll] = g->SfrInstRings[ll] * UnitMass_in_g / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS;
   }
 #endif
 
@@ -642,85 +638,6 @@ void prepare_galaxy_for_output(int n, struct GALAXY *g, struct GALAXY_OUTPUT *o)
 #ifdef COMPUTE_SPECPHOT_PROPERTIES
 #ifdef POST_PROCESS_MAGS
 
-  /*   int N_vespa_files=29, N_vespa_AgeBins=16 ,mm;
-       double vespa_age[17]={0.000125893, 0.02000, 0.03000, 0.04800, 0.07400, 0.11500,
-                          0.17700, 0.27500, 0.42500, 0.65800, 1.02000, 1.57000,
-                          2.44000, 3.78000, 5.84000, 9.04000, 14.0000};
-       int vespa_sfh_IDs[29]={0,   1, 12, 16,  2, 22, 23, 27, 29, 36,
-       		               42, 44, 50, 53, 54, 55, 56, 57, 61, 62,
-       		               63, 64, 65, 71, 81, 82, 90, 94, 99};
-       double vespa_sfh[N_vespa_AgeBins], vespa_metal[N_vespa_AgeBins], dumb[6];
-       int ii, jj, kk;
-       char buf[1000], sbuf[1000];
-       FILE *fa;
-
-       for (ii=1;ii<N_vespa_files;ii++)
-        {
-
-       	sprintf(buf, "./devel/vespa_sfh/disc_good_%d.txt", vespa_sfh_IDs[ii]);
-       	if(!(fa = fopen(buf, "r")))
-       	{
-       		char sbuf[1000];
-       		sprintf(sbuf, "can't open file `%s'\n", buf);
-       		terminate(sbuf);
-       	}
-
-       	for(jj=0;jj<6;jj++)
-       		fgets(buf, 300, fa);
-
-       	//read vespa SFH and metallicities
-       	for (jj=0;jj<N_vespa_AgeBins;jj++)
-       	{
-       		vespa_sfh[jj]=0.;
-       		vespa_metal[jj]=0.;
-       		fscanf(fa,"%lg %lg %lg %lg %lg %lg %lg %lg\n", &dumb[0], &dumb[1], &vespa_sfh[jj], &dumb[2], &vespa_metal[jj],
-       			                                     &dumb[3], &dumb[4], &dumb[5]);
-       	}
-       	fclose(fa);
-
-       	for (jj=0;jj<SFH_NBIN;jj++)
-       	 {
-       		if(jj<N_vespa_AgeBins)
-       		{
-       			o->sfh_time[jj]=(vespa_age[jj]+vespa_age[jj+1])/2.*1.e9;
-       			o->sfh_dt[jj]=(vespa_age[jj+1]-vespa_age[jj])/2.*1.e9;
-       		  o->sfh_DiskMass[jj]=vespa_sfh[jj];
-       		  o->sfh_BulgeMass[jj]=0.;
-       		  o->sfh_MetalsDiskMass[jj]=vespa_metal[jj]*o->sfh_DiskMass[jj];
-       		  for(mm=0;mm<NUM_METAL_CHANNELS;mm++)
-       		    o->sfh_MetalsBulgeMass[jj][mm] = 0.;
-       		}
-       		else
-       		{
-       			o->sfh_time[jj]=0.;
-       			o->sfh_dt[jj]=0.;
-       			o->sfh_DiskMass[jj]=0.;
-       			o->sfh_BulgeMass[jj]=0.;
-       			for(mm=0;mm<NUM_METAL_CHANNELS;mm++)
-       			{
-       			o->sfh_MetalsDiskMass[jj][mm] = 0.;
-       			o->sfh_MetalsBulgeMass[jj][mm] = 0.;
-       			}
-       		}
-       	 }
-
-        	post_process_spec_mags(o);
-
-        	sprintf(buf, "./devel/vespa_sfh/output_spectradisc_good_%d.txt", vespa_sfh_IDs[ii]);
-        	if(!(fa = fopen(buf, "w")))
-        	{
-        		char sbuf[1000];
-        		sprintf(sbuf, "can't open file `%s'\n", buf);
-        		terminate(sbuf);
-        	}
-
-        	for(jj=0;jj<NMAG;jj++)
-        		fprintf(fa,"%e\n",o->Mag[jj]);
-        	fclose(fa);
-
-         exit(0);
-       }
-  */
       //Convert recorded star formation histories into mags
 #ifdef NORMALIZEDDB
     post_process_spec_mags(o, &(sfh_bin[0]));

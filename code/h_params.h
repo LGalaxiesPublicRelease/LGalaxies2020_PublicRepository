@@ -6,12 +6,12 @@
 #define  AVOGADRO    6.0222e23
 #define  BOLTZMANN   1.3806e-16
 #define  GAS_CONST   8.31425e7
-#define  SPEEDOFLIGHT 2.9979e10 // ROB: Changed from "C" to "SPEEDOFLIGHT" (09-04-21)
+#define  SPEEDOFLIGHT 2.9979e10 // Was originally "C". Changed on 09-04-21
 #define  PLANCK      6.6262e-27
 #define  CM_PER_MPC  3.085678e24 // TODO this is read in from input.par
 #define  PROTONMASS  1.6726e-24
 #define  HUBBLE      3.2407789e-18   /* in h/sec */
-#define  MUMH        0.59341*PROTONMASS // Could be a variable but we never change it!
+#define  MUMH        0.59341*PROTONMASS // Could be a variable but we never change it
 
 //To understand the units in the code read through set_units in init.c!!!
 #define  SEC_PER_MEGAYEAR   3.155e13
@@ -61,7 +61,7 @@
 #ifdef FAST_TESTING_MODE
 #define  STEPS 10
 #else
-#define  STEPS 20 //60
+#define  STEPS 20
 #endif
 
 #ifdef H2_AND_RINGS
@@ -76,7 +76,7 @@
 
 #ifdef METALRICHWIND
 #ifdef GASDENSITYFWIND
-#define NORMGASDENSITY 1.5 //90. //100. //10. //20. //Msun/pc^2 //ISM gas surface density to normalise to when calculating density-dependent direct ejection into HotGas (18-05-18)
+#define NORMGASDENSITY 1.5 // Msun/pc^2 //ISM gas surface density to normalise to when calculating density-dependent direct ejection into HotGas (18-05-18)
 #endif
 #endif
 
@@ -84,8 +84,7 @@
 #define  ALLOCPARAMETER 50.  /* new definition !!! THIS HAS TO BE 50 !!! DONT EVER EVER EVER CHANGE !!! */
 
 #ifdef STAR_FORMATION_HISTORY
-#define SFH_NMERGE 3 //54 //15 // SFH_NMERGE=Nmax+1 (Nmax used in Shamshiri2014)
-//#define SFH_NMERGE 10  //  SFH_NMERGE=Nmax+1 (Nmax used in Shamshiri2014)
+#define SFH_NMERGE 3 // SFH_NMERGE=Nmax+1
 #ifdef NIFTY
 #define SFH_NBIN 22 //  NIFTY - 108 snapshots
 #else
@@ -93,7 +92,7 @@
 #define SFH_NBIN 24 //  CATERPILLAR - 320 snapshots
 #else
 //#define SFH_NBIN 1280 //STEPS*MAXSNAPS
-#define SFH_NBIN 20 //370 //110
+#define SFH_NBIN 20 
 #endif //NIFTY
 #endif //CATERPILLAR
 #endif //STAR_FORMATION_HISTORY

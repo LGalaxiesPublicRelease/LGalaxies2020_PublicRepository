@@ -256,18 +256,23 @@ extern double tau_dt[STEPS*MAXSNAPS];//Width of every timestep in the code. (Use
 #define AGB_MASS_NUM 59 //55 //ROB: 59, when going from 0.85 to 7 Msun
 #define AGB_Z_NUM 3
 #ifdef PORTINARI
-#define SNII_MASS_NUM 85  //ROB: 85, from 6 <= M[Msun] <= 120. Change SNII_MIN_MASS and SNII_MAX_MASS for shorter ranges. (NB: 85 is the number of interpolated steps for the max range of 6-120 Msun found in the SNII yield table files in /YieldTables. This full max range is always read in, but SNII_MIN_MASS and SNII_MAX_MASS limit the range actually used in yields_integrals.c.)
+#define SNII_MASS_NUM 85
+// N.B. SNII_MASS_NUM 85 is the number of interpolated steps for the max range of 6-120 Msun found in the SNII yield table files in /YieldTables.
+// This full max range is always read in, but SNII_MIN_MASS and SNII_MAX_MASS (defined below) limit the range actually used in yields_integrals.c.
 #define SNII_Z_NUM 5
 #endif
 #ifdef CHIEFFI
-#define SNII_MASS_NUM 81 //ROB: 56 if 7 <= M[Msun] <= 50. 81 if 7 <= M[Msun] <= 120. (NB: You can set SNII_MASS_NUM 81, and SNII_MAX_MASS 50. But DON'T put SNII_MASS_NUM > 81 ever!)
+#define SNII_MASS_NUM 81
+//SNII_MASS_NUM = 56 if 7 <= M[Msun] <= 50. SNII_MASS_NUM = 81 if 7 <= M[Msun] <= 120.
+//N.B. You can set SNII_MASS_NUM 81, and SNII_MAX_MASS 50. But DON'T put SNII_MASS_NUM > 81 ever!
 #define SNII_Z_NUM 6
 #endif
 #define SNIA_MASS_NUM 83 //48 //Number increased after extending range to cover M2 masses (07-02-12)
 
 //Mass ranges for the different modes of ejection:
 #define IMF_MIN_MASS 0.1 //NOTE: This is not used anywhere explicitly in the code yet. Instances of the minimum star mass *may* be implicit/hard-coded as 0.1 Msun in other parts of L-Galaxies. (19-05-20)
-#define IMF_MAX_MASS 120.0 //40.0 //Maximum star mass assumed to exist when normalising the Chabrier IMF in yields_read_tables.c and obtaining KALPHA and F316 in yields_integrals.c. This new parameter now allows max. star mass to be different (i.e. higher) than SNII_MAX_MASS. (18-05-20)
+#define IMF_MAX_MASS 120.0 // Maximum star mass assumed to exist when normalising the Chabrier IMF in yields_read_tables.c and obtaining KALPHA and F316 in yields_integrals.c.
+//N.B. IMF_MAX_MASS allows max. star mass to be different (i.e. higher) than SNII_MAX_MASS.
 #define AGB_MIN_MASS 0.85
 #define AGB_MAX_MASS 7.0 //6.0
 #define SNIA_MIN_MASS 3.0
@@ -276,11 +281,11 @@ extern double tau_dt[STEPS*MAXSNAPS];//Width of every timestep in the code. (Use
 #define SNIA_MAX_TIME 21.0*1.0e9
 #ifdef PORTINARI
 #define SNII_MIN_MASS 7.0 //6.0
-#define SNII_MAX_MASS 120.0 //25.0 //NOTE: This is no longer the same as IMF_MAX_MASS (see above). (18-05-20) (Changed on 10-11-21)
+#define SNII_MAX_MASS 120.0 //NOTE: This is no longer the same as IMF_MAX_MASS (see above).
 #endif
 #ifdef CHIEFFI
 #define SNII_MIN_MASS 7.0
-#define SNII_MAX_MASS 120.0 //50.0 //NOTE: This is no longer the same as IMF_MAX_MASS (see above). (18-05-20)
+#define SNII_MAX_MASS 120.0 //NOTE: This is no longer the same as IMF_MAX_MASS (see above).
 #endif
 
 int ELETOBIGCOUNTA;
@@ -332,30 +337,28 @@ double NormSNIIYieldRate_burst[STEPS*MAXSNAPS][LIFETIME_Z_NUM][NUM_ELEMENTS];
 double NormSNIaYieldRate_burst[STEPS*MAXSNAPS][LIFETIME_Z_NUM][NUM_ELEMENTS];
 double NormAGBYieldRate_burst[STEPS*MAXSNAPS][LIFETIME_Z_NUM][NUM_ELEMENTS];
 
-
 //Arrays used to plot SNe rates from SFH bins (yield_integrals.c):
 double TheSFH[SFH_NBIN];
 double SNII_Rate[STEPS*MAXSNAPS][LIFETIME_Z_NUM]; //Rate of SNe-II exploding in this timestep [units: 1/yr]
 double SNIa_Rate[STEPS*MAXSNAPS][LIFETIME_Z_NUM];
 double AGB_Rate[STEPS*MAXSNAPS][LIFETIME_Z_NUM];
-double Mi_lower_lastTS[SFH_NBIN][LIFETIME_Z_NUM][2]; //Used in yields_integrals.c to calculate the number of Sne-II from a 1Msun SP born in the first timestep. ONLY WORKS FOR SFHBIN[0]!. 2-element array (for every SFH bin at every metallicity) which stores the lower mass threshold for the 1st minibin of the previous timestep. This is then used as the upper mass threshold of the last minibin in the current timestep, to prevent any mass range over/under-lapping during integration due to dt and dt_SFH changing relative to each other over time. (20-05-20)
-double NormSNIINum[STEPS*MAXSNAPS][SFH_NBIN][LIFETIME_Z_NUM]; //Number of SNe-II exploding (per Msun formed) in this timestep per Msun [units: # / Msun]. (It's normalised this way because we have normalised the Chbrier IMF to 1Msun already).
+double Mi_lower_lastTS[SFH_NBIN][LIFETIME_Z_NUM][2]; //Used in yields_integrals.c to calculate the number of SNe-II from a 1Msun SP born in the first timestep. ONLY WORKS FOR SFHBIN[0]!
+double NormSNIINum[STEPS*MAXSNAPS][SFH_NBIN][LIFETIME_Z_NUM]; //Number of SNe-II exploding (per Msun formed) in this timestep per Msun [units: # / Msun].
+// N.B. NormSNIINum is normalised this way because we have normalised the Chabrier IMF to 1Msun already.
+
 //Arrays used to plot SNe rates from SFH-timesteps (calc_SNe_rates.c):
 double TheSFH2[STEPS*MAXSNAPS];
 double SNIIRate2[STEPS*MAXSNAPS][LIFETIME_Z_NUM];
 double SNIaRate2[STEPS*MAXSNAPS][LIFETIME_Z_NUM];
 double AGBRate2[STEPS*MAXSNAPS][LIFETIME_Z_NUM];
 
-
 //IMF parameters (for chemical enrichment):
-#define IMF_SLOPE 2.3 //2.6 //2.0 //2.15 //High-mass slope of Chabrier IMF. (2.3 = normal Chabrier IMF. <2.3 = top-heavy, >2.3 = bottom-heavy.)
+#define IMF_SLOPE 2.3 //High-mass slope of Chabrier IMF. (2.3 = normal Chabrier IMF. <2.3 = top-heavy, >2.3 = bottom-heavy.)
 //For consistency with yields_integrals.c, IMF_SLOPE must equal either: 2.0, 2.15, 2.3, or 2.6.
 
 //SNIa parameters:
 //#define FRAC2HOT 0.9 //Fraction of material released by disk stars that goes straight into the HotGas. Res goes in ColdGas.
 #ifdef DTD
-//#define KALPHA 1.4765 //1.59203 //Now set in yield_integrals.c
-//#define	F316 0.0384 //Integral of the IMF (by number) from 3.0 - 16.0 Msun //Now set in yield_integrals.c
 #define SNIAEJECMASS 1.2300971 //Total mass (and total metals) ejected by a SNIa explosion in Msun //Value form original yield table (42 elements): 1.3740855. //Value when only considering 11 elements: 1.2300971
 #ifdef BIMODALDTD
 	//#define DTD_NORM 0.903206 //(26Myrs - 21Gyrs)
@@ -458,7 +461,7 @@ extern float *PosList, *VelList;
 
 extern int Hashbits;
 extern int NumWrittenInParallel;
-extern double ScaleFactor;	// factor by which to multiply a position to get its ph index (after floring)
+extern double ScaleFactor;	// factor by which to multiply a position to get its ph index (after flooring)
 
 
 #ifdef USE_MEMORY_TO_MINIMIZE_IO

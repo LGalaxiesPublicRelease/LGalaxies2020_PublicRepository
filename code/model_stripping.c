@@ -67,9 +67,6 @@ void deal_with_satellites(int ngal)
       if(HotGasStripingModel == 0) {
 	  /* All gas Stripped from Type 2 galaxies */
 	  if (Gal[i].Type ==2 && HotGasOnType2Galaxies==0) {
-		  //int checka = 0;
-		  //if (Gal[i].HotGas > 0.0) checka = 1;
-		  //if (checka == 1) printf("dws(): CHECK 1: MostBoundID: %lld, HotGas = %e, EjectedMass = %e\n", Gal[i].MostBoundID, Gal[i].HotGas, Gal[i].EjectedMass);
 		  //if type 2 is inside Rvir of type 0 split between type 0 and type 1
 	      if (dis < Gal[FOF_centralgal].Rvir)
 		gasfraction_intotype1=Gal[centralgal].HotRadius / Gal[centralgal].Rvir;
@@ -116,7 +113,7 @@ void deal_with_satellites(int ngal)
 		  mass_checks(i,"model_stripping.c",__LINE__);
 		  mass_checks(FOF_centralgal,"model_stripping.c",__LINE__);
 	      }
-	      //if (checka == 1) printf("dws(): CHECK 2: MostBoundID: %lld, HotGas = %e, EjectedMass = %e\n", Gal[i].MostBoundID, Gal[i].HotGas, Gal[i].EjectedMass);
+
 	  }
 	  //Type 1 galaxies (or type 2's for the modified stripping) - stripping if galaxy inside Rvir of stripping_centralgal
 	  else

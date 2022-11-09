@@ -435,7 +435,6 @@ void init_galaxy(int p, int halonr)
     {
       terminate("Hah?\n");
     }
-  //Gal[p].NumDisr = 0; //***** ROB: Geoff's disruption counter (24-03-20) *****
   Gal[p].Type = 0;
 
   Gal[p].HaloNr = halonr;
@@ -546,13 +545,13 @@ void init_galaxy(int p, int halonr)
   Gal[p].CosInclination = 0.0;
 #endif
 
-  Gal[p].MassReturnRateToColdGas = 0.0; //ROB: Store mass return rate by SNe and stellar winds to the gas phases.
-  Gal[p].MassReturnRateToHotGas = 0.0; //ROB: Store mass return rate by SNe and stellar winds to the gas phases.
-  Gal[p].MetalsReturnRateToHotGas = 0.0; //ROB: Store metals mass return rate by SNe and stellar winds to the gas phases.
+  Gal[p].MassReturnRateToColdGas = 0.0; // Store mass return rate by SNe and stellar winds to the gas phases.
+  Gal[p].MassReturnRateToHotGas = 0.0; // Store mass return rate by SNe and stellar winds to the gas phases.
+  Gal[p].MetalsReturnRateToHotGas = 0.0; // Store metals mass return rate by SNe and stellar winds to the gas phases.
   Gal[p].PrimordialAccretionRate = 0.0;
-  Gal[p].ReheatingRate = 0.0; //ROB: storing ReheatingRate for outputting (31-03-20)
-  Gal[p].MetalsReheatingRate = 0.0; //ROB: storing MetalsReheatingRate for outputting (14-08-20)
-  Gal[p].EjectionRate = 0.0; //ROB: storing EjectionRate for outputting (31-03-20)
+  Gal[p].ReheatingRate = 0.0; // Store ReheatingRate for outputting
+  Gal[p].MetalsReheatingRate = 0.0; // Store MetalsReheatingRate for outputting
+  Gal[p].EjectionRate = 0.0; // Store EjectionRate for outputting
   Gal[p].CoolingRate = 0.0;
   Gal[p].CoolingRate_beforeAGN = 0.0;
   Gal[p].CoolingRadius = 0.0;
@@ -565,13 +564,13 @@ void init_galaxy(int p, int halonr)
   Gal[p].NMinorMergers = 0.0;
 #endif
   Gal[p].Sfr = 0.0;
-  Gal[p].SfrInst = 0.0; //*****ROB*****//
+  Gal[p].SfrInst = 0.0;
   Gal[p].SfrBulge = 0.0;
 #ifdef H2_AND_RINGS
  for(j=0;j<RNUM;j++)
 	 {
 	 Gal[p].SfrRings[j]=0;
-	 Gal[p].SfrInstRings[j]=0; //*****ROB*****//
+	 Gal[p].SfrInstRings[j]=0;
 	 }
 #endif
 
@@ -1151,12 +1150,11 @@ void update_type_2(int ngal,int halonr, int prog,int mostmassive)
   Gal[ngal].TimeSinceSplashBack=0.;
 #endif
 
-  //printf("ut2(): CHECK 1: MostBoundID: %lld, HotGas = %e\n", Gal[ngal].MostBoundID, Gal[ngal].HotGas);
 
   if(HotGasOnType2Galaxies==0)
     {
       //*****
-	  //ROB: David Izquierdo-Villalba spotted this: N.B. This bit has been added since Dust-Master (i.e. since L-Galaxies2015), and seems to wipe any HotGas still left in type 2s, before it's stripped in deal_with_satellites()... (23-02-22)
+	  //N.B. This bit has been added since L-Galaxies2015 and seems to wipe any HotGas still left in type 2s, before it's stripped in deal_with_satellites()...
 	  Gal[ngal].HotGas = 0.0;
       for(ii=0;ii<NUM_METAL_CHANNELS;ii++)
 	Gal[ngal].MetalsHotGas[ii] = 0.;
@@ -1170,7 +1168,6 @@ void update_type_2(int ngal,int halonr, int prog,int mostmassive)
       ///*****
       Gal[ngal].HotRadius = 0.0;
     }
-  //printf("ut2(): CHECK 2: MostBoundID: %lld, HotGas = %e\n", Gal[ngal].MostBoundID, Gal[ngal].HotGas);
 
   /* Estimate remaining merging timescale. */
   if (Gal[ngal].MergeOn == 0)
@@ -3640,8 +3637,6 @@ void mass_checks(int igal, char call_function[], int call_line) {
         		printf("            ring_sum_minus_tot = %g\n",ring_sum_minus_tot);
         		printf("            Gal[%d].MetalsBulgeMass = %g\n",igal,Gal[igal].MetalsBulgeMass[mm]);
         		printf("            Gal[%d].MetalsBulgeMassRings = %g\n",igal,ring_sum_minus_tot+Gal[igal].MetalsBulgeMass[mm]);
-        		//for (i=0; i<=Gal[igal].sfh_ibin; i++)
-        		//printf("sfh[%d]=%g\n",i,Gal[igal].sfh_BulgeMass[i]);
         		char sbuf[1000];
         		sprintf(sbuf, "\n*** Mass check error, called from: %s, line: %d, Inconsistent ring_sum for MetalsBulgeMass.*** \n",call_function, call_line);
         		terminate(sbuf);
@@ -3912,67 +3907,6 @@ void re_set_parameters(int snapnum)
 }
 
 
-
-/*
-void re_set_parameters(int snapnum)
-{
-	 if(snapnum<25)
-   	    {
-		  SfrEfficiency = 0.058;
-		  //AgnEfficiency = 1.5e-5;
-		  //BlackHoleGrowthRate = 0.083;
-		  //FeedbackReheatingEpsilon = 9.3;
-		  //ReheatPreVelocity = 60.;
-		  //ReheatSlope = 0.43;
-		  //FeedbackEjectionEfficiency = 1.9;
-		  //EjectPreVelocity = 20.;
-		  //EjectSlope = 1.9;
-		  //ReIncorporationFactor = 0.77;
-		  //Yield = 0.072;
-   	    }
-   	  else if(snapnum<30)
-   	    {
-   		  SfrEfficiency = 0.016;
-   		  //AgnEfficiency = 1.7e-5;
-   		  //BlackHoleGrowthRate = 0.05;
-   		  //FeedbackReheatingEpsilon = 8.1;
-   		  //ReheatPreVelocity = 45.;
-   		  //ReheatSlope = 1.0;
-   		  //FeedbackEjectionEfficiency = 3.4;
-   		  //EjectPreVelocity = 19.;
-   		  //EjectSlope = 1.5;
-   		  //ReIncorporationFactor = 0.77;
-   		  //Yield = 0.046;
-   	    }
-   	  else if(snapnum<38)
-   	    {
-   		  SfrEfficiency = 0.031;
-   		  //AgnEfficiency = 1.0e-5;
-   		  //BlackHoleGrowthRate = 0.018;
-   		  //FeedbackReheatingEpsilon = 8.4;
-   		  //ReheatPreVelocity = 26.0;
-   		  //ReheatSlope = 0.65;
-   		  //FeedbackEjectionEfficiency = 4.3;
-   		  //EjectPreVelocity = 18.;
-   		  //EjectSlope = 1.9;
-   		  //ReIncorporationFactor = 0.77;
-   		  //Yield = 0.073;
-   	    }
-   	  else
-   	    {
-   		  SfrEfficiency = 0.019;
-   		  //AgnEfficiency = 5.0e-6;
-   		  //BlackHoleGrowthRate = 0.074;
-   		  //FeedbackReheatingEpsilon = 8.5;
-   		  //ReheatPreVelocity = 110.;
-   		  //ReheatSlope = 0.39;
-   		  //FeedbackEjectionEfficiency = 0.78;
-   		  //EjectPreVelocity = 30.;
-   		  //EjectSlope = 2.0;
-   		  //ReIncorporationFactor = 0.77;
-   		  //Yield = 0.072;
-   	    }
-}*/
 
 
 

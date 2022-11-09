@@ -69,7 +69,6 @@ struct GALAXY_OUTPUT {
     int   PeanoKey; // None // Peano-Hilbert key, (bits=8), for position in 500/h Mpc box
     float Redshift; // None // redshift of the snapshot where this galaxy resides
 #endif     //GALAXYTREE
-//    int   NumDisr; //***** ROB: Geoff's disruption counter (24-03-20) *****
     int   Type; // None //Galaxy type: 0 for central galaxies of a main halo, 1 for central galaxies in sub-halos, 2 for satellites without halo.
 #ifndef    GALAXYTREE
     int   HaloIndex; // None // ?Unique ID of MPA halo containing this galaxy

@@ -40,9 +40,9 @@ double infall_recipe(int ngal)
 
 	/* If galaxy is orbiting a galaxy inside Rvir of the type 0 it will contribute
 	 * to the baryon sum */
-	/* Note: Rob Yates's fix to excess baryon content is simply to comment
-	 * out the following if statement so that we add up all the baryons in
-	 * the FOF group. */
+	/* If INFALL_UPDATE is on, the following if statement is commented-out
+	 * so that we add up all the baryons in the FOF group when calculating
+	 * additional prestine infall required. */
 #ifndef INFALL_UPDATE
 	/* dis is the separation of the galaxy which i orbits from the type 0 */
 	dis=separation_gal(FOF_centralgal,Gal[i].CentralGal)/(zcurr+1);
@@ -180,9 +180,7 @@ double do_reionization(float Mvir, double Zcurr)
 
 /* The gas that infalled is added to the hot gas of the central galaxy. 
  *
- * TODO: Note that the algorithm allows negative infall in order to balance 
- * the total baryon content.  In that case, should we decrement the metals
- * accordingly? - or change algorithm NOT to allow negative infall? */
+ */
 
 void add_infall_to_hot(double infallingGas) {
 

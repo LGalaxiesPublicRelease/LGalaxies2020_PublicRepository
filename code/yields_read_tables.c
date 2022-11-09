@@ -32,7 +32,6 @@ void read_yield_tables(void)
 	  lifetimeMasses[i1] = m1;
         }
 	fclose(fd1);
-	//printf("Lifetime masses read.\n");
 
 	//------------------------------------------
 	//READ LIFETIME METALLICITY LIST:
@@ -57,7 +56,6 @@ void read_yield_tables(void)
 	  lifetimeMetallicities[i2] = m2;
         }
 	fclose(fd2);
-	//printf("Lifetime metallicities read.\n");
 
 	//------------------------------------------
 	//READ LIFETIME TABLE:
@@ -85,7 +83,6 @@ void read_yield_tables(void)
           }
         }
 	fclose(fd3);
-	//printf("Lifetimes read.\n");
 #ifdef PARALLEL
 	if ( ThisTask == 0 )
 #endif
@@ -166,7 +163,6 @@ void read_yield_tables(void)
         {
         	  fscanf(fd6, "%f", &m6);
         	  AGBEjectedMasses[i6][j6] = m6 * Chabrier_IMF(AGBMasses[j6]);
-        	  //AGBEjectedMasses[i6][j6] = 0.0; //Just a test!: To simulate no contribution from AGB stars. (04-03-20)
         }
         fclose(fd6);
 	 }
@@ -198,7 +194,6 @@ void read_yield_tables(void)
 	    {
 	      fscanf(fd7, "%f", &m7);
 	      AGBTotalMetals[i7][j7] = m7 * Chabrier_IMF(AGBMasses[j7]);
-	      //AGBTotalMetals[i7][j7] = 0.0; //Just a test!: To simulate no contribution from AGB stars. (04-03-20)
 	    }
 	  fclose(fd7);
 	}
@@ -232,9 +227,6 @@ void read_yield_tables(void)
             {
             	fscanf(fd8, "%f", &m8);
             	AGBYields[k8][i8][j8] = m8 * Chabrier_IMF(AGBMasses[j8]);
-            	//if (i8 == NUM_ELEMENTS-1) {printf("m8 = %f | AGBYields[%i][%i][%i] = %f\n",m8,k8,i8,j8,AGBYields[k8][i8][j8]);}
-            	//if (k8 < AGB_Z_NUM-1 && i8 == 3 && AGBMasses[j8] > 4.0) AGBYields[k8][i8][j8] = 0.2 * m8 * Chabrier_IMF(AGBMasses[j8]); //Just a test!: To simulate reducing the N mass yield from AGB stars below Z=0.019 and above 4Msun by 80%, following the findings of Ritter+18a. (19-06-20)
-            	//AGBYields[k8][i8][j8] = 0.0; //Just a test!: To simulate no contribution from AGB stars. (04-03-20)
             }
           }
     }
@@ -342,7 +334,6 @@ void read_yield_tables(void)
 	  {
 	    fscanf(fd11, "%f", &m11);
 	    SNIIEjectedMasses[i11][j11] = m11 * Chabrier_IMF(SNIIMasses[j11]);
-	    //SNIIEjectedMasses[i11][j11] = 0.0; //Just a test!: To simulate no contribution from SNe-II. (21-03-20)
 	  }
 	  fclose(fd11);
 	}
@@ -388,7 +379,6 @@ void read_yield_tables(void)
 	  {
 	    fscanf(fd12, "%f", &m12);
 	    SNIITotalMetals[i12][j12] = m12 * Chabrier_IMF(SNIIMasses[j12]);
-	    //SNIITotalMetals[i12][j12] = 0.0; //Just a test!: To simulate no contribution from SNe-II. (21-03-20)
 	  }
 	  fclose(fd12);
 	}
@@ -436,20 +426,6 @@ void read_yield_tables(void)
 	    {
 	      fscanf(fd13, "%f", &m13);
 	      SNIIYields[k13][i13][j13] = m13 * Chabrier_IMF(SNIIMasses[j13]);
-	      /*if (i13 == 3) {SNIIYields[k13][i13][j13] = 3.0 * m13 * Chabrier_IMF(SNIIMasses[j13]);} //Just a test!: 3.0 x nitrogen production at ALL Z.
-	      else {SNIIYields[k13][i13][j13] = m13 * Chabrier_IMF(SNIIMasses[j13]);}*/
-	      //SNIIYields[k13][i13][j13] = 0.0; //Just a test!: To simulate no contribution from SNe-II. (21-03-20)
-	      /*if (i13 == 4 && k13 >= SNII_Z_NUM-2) {SNIIYields[k13][i13][j13] = 4.0 * m13 * Chabrier_IMF(SNIIMasses[j13]);} //Just a test!: Quadruple the oxygen production at high Z.
-	      else {SNIIYields[k13][i13][j13] = m13 * Chabrier_IMF(SNIIMasses[j13]);}*/
-	      /*if (i13 == 3 && k13 >= SNII_Z_NUM-2) {SNIIYields[k13][i13][j13] = 1.5 * m13 * Chabrier_IMF(SNIIMasses[j13]);} //Just a test!: 1.5 x nitrogen production at high Z.
-	      else {SNIIYields[k13][i13][j13] = m13 * Chabrier_IMF(SNIIMasses[j13]);}*/
-	      /*if (i13 == 3 && k13 >= SNII_Z_NUM-2) {SNIIYields[k13][i13][j13] = 3.0 * m13 * Chabrier_IMF(SNIIMasses[j13]);} //Just a test!: 3.0 x nitrogen production at high Z.
-	      else {SNIIYields[k13][i13][j13] = m13 * Chabrier_IMF(SNIIMasses[j13]);}*/
-	      /*//Just a test!: Undo R. Wiersma's corrections to the P98 yields:
-	      if (i13 == 2) {SNIIYields[k13][i13][j13] = (m13*2.0) * Chabrier_IMF(SNIIMasses[j13]);}
-	      else if (i13 == 6) {SNIIYields[k13][i13][j13] = (m13*0.5) * Chabrier_IMF(SNIIMasses[j13]);}
-	      else if (i13 == 10) {SNIIYields[k13][i13][j13] = (m13*2.0) * Chabrier_IMF(SNIIMasses[j13]);}
-	      else {SNIIYields[k13][i13][j13] = m13 * Chabrier_IMF(SNIIMasses[j13]);}*/
 	    }
 	  }
 	}
@@ -583,7 +559,6 @@ void read_yield_tables(void)
 		     {
 			      fscanf(fd14, "%f", &m14);
 			      SNIaYields[i14] = m14;
-			      //printf("%f, \n", SNIaYields[i14]);
 			  }
 #ifdef PARALLEL
 			 if ( ThisTask == 0 )
@@ -615,7 +590,7 @@ void read_yield_tables(void)
 	  solarAbundMassRatios[i15] = m15;
 		}
 	fclose(fd15);
-	//printf("Solar abundance ratios read.\n");
+	printf("Solar abundance ratios read.\n");
 
 }
 
@@ -627,7 +602,6 @@ double Chabrier_IMF(double M)
 	//FOR x = 2.3:
 	double A, B;
 	//For an IMF normalised over 0.1 --> 120.0 Msun:
-	//if (SNII_MAX_MASS == 120.0)
 	if (IMF_MAX_MASS == 120.0)
 	{
 		A = 0.842984;
@@ -677,20 +651,11 @@ double Chabrier_IMF(double M)
 		}
 	else {printf("Chabrier_IMF(): Normalization constants for IMF not known. Check upper mass limit (IMF_MAX_MASS)."); exit(1);}
 
-	//FOR x = 2.0:
-	//For an IMF normalised over 0.1 --> 120.0 Msun:
-	/*const double A = 0.551390;
-	const double B = 0.154026;
-	A = 0.551390;
-	B = 0.154026;*/
-
-	//const double x = 2.3; //Normal Chabrier IMF x = 2.3. Top-heavy IMF e.g. x = 2.0
 	const double mc = 0.079;
 	const double sigma = 0.69;
-
 	if(M >= 1.0)
 	{
-		//phi = B*M*pow(M,-x); //ROB: For consistency, I have replaced the slope value defined just above as "x" with the global value defined in h_variables.h as "IMF_SLOPE". (11-02-19)
+		//phi = B*M*pow(M,-x);
 		phi = B*M*pow(M,-IMF_SLOPE);
 	}
 	else

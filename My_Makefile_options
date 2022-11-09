@@ -123,6 +123,9 @@ endif #FULL_SPECTRA
 
 endif ### COMPUTE_SPECPHOT_PROPERTIES
 
+###########################
+### GCE_PROPERTIES ###
+###########################
 # Chemical enrichment of individual element yields
 OPT += -DDETAILED_METALS_AND_MASS_RETURN
 ifeq (DETAILED_METALS_AND_MASS_RETURN,$(findstring DETAILED_METALS_AND_MASS_RETURN,$(OPT)))

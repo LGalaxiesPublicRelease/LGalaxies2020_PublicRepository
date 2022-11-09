@@ -7,7 +7,6 @@ struct GALAXY			/* Galaxy data */
 #ifdef GALAXYTREE
   int FirstProgGal;
 #endif
-  //int NumDisr; //***** ROB: Geoff's disruption counter (24-03-20) *****
   int Type;
   int HaloNr;
   long long MostBoundID;
@@ -105,13 +104,13 @@ struct GALAXY			/* Galaxy data */
 
 
   /* misc */
-  double MassReturnRateToColdGas; //ROB: Store mass return rate by SNe and stellar winds to the gas phases.
-  double MassReturnRateToHotGas; //ROB: Store mass return rate by SNe and stellar winds to the gas phases.
-  double MetalsReturnRateToHotGas; //ROB: Store metal mass return rate by SNe and stellar winds to the gas phases.
+  double MassReturnRateToColdGas; //Store mass return rate by SNe and stellar winds to the gas phases.
+  double MassReturnRateToHotGas; //Store mass return rate by SNe and stellar winds to the gas phases.
+  double MetalsReturnRateToHotGas; //Store metal mass return rate by SNe and stellar winds to the gas phases.
   double PrimordialAccretionRate;
-  double ReheatingRate; //ROB: storing ReheatingRate for outputting (31-03-20)
-  double MetalsReheatingRate; //ROB: storing MetalsReheatingRate for outputting (14-08-20)
-  double EjectionRate; //ROB: storing EjectionRate for outputting (31-03-20)
+  double ReheatingRate; //store ReheatingRate for outputting
+  double MetalsReheatingRate; //store MetalsReheatingRate for outputting
+  double EjectionRate; //store EjectionRate for outputting
   double CoolingRate;
   double CoolingRate_beforeAGN;
   double CoolingRadius;
@@ -130,12 +129,12 @@ struct GALAXY			/* Galaxy data */
 #ifdef H2_AND_RINGS
   double Sfr;
   double SfrRings[RNUM];
-  double SfrInstRings[RNUM]; //*****ROB*****//
+  double SfrInstRings[RNUM];
 #else
   double Sfr;
 #endif
   double SfrBulge;
-  double SfrInst; //*****ROB*****//
+  double SfrInst;
   double XrayLum;
   double BulgeSize;
   double DiskRadius;

@@ -94,7 +94,6 @@ void disrupt(int p, int centralgal)
    * a type 3 and all its material is transferred to the central galaxy. */
   if (rho_cen > rho_sat)
   {
-  	//Gal[centralgal].NumDisr += 1; //***** ROB: Geoff's disruption counter (24-03-20) *****
 	Gal[p].Type = 3;
 #ifdef GALAXYTREE
     int q;
@@ -133,7 +132,6 @@ void disrupt(int p, int centralgal)
 #endif
     /* Put gas component to the central galaxy hot gas and stellar material into the ICM.
      * Note that the satellite should have no extended components. */
-    // TODO Shouldn't the stars end up in the bulge? - this is a close merger
 
     //if BlackHoleDisruptGrowthRate>0 some disrupted mass goes into the black hole
     Gal[centralgal].BlackHoleMass+=BlackHoleDisruptGrowthRate*Gal[p].ColdGas;

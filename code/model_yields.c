@@ -74,9 +74,8 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	    AgeCorrectionBulge[n] = 0.0;
     	  }
 
-	timestep_width = dt; //Width of current timestep in CODE UNITS (units cancel out when dividing by SFH bin width, sfh_dt) (12-04-12)
-	TimeBin = (STEPS*(Halo[Gal[p].HaloNr].SnapNum-1.0))+nstep; //TimeBin = (STEPS*Gal[p].SnapNum)+nstep; //Bin in Yield tables corresponding to current timestep //TEST!: BRUNO: Snapnum would be +1 too low for a 'jumping' galaxy (14-11-13)
-	//timet = NumToTime((Halo[Gal[p].HaloNr].SnapNum-1.0)) - (nstep + 0.5) * dt; //Time from middle of the current timestep to z=0 (used here for MassWeightAge corrections)
+	timestep_width = dt; //Width of current timestep in CODE UNITS (units cancel out when dividing by SFH bin width, sfh_dt)
+	TimeBin = (STEPS*(Halo[Gal[p].HaloNr].SnapNum-1.0))+nstep; //TimeBin = (STEPS*Gal[p].SnapNum)+nstep; //Bin in Yield tables corresponding to current timestep
 	//NB: NumToTime(Gal[p].SnapNum) is the time to z=0 from start of current snapshot
 	//    nstep is the number of the current timestep (0-19)
 	//    dt is the width of one timestep within current snapshot
@@ -91,23 +90,19 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     for (ii=0;ii<=Gal[p].sfh_ibin;ii++) //LOOP OVER SFH BINS
     {
     	sfh_time=Gal[p].sfh_t[ii]+(0.5*Gal[p].sfh_dt[ii]);
-    	//time_to_ts = ((sfh_time+(0.5*Gal[p].sfh_dt[i])) - timet)*(UnitTime_in_years/Hubble_h)/1.0e6; //Time from high-z (upper) edge of SFH bin to middle of current timestep [in Myrs]
-    	//tcut = 2.0*((Gal[p].Rvir/Gal[p].Vvir)/0.0001); //Maximum lifetime of stars that have their ejected put straight into the HotGas [in Myrs]
 
-
-    	mass_checks(p,"model_yields.c",__LINE__);
-
+	mass_checks(p,"model_yields.c",__LINE__);
 
     //******************************************************
     //ENRICHMENT FROM DISK STARS (INTO COLD GAS & HOT GAS):
     //******************************************************
 #ifdef H2_AND_RINGS
     	for(jj=0;jj<RNUM;jj++) 	
-    		if (Gal[p].DiskMassRings[jj] > 0.0)//ROB: Discs can be destroyed (i.e. converted in to bulges). So only calculate enrichment from stars born in the disc if there is still a disc
+    		if (Gal[p].DiskMassRings[jj] > 0.0) //Discs can be destroyed (i.e. converted in to bulges). So only calculate enrichment from stars born in the disc if there is still a disc
     			if (Gal[p].sfh_DiskMassRings[jj][ii] > 0.0)    	
     			{		
 #else
-    if (Gal[p].DiskMass > 0.0)//ROB: Discs can be destroyed (i.e. converted in to bulges). So only calculate enrichment from stars born in the disc if there is still a disc at the current timestep. This if statement has scope until the end of the following if statement.
+    if (Gal[p].DiskMass > 0.0)//Discs can be destroyed (i.e. converted in to bulges). So only calculate enrichment from stars born in the disc if there is still a disc at the current timestep. This if statement has scope until the end of the following if statement.
     if (Gal[p].sfh_DiskMass[ii] > 0.0)
     {
 #endif
@@ -118,8 +113,6 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 #ifndef H2_AND_RINGS
     	ColdGasSurfaceDensity = (Gal[p].ColdGas*(1.0e10)*Hubble_h)/(3.14159265*Gal[p].ColdGasRadius*Gal[p].ColdGasRadius*(1.0e6*1.0e6)); //in Msun/pc^2
     	fwind_SNII = min(1.0, 1.0/(ColdGasSurfaceDensity/NORMGASDENSITY)); //Fraction of SN-II ejecta put directly into HotGas. When ColdGasSurfaceDensity <= NORMGASDENSITY (i.e. 10.0 Msun/pc), then fwind_SNII = 1.0.
-    	//fwind_SNIa = min(1.0, 1.0/(ColdGasSurfaceDensity/NORMGASDENSITY)); //Fraction of SN-Ia ejecta put directly into HotGas. When ColdGasSurfaceDensity <= NORMGASDENSITY (i.e. 10.0 Msun/pc), then fwind_SNIa = 1.0.
-    	//fwind_AGB = min(1.0, 1.0/(ColdGasSurfaceDensity/NORMGASDENSITY)); //Fraction of AGB ejecta put directly into HotGas. When ColdGasSurfaceDensity <= NORMGASDENSITY (i.e. 10.0 Msun/pc), then fwind_AGB = 1.0.
     	fwind_SNIa = FracZSNIatoHot;
     	fwind_AGB = FracZAGBtoHot;
 #else
@@ -129,37 +122,20 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	else
     		ColdGasSurfaceDensity = (Gal[p].ColdGasRings[jj]*(1.0e10)*Hubble_h)/(3.14159265*((RingRadius[jj]*RingRadius[jj])-(RingRadius[jj-1]*RingRadius[jj-1]))*(1.0e6*1.0e6)); //in Msun/pc^2
 
-    	/*
-    	fwind_SNII = min(1.0, 1.0/(ColdGasSurfaceDensity/(FracZSNIItoHot*NORMGASDENSITY))); //Fraction of SN-II ejecta put directly into HotGas.
-    	fwind_SNIa = min(1.0, 1.0/(ColdGasSurfaceDensity/(FracZSNIatoHot*NORMGASDENSITY))); //Fraction of SN-Ia ejecta put directly into HotGas.
-    	fwind_AGB = min(1.0, 1.0/(ColdGasSurfaceDensity/(FracZAGBtoHot*NORMGASDENSITY))); //Fraction of AGB ejecta put directly into HotGas.
-    	*/
-    	/*
-    	fwind_SNII = min(1.0, FracZSNIItoHot * (log10(NORMGASDENSITY)/log10(ColdGasSurfaceDensity))); //Fraction of SN-II ejecta put directly into HotGas.
-    	fwind_SNIa = min(1.0, FracZSNIatoHot * (log10(NORMGASDENSITY)/log10(ColdGasSurfaceDensity))); //Fraction of SN-Ia ejecta put directly into HotGas.
-    	fwind_AGB = min(1.0, FracZAGBtoHot * (log10(NORMGASDENSITY)/log10(ColdGasSurfaceDensity))); //Fraction of AGB ejecta put directly into HotGas.
-    	*/
     	fwind_SNII = min(1.0, NORMGASDENSITY / log10(ColdGasSurfaceDensity)); //Fraction of SN-II ejecta put directly into HotGas.
     	fwind_SNIa = min(1.0, NORMGASDENSITY / log10(ColdGasSurfaceDensity)); //Fraction of SN-Ia ejecta put directly into HotGas.
     	fwind_AGB = 0.0; //Fraction of AGB ejecta put directly into HotGas.
-    	/*
-		find_SNII = min(1.0, 1.0/(ColdGasSurfaceDensity/NORMGASDENSITY)); //Fraction of SN-II ejecta put directly into HotGas.
-    	fwind_SNIa = min(1.0, 1.0/(ColdGasSurfaceDensity/NORMGASDENSITY)); //Fraction of SN-Ia ejecta put directly into HotGas.
-    	fwind_AGB = min(1.0, 1.0/(ColdGasSurfaceDensity/NORMGASDENSITY)); //Fraction of AGB ejecta put directly into HotGas.
-    	*/
 #endif	//H2_AND_RINGS
 #endif	//GASDENSITYFWIND
 #ifndef GASDENSITYFWIND
 #ifdef MVIRDEPFWIND
-    	fwind_SNII = min(1.0, (FracZSNIItoHot*10.5) / log10(1.e10*Gal[p].Mvir)); //min(1.0, (FracZSNIItoHot*10.) * (Hubble_h/Gal[p].Mvir)); //Sets direct ejection into HotGas by SNe-II to be dependent on gravitating mass (i.e. Mvir). Coefficient chose to be 9.0 to roughly match a value of fwind_SNII = 0.9 for low-mass galaxies [log(M*/Msun)~9.0 --> log(Mvir/Msun)~11.0]. 02-03-20
+    	fwind_SNII = min(1.0, (FracZSNIItoHot*10.5) / log10(1.e10*Gal[p].Mvir)); //Sets direct ejection into HotGas by SNe-II to be dependent on gravitating mass (i.e. Mvir).
     	fwind_SNIa = min(1.0, (FracZSNIatoHot*10.5) / log10(1.e10*Gal[p].Mvir));
     	fwind_AGB = min(1.0, (FracZAGBtoHot*10.5) / log10(1.e10*Gal[p].Mvir));
 #else
     	fwind_SNII = FracZSNIItoHot; //FracZtoHot;
     	fwind_SNIa = FracZSNIatoHot;
     	fwind_AGB = FracZAGBtoHot;
-        //fwind_SNII = min(1.0, 9. * (Hubble_h/Gal[p].Mvir));
-        //printf("fwind_SNII = %f, %f, %.2e\n", fwind_SNII, Hubble_h, (Gal[p].Mvir*1.e10)/Hubble_h);
 #endif
 #endif //#ifndef GASDENSITYFWIND
 
@@ -248,8 +224,6 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     		AGBUnProcessedMetals=AGBmetals;
 
 
-
-
     	mass_checks(p,"model_yields.c",__LINE__);
 
 
@@ -258,39 +232,29 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	//************************
 
     	//Hot Gas:
-     	//Gal[igal].HotGas += (fwind_SNII * SNIIEjectaMass) + (fwind_SNIa * SNIaEjectaMass);
      	Gal[igal].HotGas += (fwind_SNII * SNIIEjectaMass) + (fwind_SNIa * SNIaEjectaMass) + (fwind_AGB * AGBEjectaMass);
      	Gal[igal].MetalsHotGas[0] += fwind_SNII * SNIIAllMetals;
      	Gal[igal].MetalsHotGas[1] += fwind_SNIa * SNIaAllMetals;
      	Gal[igal].MetalsHotGas[2] += fwind_AGB * AGBAllMetals;
-     	//Gal[igal].MetalsReheatingRate += ((fwind_SNII * SNIIAllMetals)+(fwind_SNIa * SNIaAllMetals)+(fwind_AGB * AGBAllMetals)) / (dt*STEPS); //ROB: Adding the rate of direct metal transfer from SNe/AGBs to the HotGas in MetalsReheatingRate here. (18-08-20)
+     	//Gal[igal].MetalsReheatingRate += ((fwind_SNII * SNIIAllMetals)+(fwind_SNIa * SNIaAllMetals)+(fwind_AGB * AGBAllMetals)) / (dt*STEPS);
      	mass_checks(p,"model_yields.c",__LINE__);
      	//Cold Gas:
-     	//Gal[p].ColdGas += (1.0-fwind_SNII)*SNIIEjectaMass + (1.0-fwind_SNIa)*SNIaEjectaMass + AGBEjectaMass;
      	Gal[p].ColdGas += (1.0-fwind_SNII)*SNIIEjectaMass + (1.0-fwind_SNIa)*SNIaEjectaMass + (1.0-fwind_AGB)*AGBEjectaMass;
      	Gal[p].MetalsColdGas[0] += (1.0-fwind_SNII) * SNIIAllMetals;
      	Gal[p].MetalsColdGas[1] += (1.0-fwind_SNIa) * SNIaAllMetals;
-     	//Gal[p].MetalsColdGas[2] += AGBAllMetals;
      	Gal[p].MetalsColdGas[2] += (1.0-fwind_AGB) * AGBAllMetals;
 
 #ifdef H2_AND_RINGS
-     	/*Gal[p].ColdGasRings[jj] += ((1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + AGBEjectaMass);
-     	Gal[p].MetalsColdGasRings[jj][0] += (1.0-fwind_SNII) * SNIIAllMetals;
-     	Gal[p].MetalsColdGasRings[jj][1] += (1.0-fwind_SNIa) * SNIaAllMetals;
-     	Gal[p].MetalsColdGasRings[jj][2] +=  AGBAllMetals;*/
      	Gal[p].ColdGasRings[jj] += ((1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + (1.0-fwind_AGB) * AGBEjectaMass);
      	Gal[p].MetalsColdGasRings[jj][0] += (1.0-fwind_SNII) * SNIIAllMetals;
      	Gal[p].MetalsColdGasRings[jj][1] += (1.0-fwind_SNIa) * SNIaAllMetals;
      	Gal[p].MetalsColdGasRings[jj][2] += (1.0-fwind_AGB) * AGBAllMetals;
 #endif
     	//Total:
-     	//TotalMassReturnedToHotGas += (fwind_SNII * SNIIEjectaMass) + (fwind_SNIa * SNIaEjectaMass);
-     	//TotalMassReturnedToColdDiskGas += (1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + AGBEjectaMass; //Only use energy from SNe that eject into ColdGas to reheat
      	TotalMassReturnedToHotGas += (fwind_SNII * SNIIEjectaMass) + (fwind_SNIa * SNIaEjectaMass) + (fwind_AGB * AGBEjectaMass);
      	TotalMetalsReturnedToHotGas += (fwind_SNII * SNIIAllMetals) + (fwind_SNIa * SNIaAllMetals) + (fwind_AGB * AGBAllMetals);
      	TotalMassReturnedToColdDiskGas += (1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + (1.0-fwind_AGB) * AGBEjectaMass; //Only use energy from SNe that eject into ColdGas to reheat
 #ifdef H2_AND_RINGS
-     	//TotalMassReturnedToColdDiskGasr[jj] += ((1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + AGBEjectaMass);
      	TotalMassReturnedToColdDiskGasr[jj] += ((1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + (1.0-fwind_AGB) * AGBEjectaMass);
 #endif //H2_AND_RINGS
 
@@ -299,17 +263,13 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 #ifdef INDIVIDUAL_ELEMENTS
      	for(ee=0;ee<NUM_ELEMENTS;ee++)
      	  {
-     	    //Gal[igal].HotGas_elements[ee] += fwind_SNII * SNIIAllElements[ee] + fwind_SNIa * SNIaAllElements[ee];
-     	    //Gal[p].ColdGas_elements[ee] += (1.0-fwind_SNII) * SNIIAllElements[ee] + (1.0-fwind_SNIa) * SNIaAllElements[ee] + AGBAllElements[ee];
-     		Gal[igal].HotGas_elements[ee] += fwind_SNII * SNIIAllElements[ee] + fwind_SNIa * SNIaAllElements[ee] + fwind_AGB * AGBAllElements[ee];
-     		Gal[p].ColdGas_elements[ee] += (1.0-fwind_SNII) * SNIIAllElements[ee] + (1.0-fwind_SNIa) * SNIaAllElements[ee] + (1.0-fwind_AGB) * AGBAllElements[ee];
+     	    Gal[igal].HotGas_elements[ee] += fwind_SNII * SNIIAllElements[ee] + fwind_SNIa * SNIaAllElements[ee] + fwind_AGB * AGBAllElements[ee];
+     	    Gal[p].ColdGas_elements[ee] += (1.0-fwind_SNII) * SNIIAllElements[ee] + (1.0-fwind_SNIa) * SNIaAllElements[ee] + (1.0-fwind_AGB) * AGBAllElements[ee];
 #ifdef H2_AND_RINGS
-     	    //Gal[p].ColdGasRings_elements[jj][ee] += (1.0-fwind_SNII) * SNIIAllElements[ee] + (1.0-fwind_SNIa) * SNIaAllElements[ee] + AGBAllElements[ee];
      	    Gal[p].ColdGasRings_elements[jj][ee] += (1.0-fwind_SNII) * SNIIAllElements[ee] + (1.0-fwind_SNIa) * SNIaAllElements[ee] + (1.0-fwind_AGB) * AGBAllElements[ee];
 #endif // H2_AND_RINGS
      	  }
 #endif //INDIVIDUAL_ELEMENTS
-
 
 
      	mass_checks(p,"model_yields.c",__LINE__);
@@ -318,14 +278,14 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
      	//*****************************
      	// UPDATE DISK MASS COMPONENTS:
      	//*****************************
-     	/*ROB (13-02-13): All the mass/metals/elements in the stars that die in this timestep are lost from the stellar component.
-     	 * i.e. All the mass/metals/elements in the stars at birth are removed...
-     	 *...Some goes to the gas (+ newly synthesised component), the rest goes into the 'stellar remnants' which are not tracked and do not contribute to the stellar component's mass/metals/elements budget.*/
+     	/*All the mass/metals/elements in the stars that die in this timestep are lost from the stellar component.
+     	 * i.e. All the mass/metals/elements in the stars at birth are removed,...
+     	 *...some goes to the gas (+ newly synthesised component), the rest goes into the 'stellar remnants' which are not tracked and do not contribute to the stellar component's mass/metals/elements budget.*/
      	Gal[p].DiskMass -= SNIIEjectaMass + SNIaEjectaMass + AGBEjectaMass;
      	Gal[p].MetalsDiskMass[0] -= SNIIUnProcessedMetals;
      	Gal[p].MetalsDiskMass[1] -= SNIaUnProcessedMetals;
      	Gal[p].MetalsDiskMass[2] -= AGBUnProcessedMetals;
-     	Gal[p].DiskSNIIRate += SNIIRate/STEPS; //in 1/(time code units). This records the average rate in each snapshot [i.e. SUM(SNIIRate per timestep)/STEPS], so is set to 0.0 at the start of each snapshot in model_misc.c or main.c (I forget which!). (22-05-20)
+     	Gal[p].DiskSNIIRate += SNIIRate/STEPS; //in 1/(time code units). This records the average rate in each snapshot [i.e. SUM(SNIIRate per timestep)/STEPS], so is set to 0.0 at the start of each snapshot in model_misc.c or main.c (I forget which!).
 
 #ifdef H2_AND_RINGS
      	Gal[p].DiskMassRings[jj]-= (SNIIEjectaMass + SNIaEjectaMass + AGBEjectaMass);
@@ -360,13 +320,6 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 
 
 
-
-
-
-
-
-
-
     //******************************************************
     //ENRICHMENT FROM BULGE STARS (INTO COLD GAS & HOT GAS):
     //******************************************************
@@ -376,7 +329,6 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     		{
     			BulgeSFRxStep = timestep_width * Gal[p].sfh_BulgeMassRings[jj][ii]/Gal[p].sfh_dt[ii];
     			BulgeSFRxStep_Phys = BulgeSFRxStep * (1.0e10/Hubble_h);
-    			//printf("sfr=%0.5e\n",DiskSFRxStep_Phys);
     			BulgeMetallicity = 0.;
     			for(mm=0;mm<NUM_METAL_CHANNELS;mm++)
     				BulgeMetallicity += Gal[p].sfh_MetalsBulgeMassRings[jj][ii][mm];
@@ -507,11 +459,6 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 #endif //BULGE_TO_COLD
 
 
-
-
-
-
-
     	//*****************************
     	// UPDATE BULGE MASS COMPONENTS:
     	//*****************************
@@ -547,8 +494,6 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 
         mass_checks(p,"model_yields.c",__LINE__);
     } //if (Gal[p].sfh_BulgeMass[i] > 0.0) //all BULGE properties updated
-
-
 
 
 
@@ -668,14 +613,13 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 
 
 
-
-
-
     //Update Mass-weighted ages:
     for(n=0;n<NOUT;n++)
       {
     	Gal[p].MassWeightAge[n] -= (AgeCorrectionDisk[n]+AgeCorrectionBulge[n]);
       }
+
+
 
 
 
@@ -690,7 +634,7 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 #else
 	SN_feedback(p, centralgal, TotalMassReturnedToColdDiskGas, TotalMassReturnedToColdDiskGasr, "ColdGas", dt);
 #endif
-	Gal[p].MassReturnRateToColdGas += TotalMassReturnedToColdDiskGas / (dt * STEPS); //ROB: Store mass return rate by SNe and stellar winds to the gas phases.
+	Gal[p].MassReturnRateToColdGas += TotalMassReturnedToColdDiskGas / (dt * STEPS); //Store mass return rate by SNe and stellar winds to the gas phases.
       }
 
     //this mass will only result in ejection, no reheating
@@ -707,7 +651,7 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 			HotGasRings[jj]=0.;
 		SN_feedback(p, centralgal, TotalMassReturnedToHotGas, HotGasRings, "HotGas", dt);
 #endif
-		Gal[p].MassReturnRateToHotGas += TotalMassReturnedToHotGas / (dt * STEPS); //ROB: Store mass return rate by SNe and stellar winds to the gas phases (from disk stars, bulge stars, and ICL stars).
+		Gal[p].MassReturnRateToHotGas += TotalMassReturnedToHotGas / (dt * STEPS); //Store mass return rate by SNe and stellar winds to the gas phases (from disk stars only, currently).
       }
 
     if(TotalMetalsReturnedToHotGas>0.)
@@ -812,17 +756,17 @@ void compute_actual_eject_rates(int TimeBin, int ii, int Zi, double Zi_disp, int
   *SNIIAllMetals = SFRxStep * (NormSNIIMetalEjecRate_actual + Metallicity * NormSNIIMassEjecRate_actual);
 #endif
 #ifdef CHIEFFI
-  //ROB: No unsynth component required for SN-II ejecta, when using the Chieffi & Limongi (2007) yield tables/
+  //No unsynth component required for SN-II ejecta, when using the Chieffi & Limongi (2007) yield tables:
   *SNIIAllMetals = SFRxStep * NormSNIIMetalEjecRate_actual;
 #endif
 #endif //INSTANTANEOUS_RECYCLE
   *SNIIUnProcessedMetals = SFRxStep * Metallicity * NormSNIIMassEjecRate_actual;
-  ////*SNIIRate = (SFRxStep/timestep_width) * NormSNIINum_actual; //This is the SNII rate in [1/(10^10/h)(time code units)] in this timestep. So should divide by (UnitTime_in_s * SEC_PER_YEAR * (1.e10/Hubble_h)) in save.c to get "per year" before outputting).
+  //*SNIIRate = (SFRxStep/timestep_width) * NormSNIINum_actual; //This is the SNII rate in [1/(10^10/h)(time code units)] in this timestep. So should divide by (UnitTime_in_s * SEC_PER_YEAR * (1.e10/Hubble_h)) in save.c to get "per year" before outputting).
   *SNIIRate = (SFRxStep_Phys/timestep_width) * NormSNIINum_actual; //This is the SNII rate in [1/(time code units)] in this timestep. So should divide by (UnitTime_in_s * SEC_PER_YEAR) in save.c to get "per year" before outputting).
 
   //SNIa
   *SNIaEjectaMass = SFRxStep * NormSNIaMassEjecRate_actual;
-  //SNIa yields are written in a different way to SNIIa and AGB so the following line is correct
+  //SNIa yields are written in a different way to SNIIa and AGB so the following line is correct:
   *SNIaAllMetals = SFRxStep * NormSNIaMetalEjecRate_actual;
   *SNIaUnProcessedMetals = SFRxStep * Metallicity * NormSNIaMassEjecRate_actual;
 

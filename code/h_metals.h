@@ -1,27 +1,4 @@
 #ifdef DETAILED_METALS_AND_MASS_RETURN
-/*struct elements_str
-{
-    float H;
-    float He;
-    float O;
-    float Mg;
-    float Fe;
-};
-#endif  //MAINELEMENTS*/
-/* Define two views into the same element structure/array.
-   For example define:
-      union elements DiskMassElements;
-   Then access as either
-      DiskMassElements.str.H
-   or
-      DiskMassElements.arr[0]
-*/
-/*
-union elements
-{
-    struct elements_str str;
-    float arr[NUM_ELEMENTS];
-};*/
 #define NUM_METAL_CHANNELS 3
 
 #ifdef INDIVIDUAL_ELEMENTS
@@ -34,6 +11,6 @@ union elements
 #endif //INDIVIDUAL_ELEMENTS
 
 #else //DETAILED_METALS_AND_MASS_RETURN
-
 #define NUM_METAL_CHANNELS 1
+
 #endif //DETAILED_METALS_AND_MASS_RETURN

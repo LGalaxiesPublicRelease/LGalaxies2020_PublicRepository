@@ -574,7 +574,7 @@ void add_galaxies_together(int t, int p, double deltaT)
 
 
   Gal[t].Sfr += Gal[p].Sfr;
-  Gal[t].SfrInst += Gal[p].SfrInst; //*****ROB*****//
+  Gal[t].SfrInst += Gal[p].SfrInst;
   if(BulgeFormationInMinorMergersOn)
     Gal[t].SfrBulge += Gal[p].Sfr;
 
@@ -622,7 +622,7 @@ void make_bulge_from_burst(int p)
   for(jj=0;jj<RNUM;jj++)
 	  {
 	  Gal[p].SfrRings[jj]=0;
-	  Gal[p].SfrInstRings[jj]=0; //*****ROB*****//
+	  Gal[p].SfrInstRings[jj]=0;
 	  }
 #endif
 
@@ -712,7 +712,7 @@ double collisional_starburst_recipe(double mass_ratio, int merger_centralgal, in
 			   Halo[Gal[t].HaloNr].Spin[2] * Halo[Gal[t].HaloNr].Spin[2] );*/
  
   /*  update the star formation rate */
-  //*****ROB*****?? I have not included these starbursts to the SfrInst or SfrInstRings variables here (only secular SF from model_starformation_and_feedback.c is considered). Could do though... (28-01-20)
+  //These starbursts are not included in the SfrInst or SfrInstRings variables here (only secular SF from model_starformation_and_feedback.c is considered).
   Gal[merger_centralgal].Sfr += mstars / deltaT;
 #ifdef H2_AND_RINGS
   for(j=0;j<RNUM;j++)

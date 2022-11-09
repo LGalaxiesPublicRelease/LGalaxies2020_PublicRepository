@@ -7,6 +7,12 @@
  *      Author: robyates
  */
 
+/* WARNING: (01-10-22)
+ *
+ * Legacy code. Not used any more. Likely to be broken by now.
+ *
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -145,14 +151,6 @@ void SNe_rates()
 	        	{
 					Mi_lower = find_initial_mass2(t_upper, Zi); //Mass bin number (lifetime arrays) corresp. to lowest mass of star to 'die' in current timestep, from SFH bin i.
 					Mi_upper = find_initial_mass2(t_lower, Zi); //Mass bin number (lifetime arrays) corresp. to highest mass of star to 'die' in current timestep, from SFH bin i.
-					//if (snap==0) {printf("Zi = %i, M_l = %i, %f, M_u = %i, %f\n", Zi, Mi_lower, lifetimeMasses[Mi_lower], Mi_upper, lifetimeMasses[Mi_upper]);}
-					/*if (lifetimeMasses[Mi_upper] >= SNII_MAX_MASS)
-					{
-						int i;
-						i = 0;
-						while (lifetimeMasses[i] < SNII_MAX_MASS) { i++; }
-						Mi_upper = i;
-					}*/
 
 					Mi_lower_actual = lifetimeMasses[Mi_lower] + ((lifetimeMasses[Mi_lower+1]-lifetimeMasses[Mi_lower]) * ((t_upper-lifetimes[Zi][Mi_lower])/(lifetimes[Zi][Mi_lower+1]-lifetimes[Zi][Mi_lower]))); //IN MSUN  //Lowest mass of star to 'die' in current timestep from SFH bin i.
 					Mi_upper_actual = lifetimeMasses[Mi_upper] + ((lifetimeMasses[Mi_upper+1]-lifetimeMasses[Mi_upper]) * ((t_lower-lifetimes[Zi][Mi_upper])/(lifetimes[Zi][Mi_upper+1]-lifetimes[Zi][Mi_upper]))); //IN MSUN  //Highest mass of star to 'die' in current timestep from SFH bin i.
@@ -169,7 +167,7 @@ void SNe_rates()
 	        	    	Zi_SNII = find_initial_metallicity_comp(Zi, i, 2); //Metallicity bin (SNe-II arrays) corresp. to metallicity Zi.
 
 	        	    	//Check if mass range is within range for SN-II progenitor stars:
-	        			Mi_lower_SNII = max_Mi_lower(Mi_lower,2); //ROB: Should we send Mi_lower_actual and Mi_upper_actual to max_Mi_lower and min_Mi_upper? (24-07-120
+	        			Mi_lower_SNII = max_Mi_lower(Mi_lower,2);
 	        			Mi_upper_SNII = min_Mi_upper(Mi_upper,2);
 
 	        	    	if (Mi_lower_SNII <= Mi_upper_SNII)
@@ -179,20 +177,6 @@ void SNe_rates()
 
 	        	    		//Find true yields at the true upper and lower masses, given by 'Mi_upper_actual' and 'Mi_lower_actual':
 	        	    		find_actual_ejecta_limits(2, Mi_lower_actual, Mi_upper_actual, Mi_lower_SNII, Mi_upper_SNII, Zi_SNII,&SNIIEjectedMasses_lower_actual, &SNIIEjectedMasses_upper_actual, &SNIITotalMetals_lower_actual, &SNIITotalMetals_upper_actual, SNIIYields_lower_actual, SNIIYields_upper_actual);
-
-	        	    		/*if(Mi_upper_actual <= SNIA_MAX_MASS)
-	        	    		{
-	        	    			SNIIRate2[(STEPS*snap)+step][Zi] += (1.0-A_FACTOR) * (Mi_upper_actual-Mi_lower_actual) * ((Chabrier_IMF(Mi_lower_actual)*TheSFH2[i]) + (Chabrier_IMF(Mi_upper_actual)*TheSFH2[i]))/2.0;
-	        	    		}
-	        	    		else if (Mi_upper_actual > SNIA_MAX_MASS && Mi_lower_actual <= SNIA_MAX_MASS)
-	        	    		{
-	        	    			SNIIRate2[(STEPS*snap)+step][Zi] += (1.0-A_FACTOR) * (SNIA_MAX_MASS-Mi_lower_actual) * ((Chabrier_IMF(Mi_lower_actual)*TheSFH2[i]) + (Chabrier_IMF(SNIA_MAX_MASS)*TheSFH2[i]))/2.0;
-	        	    			SNIIRate2[(STEPS*snap)+step][Zi] += (Mi_upper_actual-SNIA_MAX_MASS) * ((Chabrier_IMF(SNIA_MAX_MASS)*TheSFH2[i]) + (Chabrier_IMF(Mi_upper_actual)*TheSFH2[i]))/2.0;
-	        	    		}
-	        	    		else if (Mi_lower_actual > SNIA_MAX_MASS)
-	        	    		{
-	        	    			SNIIRate2[(STEPS*snap)+step][Zi] += (Mi_upper_actual-Mi_lower_actual) * ((Chabrier_IMF(Mi_lower_actual)*TheSFH2[i]) + (Chabrier_IMF(Mi_upper_actual)*TheSFH2[i]))/2.0;
-	        	    		}*/
 
 	        	    		//NUMERICALLY INTEGRATE OVER THE MASS RANGE APPLICABLE FOR SNe-II:
 	        	    		int j;
@@ -340,15 +324,6 @@ void SNe_rates()
 	        //printf("%i, ", (STEPS*snap)+step);
 	    } //for(step=0;step<STEPS;step++)
 	} //for(snap=0;snap<MAXSNAPS;snap++)
-	/*printf("L1a = %i\n", L1a);
-	printf("L2a = %i\n", L2a);
-	printf("L3a = %i\n", L3a);
-	printf("L4a = %i\n", L4a);
-	printf("L5a = %i\n", L5a);
-	printf("L1b = %i\n", L1b);
-	printf("L2b = %i\n", L2b);
-	printf("L3b = %i\n", L3b);
-	printf("L4b = %i\n", L4b);*/
 	printf("\nSNe rates calculated.\n");
 }
 
@@ -403,7 +378,6 @@ int find_initial_metallicity_comp2(int Zi, int sfh_bin, int table_type)
 
 int find_initial_mass2(double lifetime, int Zi_bin)
 {
-	//printf("lifetime = %f\n", lifetime);
     if (lifetime == 0.0) return LIFETIME_MASS_NUM-1; //If the bin 'touches now', then return max mass (ie: star of shortest lifetime) ie: bin for 120Msun
     else if (lifetime > lifetimes[Zi_bin][0]) return 0; //If true lifetime is longer than max lifetime in table (shouldn't be), then return element number 0
     else
@@ -425,326 +399,6 @@ int find_initial_mass2(double lifetime, int Zi_bin)
 	return Mi_bin-1; //This returns element number i for lifetimeMasses[Zi][i] array BELOW the true initial mass corresponding to t_lower or t_upper.
     }
 }
-
-/*int max_Mi_lower2(int Mi_lower, int channel_type)
-{
-	switch (channel_type)
-		{
-			case 2: //SNII mass limits
-					if (lifetimeMasses[Mi_lower] > SNII_MIN_MASS) return Mi_lower;
-					else
-					{
-						int i;
-						i = 0;
-						do { i++; }
-						while (lifetimeMasses[i] < SNII_MIN_MASS);
-						return i;
-					}
-					break;
-			#ifndef DTD
-			case 3: //SNIa mass limits
-					if (lifetimeMasses[Mi_lower] > 0.85) return Mi_lower; //NB: Lifetimes of SNe-Ia binaries depend on M2, not Mb. (ie: 0.85<=M2<=8.0)
-					else
-					{
-						int i;
-						i = 0;
-						do { i++; }
-						while (lifetimeMasses[i] < 0.85); //NB: Lifetimes of SNe-Ia binaries depend on M2, not Mb. (ie: 0.85<=M2<=8.0)
-						return i;
-					}
-					break;
-			#endif
-			case 4: //AGB mass limits
-					if (lifetimeMasses[Mi_lower] > AGB_MIN_MASS) return Mi_lower;
-					else
-					{
-						int i;
-						i = 0;
-						do { i++; }
-						while (lifetimeMasses[i] < AGB_MIN_MASS);
-						return i;
-					}
-					break;
-			default: printf("Wrong ejection mode chosen in max_Mi_lower: Use either 2 (SNe-II), 3 (SNe-Ia) or 4 (AGB winds)"); exit(1);
-		}
-}
-
-int min_Mi_upper2(int Mi_upper, int channel_type)
-{
-	switch (channel_type)
-		{
-			case 2: //SNII mass limits
-					if (lifetimeMasses[Mi_upper] < SNII_MAX_MASS) return Mi_upper;
-					//else return LIFETIME_MASS_NUM-1;
-					else
-					{
-						int i;
-						i = LIFETIME_MASS_NUM-1;
-						do { i--; }
-						while (lifetimeMasses[i] > SNII_MAX_MASS);
-						return i;
-					}
-					break;
-			#ifndef DTD
-			case 3: //SNIa mass limits
-					if (lifetimeMasses[Mi_upper] < 8.0) return Mi_upper; //NB: Lifetimes of SNe-Ia binaries depends on M2, not Mb. (ie: 0.85<=M2<=8.0)
-					else
-					{
-						int i;
-						i = LIFETIME_MASS_NUM-1;
-						do { i--; }
-						while (lifetimeMasses[i] > 8.0); //NB: Lifetimes of SNe-Ia binaries depends on M2, not Mb. (ie: 0.85<=M2<=8.0)
-						return i;
-					}
-					break;
-			#endif
-			case 4: //AGB mass limits
-					if (lifetimeMasses[Mi_upper] < AGB_MAX_MASS) return Mi_upper;
-					else
-					{
-						int i;
-						i = LIFETIME_MASS_NUM-1;
-						do { i--; }
-						while (lifetimeMasses[i] > AGB_MAX_MASS);
-						return i;
-					}
-					break;
-			default: printf("Wrong ejection mode chosen in min_Mi_upper: Use either 2 (SNe-II), 3 (SNe-Ia) or 4 (AGB winds)"); exit(1);
-		}
-}
-
-int find_SNII_mass_bin2(double masslimit)
-{
-    if (masslimit == SNII_MAX_MASS) return SNII_MASS_NUM-1;
-    else
-    {
-	int Mi_bin;
-
-	Mi_bin = -1;
-	int i;
-	i = 0;
-	while (Mi_bin == -1)
-	{
-		if (SNIIMasses[i] < masslimit)
-		{
-			i++;
-			if (i == SNII_MASS_NUM) Mi_bin = i-1; //If mass is greater than max mass for SNe-II (shouldn't be), then just return max mass (120.0 Msun)
-		}
-		else Mi_bin = i;
-	}
-	return Mi_bin;
-    }
-}*/
-
-/*int find_agb_mass_bin2(double masslimit)
-{
-	if (masslimit == AGB_MAX_MASS) return AGB_MASS_NUM-1;
-	else
-	{
-	int Mi_bin;
-
-	Mi_bin = -1;
-	int i;
-	i = 0;
-	while (Mi_bin == -1)
-	{
-		if (AGBMasses[i] < masslimit)
-		{
-			i++;
-			if (i == AGB_MASS_NUM) Mi_bin = i-1; //If mass is greater than max mass for AGB winds (shouldn't be), then just return max mass (5.0 Msun)
-		}
-		else Mi_bin = i;
-	}
-	return Mi_bin;
-	}
-}
-
-#ifdef DTD
-double DTDcalc2 (double timevalue)
-{
-#ifdef BIMODALDTD
-	double timevalueM, DTDvalueM;
-	timevalueM = log10(timevalue); //IN [log(YEARS)]
-	if (timevalueM < 7.93) //Characteristic time == 10^7.93 yrs (NB: timevalue is in log10(yrs) here)
-	{
-		DTDvalueM = (1.4 - 50.0*(timevalueM-7.7)*(timevalueM-7.7)) / DTD_NORM;
-	}
-	else
-	{
-		DTDvalueM = (-0.8 - 0.9*(timevalueM-8.7)*(timevalueM-8.7)) / DTD_NORM;
-	}
-	return pow(10.0,DTDvalueM); //IN [SNe/Gyr]
-#endif
-
-#ifdef GAUSSIANDTD
-	double timevalueG, pivalue, DTDvalueG; //, tauCharac, sigmatd
-	timevalueG = timevalue/1.0e9; //IN [Gyrs]
-	pivalue = 3.14159;
-	//tauCharac = 1.0; //Now set in allvars.h
-	//sigmatd = 0.2*TAUCHARAC; //Now set in allvars.h
-	//DTDvalueG = (1./sqrt(2.*pivalue*sigmatd*sigmatd)) * exp(-(pow((timevalueG-tauCharac),2.))/(2.*sigmatd*sigmatd));
-	DTDvalueG = (1./sqrt(2.*pivalue*SIGMA_TD*SIGMA_TD)) * exp(-(pow((timevalueG-TAUCHARAC),2.))/(2.*SIGMA_TD*SIGMA_TD));
-	return DTDvalueG; //IN [SNe/Gyr]
-#endif
-
-#ifdef POWERLAWDTD
-	double timevalueP, DTDvalueP;
-	timevalueP = timevalue/1.0e9; //IN [Gyrs]
-	DTDvalueP = pow(timevalueP, DTD_SLOPE) / DTD_NORM;
-	return DTDvalueP; //IN [SNe/Gyr]
-#endif
-}
-#endif*/
-
-/*void find_actual_ejecta_limits2(int channel_type, double Mi_lower_actual, double Mi_upper_actual, int Mi_lower, int Mi_upper, int Zi, double* EjectedMasses_lower_actual, double* EjectedMasses_upper_actual, double* TotalMetals_lower_actual, double* TotalMetals_upper_actual, double* Yields_lower_actual, double* Yields_upper_actual)
-{
-	switch (channel_type)
-	{
-	case 2: //SNII
-		if (Mi_lower == 0)
-		{
-			*EjectedMasses_lower_actual = SNIIEjectedMasses[Zi][0]; //If Mi_lower_actual was less than or equal to Mi_lower (e.g. 7 Msun bin for SNe-II), then EjectedMasses_lower_actual is set to ejected mass from an e.g. 7 Msun star.
-		    *TotalMetals_lower_actual = SNIITotalMetals[Zi][0]; //If Mi_lower_actual was less than or equal to Mi_lower (e.g. 7 Msun bin for SNe-II), then TotalMetals_lower_actual is set to ejected mass in metals from an e.g. 7 Msun star.
-		    int k;
-		    for (k=0;k<NUM_ELEMENTS;k++)
-		    {
-		    	int kk;
-				#ifndef MAINELEMENTS
-		    	kk=k;
-		    	Yields_lower_actual[k] = SNIIYields[Zi][kk][0];
-				#else
-		    	switch(k){case 0: kk=0; break; case 1: kk=1; break; case 2: kk=4; break; case 3: kk=6; break; case 4: kk=10; break;}
-		    	Yields_lower_actual[k] = SNIIYields[Zi][kk][0];
-				#endif
-		    }
-		}
-		else
-		{
-			*EjectedMasses_lower_actual = SNIIEjectedMasses[Zi][Mi_lower] + ((SNIIEjectedMasses[Zi][Mi_lower+1]-SNIIEjectedMasses[Zi][Mi_lower]) * ((Mi_lower_actual-SNIIMasses[Mi_lower])/(SNIIMasses[Mi_lower+1]-SNIIMasses[Mi_lower])));
-		    *TotalMetals_lower_actual = SNIITotalMetals[Zi][Mi_lower] + ((SNIITotalMetals[Zi][Mi_lower+1]-SNIITotalMetals[Zi][Mi_lower]) * ((Mi_lower_actual-SNIIMasses[Mi_lower])/(SNIIMasses[Mi_lower+1]-SNIIMasses[Mi_lower])));
-		    int k;
-		    for (k=0;k<NUM_ELEMENTS;k++)
-		    {
-		    	int kk;
-				#ifndef MAINELEMENTS
-		    	kk=k;
-		        Yields_lower_actual[k] = SNIIYields[Zi][kk][Mi_lower] + ((SNIIYields[Zi][kk][Mi_lower+1]-SNIIYields[Zi][kk][Mi_lower]) * ((Mi_lower_actual-SNIIMasses[Mi_lower])/(SNIIMasses[Mi_lower+1]-SNIIMasses[Mi_lower])));
-				#else
-		        switch(k){case 0: kk=0; break; case 1: kk=1; break; case 2: kk=4; break; case 3: kk=6; break; case 4: kk=10; break;}
-		        Yields_lower_actual[k] = SNIIYields[Zi][kk][Mi_lower] + ((SNIIYields[Zi][kk][Mi_lower+1]-SNIIYields[Zi][kk][Mi_lower]) * ((Mi_lower_actual-SNIIMasses[Mi_lower])/(SNIIMasses[Mi_lower+1]-SNIIMasses[Mi_lower])));
-				#endif
-		    }
-		}
-
-		if (Mi_upper == SNII_MASS_NUM-1)
-		{
-			*EjectedMasses_upper_actual = SNIIEjectedMasses[Zi][SNII_MASS_NUM-1]; //If Mi_upper_actual was more than or equal to 120 Msun, then EjectedMasses_upper_actual is set to ejected mass from 120 Msun star.
-		    *TotalMetals_upper_actual = SNIITotalMetals[Zi][SNII_MASS_NUM-1]; //If Mi_upper_actual was more than or equal to 120 Msun, then TotalMetals_upper_actual is set to ejected mass in metals from 120 Msun star.
-		    int k;
-		    for (k=0;k<NUM_ELEMENTS;k++)
-		    {
-		    	int kk;
-				#ifndef MAINELEMENTS
-		    	kk=k;
-		    	Yields_upper_actual[k] = SNIIYields[Zi][kk][SNII_MASS_NUM-1];
-				#else
-		    	switch(k){case 0: kk=0; break; case 1: kk=1; break; case 2: kk=4; break; case 3: kk=6; break; case 4: kk=10; break;}
-		    	Yields_upper_actual[k] = SNIIYields[Zi][kk][SNII_MASS_NUM-1];
-				#endif
-		    }
-		}
-		else
-		{
-		    *EjectedMasses_upper_actual = SNIIEjectedMasses[Zi][Mi_upper] + ((SNIIEjectedMasses[Zi][Mi_upper+1]-SNIIEjectedMasses[Zi][Mi_upper]) * ((Mi_upper_actual-SNIIMasses[Mi_upper])/(SNIIMasses[Mi_upper+1]-SNIIMasses[Mi_upper])));
-		    *TotalMetals_upper_actual = SNIITotalMetals[Zi][Mi_upper] + ((SNIITotalMetals[Zi][Mi_upper+1]-SNIITotalMetals[Zi][Mi_upper]) * ((Mi_upper_actual-SNIIMasses[Mi_upper])/(SNIIMasses[Mi_upper+1]-SNIIMasses[Mi_upper])));
-		    int k;
-		    for (k=0;k<NUM_ELEMENTS;k++)
-		    {
-		    	int kk;
-				#ifndef MAINELEMENTS
-		    	kk=k;
-		    	Yields_upper_actual[k] = SNIIYields[Zi][kk][Mi_upper] + ((SNIIYields[Zi][kk][Mi_upper+1]-SNIIYields[Zi][kk][Mi_upper]) * ((Mi_upper_actual-SNIIMasses[Mi_upper])/(SNIIMasses[Mi_upper+1]-SNIIMasses[Mi_upper])));
-				#else
-		        switch(k){case 0: kk=0; break; case 1: kk=1; break; case 2: kk=4; break; case 3: kk=6; break; case 4: kk=10; break;}
-		        Yields_upper_actual[k] = SNIIYields[Zi][kk][Mi_upper] + ((SNIIYields[Zi][kk][Mi_upper+1]-SNIIYields[Zi][kk][Mi_upper]) * ((Mi_upper_actual-SNIIMasses[Mi_upper])/(SNIIMasses[Mi_upper+1]-SNIIMasses[Mi_upper])));
-				#endif
-		     }
-		}
-	break;
-
-	case 4: //AGB
-		if (Mi_lower == 0)
-		{
-			*EjectedMasses_lower_actual = AGBEjectedMasses[Zi][0]; //If Mi_lower_actual was less than or equal to Mi_lower (e.g. 0.85 Msun bin for AGB), then EjectedMasses_lower_actual is set to ejected mass from an e.g. 0.85 Msun star.
-		    *TotalMetals_lower_actual = AGBTotalMetals[Zi][0]; //If Mi_lower_actual was less than or equal to Mi_lower (e.g. 0.85 Msun bin for AGB), then TotalMetals_lower_actual is set to ejected mass in metals from an e.g. 0.85 Msun star.
-		    int k;
-		    for (k=0;k<NUM_ELEMENTS;k++)
-		    {
-		    	int kk;
-				#ifndef MAINELEMENTS
-		    	kk=k;
-		    	Yields_lower_actual[k] = AGBYields[Zi][kk][0];
-				#else
-		    	switch(k){case 0: kk=0; break; case 1: kk=1; break; case 2: kk=4; break; case 3: kk=6; break; case 4: kk=10; break;}
-		    	Yields_lower_actual[k] = AGBYields[Zi][kk][0];
-				#endif
-		    }
-		}
-		else
-		{
-			*EjectedMasses_lower_actual = AGBEjectedMasses[Zi][Mi_lower] + ((AGBEjectedMasses[Zi][Mi_lower+1]-AGBEjectedMasses[Zi][Mi_lower]) * ((Mi_lower_actual-AGBMasses[Mi_lower])/(AGBMasses[Mi_lower+1]-AGBMasses[Mi_lower])));
-		    *TotalMetals_lower_actual = AGBTotalMetals[Zi][Mi_lower] + ((AGBTotalMetals[Zi][Mi_lower+1]-AGBTotalMetals[Zi][Mi_lower]) * ((Mi_lower_actual-AGBMasses[Mi_lower])/(AGBMasses[Mi_lower+1]-AGBMasses[Mi_lower])));
-		    int k;
-		    for (k=0;k<NUM_ELEMENTS;k++)
-		    {
-		    	int kk;
-				#ifndef MAINELEMENTS
-		    	kk=k;
-		        Yields_lower_actual[k] = AGBYields[Zi][kk][Mi_lower] + ((AGBYields[Zi][kk][Mi_lower+1]-AGBYields[Zi][kk][Mi_lower]) * ((Mi_lower_actual-AGBMasses[Mi_lower])/(AGBMasses[Mi_lower+1]-AGBMasses[Mi_lower])));
-				#else
-		        switch(k){case 0: kk=0; break; case 1: kk=1; break; case 2: kk=4; break; case 3: kk=6; break; case 4: kk=10; break;}
-		        Yields_lower_actual[k] = AGBYields[Zi][kk][Mi_lower] + ((AGBYields[Zi][kk][Mi_lower+1]-AGBYields[Zi][kk][Mi_lower]) * ((Mi_lower_actual-AGBMasses[Mi_lower])/(AGBMasses[Mi_lower+1]-AGBMasses[Mi_lower])));
-				#endif
-		    }
-		}
-
-		if (Mi_upper == AGB_MASS_NUM-1)
-		{
-			*EjectedMasses_upper_actual = AGBEjectedMasses[Zi][AGB_MASS_NUM-1]; //If Mi_upper_actual was more than or equal to 5 Msun, then EjectedMasses_upper_actual is set to ejected mass from 5 Msun star.
-		    *TotalMetals_upper_actual = AGBTotalMetals[Zi][AGB_MASS_NUM-1]; //If Mi_upper_actual was more than or equal to 5 Msun, then TotalMetals_upper_actual is set to ejected mass in metals from 5 Msun star.
-		    int k;
-		    for (k=0;k<NUM_ELEMENTS;k++)
-		    {
-		    	int kk;
-				#ifndef MAINELEMENTS
-		    	kk=k;
-		    	Yields_upper_actual[k] = AGBYields[Zi][kk][AGB_MASS_NUM-1];
-				#else
-		    	switch(k){case 0: kk=0; break; case 1: kk=1; break; case 2: kk=4; break; case 3: kk=6; break; case 4: kk=10; break;}
-		    	Yields_upper_actual[k] = AGBYields[Zi][kk][AGB_MASS_NUM-1];
-				#endif
-		    }
-		}
-		else
-		{
-		    *EjectedMasses_upper_actual = AGBEjectedMasses[Zi][Mi_upper] + ((AGBEjectedMasses[Zi][Mi_upper+1]-AGBEjectedMasses[Zi][Mi_upper]) * ((Mi_upper_actual-AGBMasses[Mi_upper])/(AGBMasses[Mi_upper+1]-AGBMasses[Mi_upper])));
-		    *TotalMetals_upper_actual = AGBTotalMetals[Zi][Mi_upper] + ((AGBTotalMetals[Zi][Mi_upper+1]-AGBTotalMetals[Zi][Mi_upper]) * ((Mi_upper_actual-AGBMasses[Mi_upper])/(AGBMasses[Mi_upper+1]-AGBMasses[Mi_upper])));
-		    int k;
-		    for (k=0;k<NUM_ELEMENTS;k++)
-		    {
-		    	int kk;
-				#ifndef MAINELEMENTS
-		    	kk=k;
-		    	Yields_upper_actual[k] = AGBYields[Zi][kk][Mi_upper] + ((AGBYields[Zi][kk][Mi_upper+1]-AGBYields[Zi][kk][Mi_upper]) * ((Mi_upper_actual-AGBMasses[Mi_upper])/(AGBMasses[Mi_upper+1]-AGBMasses[Mi_upper])));
-				#else
-		        switch(k){case 0: kk=0; break; case 1: kk=1; break; case 2: kk=4; break; case 3: kk=6; break; case 4: kk=10; break;}
-		        Yields_upper_actual[k] = AGBYields[Zi][kk][Mi_upper] + ((AGBYields[Zi][kk][Mi_upper+1]-AGBYields[Zi][kk][Mi_upper]) * ((Mi_upper_actual-AGBMasses[Mi_upper])/(AGBMasses[Mi_upper+1]-AGBMasses[Mi_upper])));
-				#endif
-		     }
-		}
-		break;
-	}
-}*/
 
 #endif //INDIVIDUAL_ELEMENTS
 #endif //#ifdef DETAILED_METALS_AND_MASS_RETURN

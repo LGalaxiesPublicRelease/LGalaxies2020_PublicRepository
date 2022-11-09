@@ -232,11 +232,6 @@ double get_virial_radius(int halonr);
 double get_virial_mass(int halonr);
 double collisional_starburst_recipe(double mass_ratio, int merger_centralgal, int centralgal, double time, double deltaT);
 
-/*de lucia's */
-//void construct_galaxies(int halonr);
-//void update_from_feedback(int p, int centralgal, double reheated_mass, double ejected_mass,double metallicity);
-//double estimate_merging_time(int halonr, int mostmassive);
-
 //********************************************************
 //*******************************************************
 
@@ -363,16 +358,6 @@ double Chabrier_IMF(double M);
 void SNe_rates();
 int find_initial_mass2(double lifetime, int Zi_bin);
 #endif
-/*int find_initial_metallicity_comp2(int Zi, int sfh_bin, int table_type);
-int find_initial_mass2(double lifetime, int Zi_bin);
-int max_Mi_lower2(int Mi_lower, int channel_type);
-int min_Mi_upper2(int Mi_upper, int channel_type);
-int find_SNII_mass_bin2(double masslimit);*/
-/*int find_agb_mass_bin(double masslimit);
-#ifdef DTD
-double DTDcalc (double timevalue);
-#endif*/
-//void find_actual_ejecta_limits2(int channel_type, double Mi_lower_actual, double Mi_upper_actual, int Mi_lower, int Mi_upper, int Zi,  double* EjectedMasses_lower_actual, double* EjectedMasses_upper_actual, double* TotalMetals_lower_actual, double* TotalMetals_upper_actual, double* Yields_lower_actual, double* Yields_upper_actual);
 
 //in yield_integrals.c:
 void init_integrated_yields();
