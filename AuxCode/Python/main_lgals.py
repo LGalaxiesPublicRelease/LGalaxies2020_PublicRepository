@@ -51,7 +51,6 @@ LOAD_SAMPLE = 0 #If on, a pre-made sample of galaxies is loaded from the pickele
 MASS_CHECKS = 0 #If on (and LOAD_SAMPLE is off), key mass properties will be checked for Nans, negatives, and whether sub-components add up to component masses properly.
 GENERAL_PLOTS = 1 #If on, general plots are plotted, such as the SMF, cosmic SFRD, etc.
 MULTI_REDSHIFT_PLOTS = 0 #OVERRIDES ALL OTHER PLOT SWITCHES ABOVE. If on, plots requiring multiple redshift outputs will be calculated and made (inc. e.g. SFRD evo).
-SOLAR_ABUNDANCE_SET = 'GAS07' #'A09' #'AG89_phot' #'AG89_mete' #Sets which solar abundances are assumed when normalising abundances and enhancements inplots
 
 #################
 #Output file info:
@@ -78,15 +77,24 @@ TotTreeFiles = 512
 ################# 
 #Select sample type:
 SAMPLE_TYPE = 'All' #Select from: 'All', 'Discs', 'Dwarfs'
-   
-#################  
-#Plot suffix:
-mark = 'mk1'
 
 ################# 
 #Redshifts to load: (in snapshot mode, only works for single redshifts currently 21-04-21)
 FullRedshiftList = [0.00] #[0.00,1.04,2.07,3.11,3.95,5.03,5.92,6.97,8.22,8.93]
 RedshiftsToRead = [True] #[True,True,True,True,True,True,True,True,True,True]
+
+#################  
+#Plot suffix:
+mark = 'mk1'
+
+
+
+
+#################
+#################
+# KEY PARAMETERS:
+#################
+#################
 char_z_low="%0.2f" % FullRedshiftList[0]
 char_z_high="%0.2f" % FullRedshiftList[-1]
 if (MULTI_REDSHIFT_PLOTS == 1) :    
