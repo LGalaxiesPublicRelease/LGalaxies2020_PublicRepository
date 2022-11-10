@@ -89,10 +89,10 @@ ifeq (NORMALIZEDDB,$(findstring NORMALIZEDDB,$(OPT)))
 else
 	awk -f ./AuxCode/awk/extract_SFH_Time.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/SFH_Time_2_DDL.awk >> ./AuxCode/awk/output/L-Galaxies_DDL.sql
 endif	
-	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_IDL_struct.awk >  ./AuxCode/awk/output/idl/LGalaxy.pro
-	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_IDL_hists.awk > ./AuxCode/awk/output/idl/LGalaxy_plot.pro
-	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_IDL_testfloats.awk > ./AuxCode/awk/output/idl/LGalaxy_testfloats.pro
-	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_IDL_zerofloats.awk > ./AuxCode/awk/output/idl/LGalaxy_zerofloats.pro
+#	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_IDL_struct.awk >  ./AuxCode/awk/output/idl/LGalaxy.pro
+#	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_IDL_hists.awk > ./AuxCode/awk/output/idl/LGalaxy_plot.pro
+#	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_IDL_testfloats.awk > ./AuxCode/awk/output/idl/LGalaxy_testfloats.pro
+#	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_IDL_zerofloats.awk > ./AuxCode/awk/output/idl/LGalaxy_zerofloats.pro
 	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_LGalaxy.awk > ./AuxCode/awk/output/L-Galaxies.h
 	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_FileFormat.awk > ./AuxCode/awk/output/L-Galaxies_FileFormat.csv
 	awk -f ./AuxCode/awk/extract_SFH_BIN.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/MOMAF_INPUT_2_MoMaFGalaxy.awk >> ./AuxCode/awk/output/L-Galaxies.h
