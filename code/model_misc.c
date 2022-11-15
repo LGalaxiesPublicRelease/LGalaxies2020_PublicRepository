@@ -3446,6 +3446,7 @@ void mass_checks(int igal, char call_function[], int call_line) {
 
 
 //CHECK SFH IN RINGS
+#ifdef STAR_FORMATION_HISTORY
   //DISK
   double sfh_sum_ring;
 
@@ -3530,7 +3531,7 @@ void mass_checks(int igal, char call_function[], int call_line) {
 		  }
 	    }
     }
-
+#endif //STAR_FORMATION_HISTORY
 
 
 

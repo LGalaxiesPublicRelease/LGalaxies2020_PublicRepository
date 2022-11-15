@@ -14,7 +14,6 @@
 #pragma pack(1)
 struct GALAXY_OUTPUT {
 # 72 "./code/h_galaxy_output.h"
-//    int   NumDisr; //***** ROB: Geoff's disruption counter (24-03-20) *****
     int Type; // None //Galaxy type: 0 for central galaxies of a main halo, 1 for central galaxies in sub-halos, 2 for satellites without halo.
 
     int HaloIndex; // None // ?Unique ID of MPA halo containing this galaxy
@@ -125,18 +124,18 @@ struct GALAXY_OUTPUT {
 
 
 
-    float ReheatingRate; // Msun/yr // gross rate at which mass is reheated from coldgas to hotgas. //ROB: storing ReheatingRate for outputting (31-03-20)
+    float ReheatingRate; // Msun/yr // gross rate at which mass is reheated from coldgas to hotgas.
     float MetalsReheatingRate; // Msun/yr // gross rate at which metal mass is reheated from coldgas to hotgas.
-    float EjectionRate; // Msun/yr // gross rate at which mass is ejected hotgas to ejecta reservoir. //ROB: storing EjectionRate for outputting (31-03-20)
+    float EjectionRate; // Msun/yr // gross rate at which mass is ejected hotgas to ejecta reservoir.
     float CoolingRate; // Msun/yr // Cooling rate of the hot gas
     float CoolingRate_beforeAGN; // Msun/yr // What the cooling rate of the hot gas would have been if there was no AGN feedback.
     float QuasarAccretionRate; // Msun/yr // Rate at which cold gas is accreted into the central black hole in the quasar mode.
     float RadioAccretionRate; // Msun/yr // Rate at which hot gas is accreted into the central black hole in the radio mode.
     float Sfr; // Msun/yr // Star formation rate
-    float SfrInst; // Msun/yr // Instantaneous star formation rate (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts) //*****ROB*****//
+    float SfrInst; // Msun/yr // Instantaneous star formation rate (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts)
 
     float SfrRings[RNUM]; // Msun/yr // Star formation rate within each annular ring
-    float SfrInstRings[RNUM]; // Msun/yr // Instantaneous star formation rate within each annular ring (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts) //*****ROB*****//
+    float SfrInstRings[RNUM]; // Msun/yr // Instantaneous star formation rate within each annular ring (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts)
 
     float SfrBulge; // Msun/yr // Star formation rate in bulge.
     float XrayLum; // log10(erg/sec) // (log_10 of) X-Ray luminosity
