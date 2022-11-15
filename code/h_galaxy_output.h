@@ -198,10 +198,10 @@ struct GALAXY_OUTPUT {
     float QuasarAccretionRate; // Msun/yr // Rate at which cold gas is accreted into the central black hole in the quasar mode.
     float RadioAccretionRate; // Msun/yr // Rate at which hot gas is accreted into the central black hole in the radio mode.
     float Sfr; // Msun/yr // Star formation rate
-    float SfrInst; // Msun/yr // Instantaneous star formation rate (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts) //*****ROB*****//
+    float SfrInst; // Msun/yr // Instantaneous star formation rate (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts)
 #ifdef OUTPUT_RINGS
     float SfrRings[RNUM]; // Msun/yr // Star formation rate within each annular ring
-    float SfrInstRings[RNUM]; // Msun/yr // Instantaneous star formation rate within each annular ring (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts) //*****ROB*****//
+    float SfrInstRings[RNUM]; // Msun/yr // Instantaneous star formation rate within each annular ring (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts)
 #endif     //H2_AND_RINGS
     float SfrBulge; // Msun/yr // Star formation rate in bulge.
     float XrayLum; // log10(erg/sec) // (log_10 of) X-Ray luminosity
