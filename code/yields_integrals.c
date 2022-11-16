@@ -119,7 +119,7 @@ void integrate_yields()
   double Solar_mass_ratios[NUM_ELEMENTS];
   int ee2=0.;
   for (int ee=0;ee<11;ee++) {
-#ifndef MAIN_ELEMENTS
+#ifndef MAINELEMENTS
 	  Solar_mass_ratios[ee] = solarAbundMassRatios[ee]; //Taken from Asplund+09 for [H][He][C][N][O][Ne][Mg][Si][S][Ca][Fe]
 #else
 	  if (ee==0 || ee==1 | ee==4 | ee==6 | ee==10) {
