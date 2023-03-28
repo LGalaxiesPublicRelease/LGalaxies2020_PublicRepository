@@ -71,7 +71,9 @@ CoolingRate_beforeAGN, Msun/yr , What the cooling rate of the hot gas would have
 QuasarAccretionRate, Msun/yr , Rate at which cold gas is accreted into the central black hole in the quasar mode.
 RadioAccretionRate, Msun/yr , Rate at which hot gas is accreted into the central black hole in the radio mode.
 Sfr, Msun/yr , Star formation rate
+SfrInst, Msun/yr , Instantaneous star formation rate (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts)
 SfrRings, Msun/yr , Star formation rate within each annular ring
+SfrInstRings, Msun/yr , Instantaneous star formation rate within each annular ring (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts)
 SfrBulge, Msun/yr , Star formation rate in bulge.
 XrayLum, log10(erg/sec) , (log_10 of) X-Ray luminosity
 BulgeSize, Mpc/h , Half mass radius of bulge

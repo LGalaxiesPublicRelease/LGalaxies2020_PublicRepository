@@ -1,24 +1,5 @@
-metals {
-     float H
-     float He
-     float O
-     float Mg
-     float Fe
-}
-elements {
-     float H
-     float He
-     float O
-     float Mg
-     float Fe
-}
-       union elements DiskMassElements
-    Then access as either       DiskMassElements.str.H    or       DiskMassElements.arr[0] */ /* union elements {     struct elements_str str
-     float arr[NUM_ELEMENTS]
-}
 GALAXY_OUTPUT {
- //    int   NumDisr
- //***** ROB: Geoff's disruption counter (24-03-20) *****     int Type
+     int Type
  // None //Galaxy type: 0 for central galaxies of a main halo, 1 for central galaxies in sub-halos, 2 for satellites without halo.     int HaloIndex
  // None // ?Unique ID of MPA halo containing this galaxy     float HaloM_Mean200
  // 1e10 Msun/h // M200 cf mean last time this halo was a type 0     float HaloM_Crit200
@@ -98,9 +79,9 @@ GALAXY_OUTPUT {
  // Msun/yr // Rate at which cold gas is accreted into the central black hole in the quasar mode.     float RadioAccretionRate
  // Msun/yr // Rate at which hot gas is accreted into the central black hole in the radio mode.     float Sfr
  // Msun/yr // Star formation rate     float SfrInst
- // Msun/yr // Instantaneous star formation rate (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts) //*****ROB*****//     float SfrRings[RNUM]
+ // Msun/yr // Instantaneous star formation rate (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts)     float SfrRings[RNUM]
  // Msun/yr // Star formation rate within each annular ring     float SfrInstRings[RNUM]
- // Msun/yr // Instantaneous star formation rate within each annular ring (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts) //*****ROB*****//     float SfrBulge
+ // Msun/yr // Instantaneous star formation rate within each annular ring (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts)     float SfrBulge
  // Msun/yr // Star formation rate in bulge.     float XrayLum
  // log10(erg/sec) // (log_10 of) X-Ray luminosity     float BulgeSize
  // Mpc/h // Half mass radius of bulge     float DiskRadius

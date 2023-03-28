@@ -160,12 +160,12 @@ if LOAD_SAMPLE == 0 :
     #Make and pickle sample data (NOTE: "mark" is not included in the sample filename, so these will be overwritten if the same model is run again):       
     G_samp1 = make_lgals_sample(G_lgal, FILE_TYPE, SAMPLE_TYPE, Hubble_h, DMParticleMass, ParticleMassRes, StellarMassRes, \
                            FullRedshiftList, RedshiftsToRead)
-    np.save(OutputDir+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE, G_samp1, allow_pickle=True)
+    np.save(OutputDir+"/samples/"+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE, G_samp1, allow_pickle=True)
     NumGals = len(G_samp1) #Number of galaxies in the sample selected in make_lgals_sample (not the total number of objects in the treefiles used).
     print('Sample data pickled\n')
 
 elif LOAD_SAMPLE == 1 :
-    G_samp1 = np.load(OutputDir+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+".npy")
+    G_samp1 = np.load(OutputDir+"/samples/"+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+".npy")
     NumGals = len(G_samp1)
     print('Pickled sample data loaded\n')
 else : print("***** ERROR: No sample calculated or pre-loaded. Please set LOAD_SAMPLE parameter to 0 or 1. *****")

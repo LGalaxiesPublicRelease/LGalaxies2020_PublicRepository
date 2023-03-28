@@ -74,6 +74,7 @@ CREATE TABLE GALAXIES (
 ,  quasarAccretionRate REAL NOT NULL 
 ,  radioAccretionRate REAL NOT NULL 
 ,  sfr REAL NOT NULL 
+,  sfrInst REAL NOT NULL 
 ,  sfrBulge REAL NOT NULL 
 ,  xrayLum REAL NOT NULL 
 ,  bulgeSize REAL NOT NULL 

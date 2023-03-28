@@ -1,5 +1,5 @@
 # 0 "./code/h_galaxy_output.h"
-# 1 "/cygdrive/c/Users/ry22aas/robyates/Astro/L-Galaxies/LGalaxies2020_code//"
+# 1 "/cygdrive/c/Users/ry22aas/robyates/Astro/L-Galaxies/LGalaxies2020_code_git//"
 # 0 "<built-in>"
 # 0 "<command-line>"
 # 1 "./code/h_galaxy_output.h"
@@ -52,7 +52,7 @@ struct GALAXY_OUTPUT {
 
     float OriMergTime; // yr // Estimated dynamical friction time when the merger clock is set.
     float MergTime; //yr // Estimated remaining merging time. 
-# 123 "./code/h_galaxy_output.h"
+# 122 "./code/h_galaxy_output.h"
     /* baryonic reservoirs */
     float ColdGas; // 10^10/h Msun // Mass in cold gas.
 
@@ -124,9 +124,9 @@ struct GALAXY_OUTPUT {
 
 
 
-    float ReheatingRate; // Msun/yr // gross rate at which mass is reheated from coldgas to hotgas.
+    float ReheatingRate; // Msun/yr // gross rate at which mass is reheated from coldgas to hotgas. //ROB: storing ReheatingRate for outputting (31-03-20)
     float MetalsReheatingRate; // Msun/yr // gross rate at which metal mass is reheated from coldgas to hotgas.
-    float EjectionRate; // Msun/yr // gross rate at which mass is ejected hotgas to ejecta reservoir.
+    float EjectionRate; // Msun/yr // gross rate at which mass is ejected hotgas to ejecta reservoir. //ROB: storing EjectionRate for outputting (31-03-20)
     float CoolingRate; // Msun/yr // Cooling rate of the hot gas
     float CoolingRate_beforeAGN; // Msun/yr // What the cooling rate of the hot gas would have been if there was no AGN feedback.
     float QuasarAccretionRate; // Msun/yr // Rate at which cold gas is accreted into the central black hole in the quasar mode.
@@ -159,7 +159,7 @@ struct GALAXY_OUTPUT {
     float MagDust[5]; // AB mag // dust corrected, rest-frame absolute mags
     float Mag[5]; // AB mag // rest-frame absolute mags
     float MagBulge[5]; // AB mag // rest-frame absolute mags for the bulge
-# 261 "./code/h_galaxy_output.h"
+# 260 "./code/h_galaxy_output.h"
     float MassWeightAge; //10^9yr //The age of this galaxy weighted by mass of its components.
 
     float rbandWeightAge; // 10^9yr // The age of this galaxy weighted by mass of its components.
@@ -184,7 +184,7 @@ struct GALAXY_OUTPUT {
 
 
     float sfh_MetalsICM[SFH_NBIN][NUM_METAL_CHANNELS]; // 10^10 Msun/h // Metal formation history in the ICM.
-# 297 "./code/h_galaxy_output.h"
+# 296 "./code/h_galaxy_output.h"
     //All: [H][He][Cb][N][O][Ne][Mg][Si][S][Ca][Fe] or //Only [H][He][O][Mg][Fe]
 
     float sfh_DiskMass_elements[SFH_NBIN][NUM_ELEMENTS]; // Msun // History of mass of elements locked up in stars in disk.
@@ -230,7 +230,7 @@ struct SFH_BIN {
     float sfh_BulgeMassRings[RNUM]; // 10^10 Msun/h // Star formation history in the bulge RINGS.
 
     float sfh_ICM; // 1e10 Msun/h // SFH of ICM
-# 350 "./code/h_galaxy_output.h"
+# 349 "./code/h_galaxy_output.h"
     float sfh_MetalsDiskMass[NUM_METAL_CHANNELS]; // 1e10 Msun/h // Metals locked up in stars in disk.
     float sfh_MetalsBulgeMass[NUM_METAL_CHANNELS]; // 1e10 Msun/h // Metals locked up in stars in bulge.
     float sfh_MetalsICM[NUM_METAL_CHANNELS]; // 1e10 Msun/h // Metals locked up in stars in ICM.

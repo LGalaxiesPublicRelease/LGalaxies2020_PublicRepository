@@ -71,7 +71,9 @@ CoolingRate_beforeAGN,float,4,1
 QuasarAccretionRate,float,4,1
 RadioAccretionRate,float,4,1
 Sfr,float,4,1
+SfrInst,float,4,1
 SfrRings,float,4,RNUM
+SfrInstRings,float,4,RNUM
 SfrBulge,float,4,1
 XrayLum,float,4,1
 BulgeSize,float,4,1

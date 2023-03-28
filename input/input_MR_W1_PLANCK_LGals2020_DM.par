@@ -10,7 +10,7 @@ FileWithOutputRedshifts   ./input/desired_output_redshifts.txt
 McFile			  ./input/Mc.txt
 CoolFunctionsDir          ./CoolFunctions/
 
-SpecPhotDir               ./SpecPhotTables/
+SpecPhotDir               C:\Users\ry22aas\robyates\Astro\L-Galaxies\SpecPhotTables ; ./SpecPhotTables/
 PhotPrefix                WMAP7 ;PLANCK
 SpecPhotIMF               Chabrier ; Salpeter ; Kroupa 
 FileWithFilterNames       ./input/Filter_Sloan.txt
@@ -20,7 +20,7 @@ FileWithFilterNames       ./input/Filter_Sloan.txt
 %----- Simulation input/output files  ------------
 %-------------------------------------------------
 
-SimulationDir		  ./MergerTrees/MR/
+SimulationDir		  C:\Users\ry22aas\robyates\Astro\L-Galaxies\Millennium\modified_trees ; ./MergerTrees/MR/
 OutputDir		  ./output/
 
 LastDarkMatterSnapShot    63

@@ -1,5 +1,5 @@
 struct LGalaxy {
-      int Type;
+     int Type;
       int HaloIndex;
       float HaloM_Mean200;
       float HaloM_Crit200;
@@ -72,7 +72,9 @@ struct LGalaxy {
       float QuasarAccretionRate;
       float RadioAccretionRate;
       float Sfr;
+      float SfrInst;
       float SfrRings[RNUM];
+      float SfrInstRings[RNUM];
       float SfrBulge;
       float XrayLum;
       float BulgeSize;

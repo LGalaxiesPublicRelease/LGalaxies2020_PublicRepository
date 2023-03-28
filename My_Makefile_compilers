@@ -4,9 +4,9 @@
 # accept the DEBUG flag
 
 #Default configurations:
-SYSTYPE = "Linux"
+#SYSTYPE = "Linux"
 # SYSTYPE = "Mac"
-# SYSTYPE = "cygwin"
+SYSTYPE = "cygwin"
 
 #Some specific configurations:
 # SYSTYPE = "Mac_old"
