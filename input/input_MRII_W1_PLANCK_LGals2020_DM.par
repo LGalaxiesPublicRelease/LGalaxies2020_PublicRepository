@@ -240,9 +240,9 @@ A_FACTOR 					0.04 ;Fraction of mass from all objects between SNIa_MIN_MASS and 
 Dust_tExch					1.0e+07 	;yr: Exchange timescale for material between molecular clouds and diffuse gas. I.e. cloud lifetime (see Vijayan+19)
 Dust_tAcc0					5.0e+03  ;yr: ;Now tuned to roughly match expected accretion timescale in solar-metallicity MCs of density ~250 cm^-3 from Asano+13 (17-03-23)
 Cmax_CO						0.3			;Maximum fraction of carbon atoms allowed to be in gas-phase CO (see Vijayan+19)
-FracDustSNIItoHot			0.9		 	;if SEPARATE_DUST_EJEC_FRACTIONS is on, this is the fraction of SNII metals put directly into hot gas from the disc
-FracDustSNIatoHot			0.8  		;if SEPARATE_DUST_EJEC_FRACTIONS is on, this is the fraction of SNIa metals put directly into hot gas from the disc
-FracDustAGBtoHot			0.25		;if SEPARATE_DUST_EJEC_FRACTIONS is on, this is the fraction of AGB metals put directly into hot gas from the disc
+FracDustSNIItoHot			0.3		 	;if SEPARATE_DUST_EJEC_FRACTIONS is on, this is the fraction of SNII metals put directly into hot gas from the disc
+FracDustSNIatoHot			0.3  		;if SEPARATE_DUST_EJEC_FRACTIONS is on, this is the fraction of SNIa metals put directly into hot gas from the disc
+FracDustAGBtoHot			0.0		;if SEPARATE_DUST_EJEC_FRACTIONS is on, this is the fraction of AGB metals put directly into hot gas from the disc
 
 %-------------------------------------------
 %% IMF
