@@ -1,0 +1,1 @@
+Total yield data when the WRITE_YIELD_DATA switch is on will be written here.
