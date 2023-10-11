@@ -147,12 +147,9 @@ endif
 OPT   += -DMETALRICHWIND #This switch allows SNII, SNIa, and AGB ejecta to be directly dumped in to the HotGas, via fwindSNII, fwindSNIa, fwindAGB.
 #OPT   += -DGASDENSITYFWIND #This sets the amount of direct ejection into the HotGas to depend on the ISM density. MUST HAVE METALRICHWIND SWITCHED ON TOO.
 #OPT   += -DMVIRDEPFWIND #Amount of direct ejection into the HotGas depends on Mvir and the FRACZ values set in the input file (see model_yields.c). (16-06-20)
-#OBJS += ./code/model_yields.o #ORIGINAL FILE
-OBJS += ./code/model_yields_withBinaryC.o
-OBJS += ./code/yields_read_tables.o #ORIGINAL FILE
-#OBJS += ./code/yields_integrals.o #ORIGINAL FILE
-OBJS += ./code/yields_integrals_withBinaryC.o
-#OBJS += ./code/yields_integrals_old.o
+OBJS += ./code/model_yields.o
+OBJS += ./code/yields_read_tables.o
+OBJS += ./code/yields_integrals.o
 #OPT  += -DNORMALIZE #(ONLY WORKS WITH MAINELEMENTS OFF) If on, elements and total metals are normlaised to total component masses.
 #OPT += -DINSTANTANEOUS_RECYCLE #Recycle all metals in one time step to resemble instantaneous recycling approximation 
 

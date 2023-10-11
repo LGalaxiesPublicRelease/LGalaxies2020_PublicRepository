@@ -3,6 +3,9 @@
  *
  *  Created on: 18.11.2011
  *      Author: robyates
+ *
+ * Updates:
+ * 10-05-22: Modified to account for binary_c yields, which need to be integrated over in time for AGBs, SNe-II, and SNe-Ia.
  */
 
 #include <stdio.h>
@@ -81,9 +84,15 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 		DiskSNIaRate_current_ts[jj]=0.0; //Instantaneous SNIa rate in the disc (stored for use in model_dust_yields.c)
 		DiskAGBRate_current_ts[jj]=0.0; //Instantaneous AGB rate in the disc (stored for use in model_dust_yields.c)
 		for(ee=0;ee<NUM_ELEMENTS;ee++) {
-			DiskSNIIAllElements_ts[jj][ee]=0.0; //Total element masses ejected by all SNe-II in this timestep (stored for use in model_dust_yields.c)
-			DiskSNIaAllElements_ts[jj][ee]=0.0; //Total element masses ejected by all SNe-Ia in this timestep (stored for use in model_dust_yields.c)
-			DiskAGBAllElements_ts[jj][ee]=0.0; //Total element masses ejected by all AGBs in this timestep (stored for use in model_dust_yields.c)
+			DiskSNIIAllElements_ts[jj][ee]=0.0; //Total element masses ejected by disc SNe-II in this timestep (stored for use in model_dust_yields.c)
+			DiskSNIaAllElements_ts[jj][ee]=0.0; //Total element masses ejected by disc SNe-Ia in this timestep (stored for use in model_dust_yields.c)
+			DiskAGBAllElements_ts[jj][ee]=0.0; //Total element masses ejected by disc AGBs in this timestep (stored for use in model_dust_yields.c)
+			BulgeSNIIAllElements_ts[jj][ee]=0.0; //Total element masses ejected by bulge SNe-II in this timestep (stored for use in model_dust_yields.c)
+			BulgeSNIaAllElements_ts[jj][ee]=0.0; //Total element masses ejected by bulge SNe-Ia in this timestep (stored for use in model_dust_yields.c)
+			BulgeAGBAllElements_ts[jj][ee]=0.0; //Total element masses ejected by bulge AGBs in this timestep (stored for use in model_dust_yields.c)
+			ICMSNIIAllElements_ts[jj][ee]=0.0; //Total element masses ejected by halo SNe-II in this timestep (stored for use in model_dust_yields.c)
+			ICMSNIaAllElements_ts[jj][ee]=0.0; //Total element masses ejected by halo SNe-Ia in this timestep (stored for use in model_dust_yields.c)
+			ICMAGBAllElements_ts[jj][ee]=0.0; //Total element masses ejected by halo AGBs in this timestep (stored for use in model_dust_yields.c)
 		}
     }
 #else //H2_AND_RINGS
@@ -91,9 +100,15 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     DiskSNIaRate_current_ts=0.0; //Instantaneous SNIa rate in the disc (stored for use in model_dust_yields.c)
     DiskAGBRate_current_ts=0.0; //Instantaneous AGB rate in the disc (stored for use in model_dust_yields.c)
     for(ee=0;ee<NUM_ELEMENTS;ee++) {
-    	DiskSNIIAllElements_ts[ee]=0.0; //Total element masses ejected by all SNe-II in this timestep (stored for use in model_dust_yields.c)
-    	DiskSNIaAllElements_ts[ee]=0.0; //Total element masses ejected by all SNe-Ia in this timestep (stored for use in model_dust_yields.c)
-    	DiskAGBAllElements_ts[ee]=0.0; //Total element masses ejected by all AGBs in this timestep (stored for use in model_dust_yields.c)
+    	DiskSNIIAllElements_ts[ee]=0.0; //Total element masses ejected by disc SNe-II in this timestep (stored for use in model_dust_yields.c)
+    	DiskSNIaAllElements_ts[ee]=0.0; //Total element masses ejected by disc SNe-Ia in this timestep (stored for use in model_dust_yields.c)
+    	DiskAGBAllElements_ts[ee]=0.0; //Total element masses ejected by disc AGBs in this timestep (stored for use in model_dust_yields.c)
+    	BulgeSNIIAllElements_ts[ee]=0.0; //Total element masses ejected by bulge SNe-II in this timestep (stored for use in model_dust_yields.c)
+    	BulgeSNIaAllElements_ts[ee]=0.0; //Total element masses ejected by bulge SNe-Ia in this timestep (stored for use in model_dust_yields.c)
+    	BulgeAGBAllElements_ts[ee]=0.0; //Total element masses ejected by bulge AGBs in this timestep (stored for use in model_dust_yields.c)
+    	ICMSNIIAllElements_ts[ee]=0.0; //Total element masses ejected by halo SNe-II in this timestep (stored for use in model_dust_yields.c)
+		ICMSNIaAllElements_ts[ee]=0.0; //Total element masses ejected by halo SNe-Ia in this timestep (stored for use in model_dust_yields.c)
+		ICMAGBAllElements_ts[ee]=0.0; //Total element masses ejected by halo AGBs in this timestep (stored for use in model_dust_yields.c)
     }
 #endif //H2_AND_RINGS
 #else //DETAILED_DUST
@@ -102,6 +117,22 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	TotalMassReturnedToColdDiskGasr[jj]=0.0;
 #endif //H2_AND_RINGS
 #endif //DETAILED_DUST
+
+    //Initialise the Al26 arrays, as these should only be recording the Al26 production in the current timestep (i.e. to be calculated below now):
+#ifdef INDIVIDUAL_ELEMENTS
+#ifndef MAINELEMENTS
+#ifdef AL26
+    for(int mm=0; mm<NUM_METAL_CHANNELS; mm++) {
+    	Gal[p].ColdGas_Al26Inst[mm] = 0.0;
+#ifdef H2_AND_RINGS
+		for(jj=0; jj<RNUM; jj++) {
+			Gal[p].ColdGasRings_Al26Inst[jj][mm] = 0.0;
+#endif //H2_AND_RINGS
+		}
+    }
+#endif //AL26
+#endif //MAINELEMENTS
+#endif //INDIVIDUAL_ELEMENTS
 
     for(n=0;n<NOUT;n++) {
     	AgeCorrectionDisk[n] = 0.0;
@@ -133,7 +164,6 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     }
 #endif  
 
-    //**********
     for (ii=0;ii<=Gal[p].sfh_ibin;ii++) //LOOP OVER SFH BINS
     {
     	sfh_time=Gal[p].sfh_t[ii]+(0.5*Gal[p].sfh_dt[ii]);
@@ -141,7 +171,7 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	//tcut = 2.0*((Gal[p].Rvir/Gal[p].Vvir)/0.0001); //Maximum lifetime of stars that have their ejected put straight into the HotGas [in Myrs]
 
 #ifdef DETAILED_DUST
-// These variables store the amount of metals produced by SNe in a timestep for use in model_dustyields.c
+// These variables store the amount of metals produced by SNe in a timestep for use in model_dust_yields.c
 //ROB: Looks more like they store the mass of an element ejected into the ColdGas in the current timestep by disc SNe with progenitors born in each of the SFH bins. (29-11-21)
 #ifdef H2_AND_RINGS
     	for(jj=0;jj<RNUM;jj++) {
@@ -149,12 +179,28 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 			SNII_prevstep_Cold_Fe[jj][ii] = 0.0;
 			SNII_prevstep_Cold_Cb[jj][ii] = 0.0;
 			SNIa_prevstep_Cold_Fe[jj][ii] = 0.0;
+			SNII_prevstep_Hot_bulge_Si[jj][ii] = 0.0;
+			SNII_prevstep_Hot_bulge_Fe[jj][ii] = 0.0;
+			SNII_prevstep_Hot_bulge_Cb[jj][ii] = 0.0;
+			SNIa_prevstep_Hot_bulge_Fe[jj][ii] = 0.0;
+			SNII_prevstep_Hot_ICM_Si[jj][ii] = 0.0;
+			SNII_prevstep_Hot_ICM_Fe[jj][ii] = 0.0;
+			SNII_prevstep_Hot_ICM_Cb[jj][ii] = 0.0;
+			SNIa_prevstep_Hot_ICM_Fe[jj][ii] = 0.0;
     	}
 #else
     	SNII_prevstep_Cold_Si[ii] = 0.0;
 		SNII_prevstep_Cold_Fe[ii] = 0.0;
 		SNII_prevstep_Cold_Cb[ii] = 0.0;
 		SNIa_prevstep_Cold_Fe[ii] = 0.0;
+		SNII_prevstep_Hot_bulge_Si[ii] = 0.0;
+		SNII_prevstep_Hot_bulge_Fe[ii] = 0.0;
+		SNII_prevstep_Hot_bulge_Cb[ii] = 0.0;
+		SNIa_prevstep_Hot_bulge_Fe[ii] = 0.0;
+		SNII_prevstep_Hot_ICM_Si[ii] = 0.0;
+		SNII_prevstep_Hot_ICM_Fe[ii] = 0.0;
+		SNII_prevstep_Hot_ICM_Cb[ii] = 0.0;
+		SNIa_prevstep_Hot_ICM_Fe[ii] = 0.0;
 #endif //H2_AND_RINGS
 #endif //DETAILED_DUST
 
@@ -165,7 +211,7 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     //ENRICHMENT FROM DISK STARS (INTO COLD GAS & HOT GAS):
     //******************************************************
 #ifdef H2_AND_RINGS
-    for(jj=0;jj<RNUM;jj++) 	
+	for(jj=0;jj<RNUM;jj++)
     	if (Gal[p].DiskMassRings[jj] > 0.0)//ROB: Discs can be destroyed (i.e. converted in to bulges). So only calculate enrichment from stars born in the disc if there is still a disc
     		if (Gal[p].sfh_DiskMassRings[jj][ii] > 0.0)    	
     		{		
@@ -222,8 +268,8 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	//pre-calculations to speed up the code
 	    //timestep_width and dt units cancel out
 #ifdef H2_AND_RINGS
-    	DiskSFRxStep = timestep_width * Gal[p].sfh_DiskMassRings[jj][ii]/Gal[p].sfh_dt[ii];
-    	DiskSFRxStep_Phys = DiskSFRxStep * (1.0e10/Hubble_h); //ROB: I think this is actually just the *mass* of stars formed in the disc in SFH bin ii [in Msun].
+    	DiskSFRxStep = timestep_width * Gal[p].sfh_DiskMassRings[jj][ii]/Gal[p].sfh_dt[ii]; //[in code units].
+    	DiskSFRxStep_Phys = DiskSFRxStep * (1.0e10/Hubble_h); //[in Msun].
 
     	DiskMetallicity = 0.;
     	for(mm=0;mm<NUM_METAL_CHANNELS;mm++)
@@ -258,38 +304,63 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 #endif //H2_AND_RINGS
 
 #ifdef BINARYC
-    	Zi = find_initial_metallicity(DiskMetallicity, 1, 5);
+    	Zi = find_initial_metallicity(DiskMetallicity, 5); //Find the metallicity bin BELOW the true metallicity in the SFH bin
+    	//Zi = find_initial_metallicity(DiskMetallicity, 1, 5);
+    	Zi_disp = (DiskMetallicity - bcMetallicities[Zi])/(bcMetallicities[Zi+1] - bcMetallicities[Zi]); //Fractional position of the SFH metallicity between the bcMetallicities bins.
 #else //BINARYC
-    	Zi = find_initial_metallicity(DiskMetallicity, 1, 1);
+    	Zi = find_initial_metallicity(DiskMetallicity, 1); //Find the metallicity bin BELOW the true metallicity in the SFH bin
+    	Zi_disp = (DiskMetallicity - lifetimeMetallicities[Zi])/(lifetimeMetallicities[Zi+1] - lifetimeMetallicities[Zi]); //Fractional position of the SFH metallicity between the bcMetallicities bins.
 #endif //BINARYC
-    	//Interpolate the disk metallicity on the lifetimeMetallicities tables:
-    	Zi_disp = (DiskMetallicity - lifetimeMetallicities[Zi])/(lifetimeMetallicities[Zi+1] - lifetimeMetallicities[Zi]);
-    	if (Zi_disp < 0.0) Zi_disp = 0.0; //Don't want to extrapolate yields down below lifetimeMetallicities[0]=0.0004. Instead, assume constant yield below this metallicity.
+    	if (Zi_disp < 0.0) Zi_disp = 0.0; //Don't want to extrapolate yields down below minimum metallicity considered (e.g. lifetimeMetallicities[0]=0.0004 or bcMetallicities[0]=0.0001). Instead, assume constant yield below this metallicity.
+    	//printf("CHECK 1: DiskMetallicity = %f | Zi = %i | bcMetallicities[Zi] = %f | bcMetallicities[Zi+1] = %f | Zi_disp_lt = %f | Zi_disp_bc = %f\n", DiskMetallicity, Zi, bcMetallicities[Zi], bcMetallicities[Zi+1], (DiskMetallicity - lifetimeMetallicities[Zi])/(lifetimeMetallicities[Zi+1] - lifetimeMetallicities[Zi]), (DiskMetallicity - bcMetallicities[Zi])/(bcMetallicities[Zi+1] - bcMetallicities[Zi]));
 
 #ifdef DETAILED_DUST //For use in update_dust_mass() later on
 #ifdef H2_AND_RINGS
-    	Zi_saved[jj][ii] = Zi;
-		Zi_disp_saved[jj][ii] = Zi_disp;
+    	Zi_disk_saved[jj][ii] = Zi;
+		Zi_disk_disp_saved[jj][ii] = Zi_disp;
 #else
-		Zi_saved[ii] = Zi;
-		Zi_disp_saved[ii] = Zi_disp;
+		Zi_disk_saved[ii] = Zi;
+		Zi_disk_disp_saved[ii] = Zi_disp;
 #endif //H2_AND_RINGS
 #endif
 
 #ifndef INDIVIDUAL_ELEMENTS
     	compute_actual_eject_rates(TimeBin, ii, Zi, Zi_disp, Gal[p].sfh_ibin, DiskSFRxStep, DiskSFRxStep_Phys, DiskMetallicity, timestep_width,
-				   &SNIIEjectaMass, &SNIIAllMetals, &SNIIUnProcessedMetals,
-				   &SNIaEjectaMass, &SNIaAllMetals, &SNIaUnProcessedMetals,
-				   &AGBEjectaMass, &AGBAllMetals, &AGBUnProcessedMetals,
-				   &SNIIRate, &SNIaRate, &AGBRate);
-#else
+								   &SNIIEjectaMass, &SNIIAllMetals, &SNIIUnProcessedMetals,
+								   &SNIaEjectaMass, &SNIaAllMetals, &SNIaUnProcessedMetals,
+								   &AGBEjectaMass, &AGBAllMetals, &AGBUnProcessedMetals,
+								   &SNIIRate, &SNIaRate, &AGBRate);
+#ifdef H2_AND_RINGS
+    	rescale_ejected_material(p, jj, "DiskMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals);
+#else //H2_AND_RINGS
+		rescale_ejected_material(p, "DiskMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals);
+#endif //H2_AND_RINGS
+#else //INDIVIDUAL_ELEMENTS
     	compute_actual_eject_rates(TimeBin, ii, Zi, Zi_disp, Gal[p].sfh_ibin, DiskSFRxStep, DiskSFRxStep_Phys, DiskMetallicity, DiskMetallicityElement_Phys, timestep_width,
-				   &SNIIEjectaMass, &SNIIAllMetals, &SNIIUnProcessedMetals,
-				   &SNIaEjectaMass, &SNIaAllMetals, &SNIaUnProcessedMetals,
-				   &AGBEjectaMass, &AGBAllMetals, &AGBUnProcessedMetals,
-				   &SNIIRate, &SNIaRate, &AGBRate,
-				   SNIIAllElements, SNIIUnProcessedElements, SNIaAllElements, SNIaUnProcessedElements, AGBAllElements, AGBUnProcessedElements);
-#endif
+								   &SNIIEjectaMass, &SNIIAllMetals, &SNIIUnProcessedMetals,
+								   &SNIaEjectaMass, &SNIaAllMetals, &SNIaUnProcessedMetals,
+								   &AGBEjectaMass, &AGBAllMetals, &AGBUnProcessedMetals,
+								   &SNIIRate, &SNIaRate, &AGBRate,
+								   SNIIAllElements, SNIIUnProcessedElements, SNIaAllElements, SNIaUnProcessedElements, AGBAllElements, AGBUnProcessedElements);
+#ifdef H2_AND_RINGS
+    	//ROB: (08-07-22): New way to scale unprocessed components:
+    	rescale_ejected_material(p, jj, "DiskMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
+								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
+								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+#else //H2_AND_RINGS
+		rescale_ejected_material(p, "DiskMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
+								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
+								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+#endif //H2_AND_RINGS
+#endif //INDIVIDUAL_ELEMENTS
 
     	//Store for use in dust_yields.c:
 #ifdef DETAILED_DUST
@@ -297,53 +368,42 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	DiskSNIIRate_current_ts[jj] += SNIIRate;
     	DiskSNIaRate_current_ts[jj] += SNIaRate;
     	DiskAGBRate_current_ts[jj] += AGBRate; //Not currently used, but calculated anyway. (29-11-21)
+#ifdef INDIVIDUAL_ELEMENTS
     	for(ee=0;ee<NUM_ELEMENTS;ee++) {
-    		DiskSNIIAllElements_ts[jj][ee] += SNIIAllElements[ee];
+    		DiskSNIIAllElements_ts[jj][ee] += SNIIAllElements[ee]; //TOTAL element masses ejected by disc SNe-II in this timestep (from all SFH bins). The fwind factors do not need to be included here (they are included later in model_dust_yields.c, where necessary).
     		DiskSNIaAllElements_ts[jj][ee] += SNIaAllElements[ee];
     		DiskAGBAllElements_ts[jj][ee] += AGBAllElements[ee];
+    		//if (AGBAllElements[ee] < 0.0) printf("AGBAllElements[%i] = %e | DiskAGBAllElements_ts[%i][%i] = %e\n", ee,AGBAllElements[ee],jj,ee,DiskAGBAllElements_ts[jj][ee]);
     	}
-#else
+#endif //INDIVIDUAL_ELEMENTS
+#else //H2_AND_RINGS
     	DiskSNIIRate_current_ts += SNIIRate;
     	DiskSNIaRate_current_ts += SNIaRate;
     	DiskAGBRate_current_ts += AGBRate; //Not currently used, but calculated anyway. (29-11-21)
+#ifdef INDIVIDUAL_ELEMENTS
     	for(ee=0;ee<NUM_ELEMENTS;ee++) {
     		DiskSNIIAllElements_ts[ee] += SNIIAllElements[ee];
     		DiskSNIaAllElements_ts[ee] += SNIaAllElements[ee];
     		DiskAGBAllElements_ts[ee] += AGBAllElements[ee];
     	}
+#endif //INDIVIDUAL_ELEMENTS
 #endif //H2_AND_RINGS
 #endif //DETAILED_DUST
 
-//If mass return or unprocessed metals larger than what is currently in the stellar population, re-adjust
-    	double SNIImetals, SNIametals, AGBmetals;
-#ifdef H2_AND_RINGS
-		SNIImetals = Gal[p].MetalsDiskMassRings[jj][0];
-		SNIametals = Gal[p].MetalsDiskMassRings[jj][1];
-		AGBmetals = Gal[p].MetalsDiskMassRings[jj][2];
-#else
-		SNIImetals = Gal[p].MetalsDiskMass[0];
-		SNIametals = Gal[p].MetalsDiskMass[1];
-		AGBmetals = Gal[p].MetalsDiskMass[2];
-#endif
-    	if(SNIIUnProcessedMetals>SNIImetals)
-    		SNIIUnProcessedMetals=SNIImetals;
-    	if(SNIaUnProcessedMetals>SNIametals)
-    		SNIaUnProcessedMetals=SNIametals;
-    	if(AGBUnProcessedMetals>AGBmetals)
-    		AGBUnProcessedMetals=AGBmetals;
-
-
-
+    	/*rescale_ejected_material(p, jj, "DiskMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
+								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
+								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+*/
 
     	mass_checks(p,"model_yields.c",__LINE__);
-
 
     	//************************
     	// UPDATE GAS COMPONENTS:
     	//************************
 
     	//Hot Gas:
-     	//Gal[igal].HotGas += (fwind_SNII * SNIIEjectaMass) + (fwind_SNIa * SNIaEjectaMass);
      	Gal[igal].HotGas += (fwind_SNII * SNIIEjectaMass) + (fwind_SNIa * SNIaEjectaMass) + (fwind_AGB * AGBEjectaMass);
      	Gal[igal].MetalsHotGas[0] += fwind_SNII * SNIIAllMetals;
      	Gal[igal].MetalsHotGas[1] += fwind_SNIa * SNIaAllMetals;
@@ -351,62 +411,80 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
      	//Gal[igal].MetalsReheatingRate += ((fwind_SNII * SNIIAllMetals)+(fwind_SNIa * SNIaAllMetals)+(fwind_AGB * AGBAllMetals)) / (dt*STEPS); //ROB: Adding the rate of direct metal transfer from SNe/AGBs to the HotGas in MetalsReheatingRate here. (18-08-20)
      	mass_checks(p,"model_yields.c",__LINE__);
      	//Cold Gas:
-     	//Gal[p].ColdGas += (1.0-fwind_SNII)*SNIIEjectaMass + (1.0-fwind_SNIa)*SNIaEjectaMass + AGBEjectaMass;
      	Gal[p].ColdGas += (1.0-fwind_SNII)*SNIIEjectaMass + (1.0-fwind_SNIa)*SNIaEjectaMass + (1.0-fwind_AGB)*AGBEjectaMass;
      	Gal[p].MetalsColdGas[0] += (1.0-fwind_SNII) * SNIIAllMetals;
      	Gal[p].MetalsColdGas[1] += (1.0-fwind_SNIa) * SNIaAllMetals;
-     	//Gal[p].MetalsColdGas[2] += AGBAllMetals;
      	Gal[p].MetalsColdGas[2] += (1.0-fwind_AGB) * AGBAllMetals;
+#ifdef INDIVIDUAL_ELEMENTS
+#ifndef MAINELEMENTS
+#ifdef AL26
+     	Gal[p].ColdGas_Al26Inst[0] += (1.0-fwind_SNII) * SNIIAllElements[Al26_NUM];
+     	Gal[p].ColdGas_Al26Inst[1] += (1.0-fwind_SNIa) * SNIaAllElements[Al26_NUM];
+     	Gal[p].ColdGas_Al26Inst[2] += (1.0-fwind_AGB) * AGBAllElements[Al26_NUM];
+#endif //AL26
+#endif //MAINELEMENTS
+#endif //INDIVIDUAL_ELEMENTS
 
 #ifdef H2_AND_RINGS
-     	/*Gal[p].ColdGasRings[jj] += ((1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + AGBEjectaMass);
-     	Gal[p].MetalsColdGasRings[jj][0] += (1.0-fwind_SNII) * SNIIAllMetals;
-     	Gal[p].MetalsColdGasRings[jj][1] += (1.0-fwind_SNIa) * SNIaAllMetals;
-     	Gal[p].MetalsColdGasRings[jj][2] +=  AGBAllMetals;*/
      	Gal[p].ColdGasRings[jj] += ((1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + (1.0-fwind_AGB) * AGBEjectaMass);
      	Gal[p].MetalsColdGasRings[jj][0] += (1.0-fwind_SNII) * SNIIAllMetals;
      	Gal[p].MetalsColdGasRings[jj][1] += (1.0-fwind_SNIa) * SNIaAllMetals;
      	Gal[p].MetalsColdGasRings[jj][2] += (1.0-fwind_AGB) * AGBAllMetals;
-#endif
+#ifdef INDIVIDUAL_ELEMENTS
+#ifndef MAINELEMENTS
+#ifdef AL26
+     	Gal[p].ColdGasRings_Al26Inst[jj][0] += (1.0-fwind_SNII) * SNIIAllElements[Al26_NUM];
+     	Gal[p].ColdGasRings_Al26Inst[jj][1] += (1.0-fwind_SNIa) * SNIaAllElements[Al26_NUM];
+     	Gal[p].ColdGasRings_Al26Inst[jj][2] += (1.0-fwind_AGB) * AGBAllElements[Al26_NUM];
+#endif //AL26
+#endif //MAINELEMENTS
+#endif //INDIVIDUAL_ELEMENTS
+#endif //H2_AND_RINGS
+
     	//Total:
-     	//TotalMassReturnedToHotGas += (fwind_SNII * SNIIEjectaMass) + (fwind_SNIa * SNIaEjectaMass);
-     	//TotalMassReturnedToColdDiskGas += (1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + AGBEjectaMass; //Only use energy from SNe that eject into ColdGas to reheat
      	TotalMassReturnedToHotGas += (fwind_SNII * SNIIEjectaMass) + (fwind_SNIa * SNIaEjectaMass) + (fwind_AGB * AGBEjectaMass);
      	TotalMetalsReturnedToHotGas += (fwind_SNII * SNIIAllMetals) + (fwind_SNIa * SNIaAllMetals) + (fwind_AGB * AGBAllMetals);
      	TotalMassReturnedToColdDiskGas += (1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + (1.0-fwind_AGB) * AGBEjectaMass; //Only use energy from SNe that eject into ColdGas to reheat
 #ifdef H2_AND_RINGS
-     	//TotalMassReturnedToColdDiskGasr[jj] += ((1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + AGBEjectaMass);
      	TotalMassReturnedToColdDiskGasr[jj] += ((1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + (1.0-fwind_AGB) * AGBEjectaMass);
 #endif //H2_AND_RINGS
 
-
+    	  /*for (int ee=0;ee<NUM_ELEMENTS;ee++)
+    			if (Gal[igal].HotGas_elements[ee] < 0.0)
+    				printf("IN update_yields_and_return_mass() 0: Gal[%i].HotGas_elements[%i] = %e\n",
+    						igal, ee, Gal[igal].HotGas_elements[ee]);*/
 
 #ifdef INDIVIDUAL_ELEMENTS
      	for(ee=0;ee<NUM_ELEMENTS;ee++)
      	  {
-     	    //Gal[igal].HotGas_elements[ee] += fwind_SNII * SNIIAllElements[ee] + fwind_SNIa * SNIaAllElements[ee];
-     	    //Gal[p].ColdGas_elements[ee] += (1.0-fwind_SNII) * SNIIAllElements[ee] + (1.0-fwind_SNIa) * SNIaAllElements[ee] + AGBAllElements[ee];
-     		Gal[igal].HotGas_elements[ee] += fwind_SNII * SNIIAllElements[ee] + fwind_SNIa * SNIaAllElements[ee] + fwind_AGB * AGBAllElements[ee];
+     	    Gal[igal].HotGas_elements[ee] += fwind_SNII * SNIIAllElements[ee] + fwind_SNIa * SNIaAllElements[ee] + fwind_AGB * AGBAllElements[ee];
      		Gal[p].ColdGas_elements[ee] += (1.0-fwind_SNII) * SNIIAllElements[ee] + (1.0-fwind_SNIa) * SNIaAllElements[ee] + (1.0-fwind_AGB) * AGBAllElements[ee];
 #ifdef H2_AND_RINGS
      	    Gal[p].ColdGasRings_elements[jj][ee] += (1.0-fwind_SNII) * SNIIAllElements[ee] + (1.0-fwind_SNIa) * SNIaAllElements[ee] + (1.0-fwind_AGB) * AGBAllElements[ee];
 #endif // H2_AND_RINGS
      	  }
+
+  	  /*for (int ee=0;ee<NUM_ELEMENTS;ee++)
+  			if (Gal[igal].HotGas_elements[ee] < 0.0)
+  				printf("IN update_yields_and_return_mass() 1: Gal[%i].HotGas_elements[%i] = %e\n",
+  						igal, ee, Gal[igal].HotGas_elements[ee]);*/
+
 #ifdef DETAILED_DUST
 #ifdef H2_AND_RINGS
 #ifndef MAINELEMENTS
-     		SNII_prevstep_Cold_Cb[jj][ii] += (1.0-fwind_SNII) * SNIIAllElements[Cb_NUM];
-     		SNII_prevstep_Cold_Si[jj][ii] += (1.0-fwind_SNII) * SNIIAllElements[Si_NUM];
+     		//SNII_prevstep_Cold_Cb[jj][ii] += (1.0-fwind_SNII) * SNIIAllElements[Cb_NUM]; //Element mass that is ejected into the ColdGas ONLY from each SFH bin (ii). Used to calculate SN-II dust production mass and rate in the ColdGas ONLY in model_dust_yields.c.
+     		SNII_prevstep_Cold_Cb[jj][ii] += SNIIAllElements[Cb_NUM]; //Element mass from Disc SNe-II that is ejected in TOTAL from each SFH bin (ii). Used to calculate SN-II dust production mass and rate from Disc SNe-II in model_dust_yields.c.
+     		SNII_prevstep_Cold_Si[jj][ii] += SNIIAllElements[Si_NUM];
 #endif //MAINELEMENTS
-     		SNII_prevstep_Cold_Fe[jj][ii] += (1.0-fwind_SNII) * SNIIAllElements[Fe_NUM];
-     		SNIa_prevstep_Cold_Fe[jj][ii] += (1.0-fwind_SNIa) * SNIaAllElements[Fe_NUM];
+     		SNII_prevstep_Cold_Fe[jj][ii] += SNIIAllElements[Fe_NUM];
+     		SNIa_prevstep_Cold_Fe[jj][ii] += SNIaAllElements[Fe_NUM];
 #else //H2_AND_RINGS
 #ifndef MAINELEMENTS
-     		SNII_prevstep_Cold_Cb[ii] += (1.0-fwind_SNII) * SNIIAllElements[Cb_NUM];
-     		SNII_prevstep_Cold_Si[ii] += (1.0-fwind_SNII) * SNIIAllElements[Si_NUM];
+     		SNII_prevstep_Cold_Cb[ii] += SNIIAllElements[Cb_NUM];
+     		SNII_prevstep_Cold_Si[ii] += SNIIAllElements[Si_NUM];
 #endif //MAINELEMENTS
-     		SNII_prevstep_Cold_Fe[ii] += (1.0-fwind_SNII) * SNIIAllElements[Fe_NUM];
-     		SNIa_prevstep_Cold_Fe[ii] += (1.0-fwind_SNIa) * SNIaAllElements[Fe_NUM];
+     		SNII_prevstep_Cold_Fe[ii] += SNIIAllElements[Fe_NUM];
+     		SNIa_prevstep_Cold_Fe[ii] += SNIaAllElements[Fe_NUM];
 #endif //H2_AND_RINGS
 #endif //DETAILED_DUST
 #endif //INDIVIDUAL_ELEMENTS
@@ -419,26 +497,48 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
      	//*****************************
      	/*ROB (13-02-13): All the mass/metals/elements in the stars that die in this timestep are lost from the stellar component.
      	 * i.e. All the mass/metals/elements in the stars at birth are removed...
-     	 *...Some goes to the gas (+ newly synthesised component), the rest goes into the 'stellar remnants' which are not tracked and do not contribute to the stellar component's mass/metals/elements budget.*/
+     	 *...Some goes to the gas (+ newly synthesised component), the rest goes into the 'stellar remnants' which are not tracked and do not contribute to the stellar component's mass/metals/elements budget.
+     	 */
+     	/*ROB (18-05-22): Actually, I don't think the above statements are correct.
+     	 * The total mass ejected is less than the total mass formed into stars that die in this timestep (see yield tables).
+     	 * Also, the metal mass removed from the stars is less than the metal mass in the ejecta, e.g. SNIIUnProcessedMetals < SNIIAllMetals. This simulates the net production/ejected of newly-synthesised metals.
+     	 * But is this done correctly? Is the "Q-matrix formalism" required / significantly different?
+     	 */
      	Gal[p].DiskMass -= SNIIEjectaMass + SNIaEjectaMass + AGBEjectaMass;
      	Gal[p].MetalsDiskMass[0] -= SNIIUnProcessedMetals;
      	Gal[p].MetalsDiskMass[1] -= SNIaUnProcessedMetals;
      	Gal[p].MetalsDiskMass[2] -= AGBUnProcessedMetals;
      	Gal[p].DiskSNIIRate += SNIIRate/STEPS; //in 1/(time code units). This records the average rate in each snapshot [i.e. SUM(SNIIRate per timestep)/STEPS], so is set to 0.0 at the start of each snapshot in model_misc.c or main.c (I forget which!). (22-05-20)
+     	Gal[p].DiskSNIaRate += SNIaRate/STEPS; //in 1/(time code units).
 
 #ifdef H2_AND_RINGS
-     	Gal[p].DiskMassRings[jj]-= (SNIIEjectaMass + SNIaEjectaMass + AGBEjectaMass);
-     	Gal[p].MetalsDiskMassRings[jj][0]-= SNIIUnProcessedMetals;
-     	Gal[p].MetalsDiskMassRings[jj][1]-= SNIaUnProcessedMetals;
-     	Gal[p].MetalsDiskMassRings[jj][2]-= AGBUnProcessedMetals;
+     	/*if (Gal[p].MetalsDiskMassRings[jj][0] < SNIIUnProcessedMetals || Gal[p].MetalsDiskMassRings[jj][1] < SNIaUnProcessedMetals || Gal[p].MetalsDiskMassRings[jj][2] < AGBUnProcessedMetals) {
+     		printf("WARNING: Gal[p].MetalsDiskMassRings[jj][0] = %e | SNIIUnProcessedMetals = %e | Diff = %e\n", Gal[p].MetalsDiskMassRings[jj][0], SNIIUnProcessedMetals, Gal[p].MetalsDiskMassRings[jj][0]-SNIIUnProcessedMetals);
+     		printf("WARNING: Gal[p].MetalsDiskMassRings[jj][1] = %e | SNIaUnProcessedMetals = %e | Diff = %e\n", Gal[p].MetalsDiskMassRings[jj][1], SNIaUnProcessedMetals, Gal[p].MetalsDiskMassRings[jj][1]-SNIaUnProcessedMetals);
+     		printf("WARNING: Gal[p].MetalsDiskMassRings[jj][2] = %e | AGBUnProcessedMetals = %e | Diff = %e\n", Gal[p].MetalsDiskMassRings[jj][2], AGBUnProcessedMetals, Gal[p].MetalsDiskMassRings[jj][2]-AGBUnProcessedMetals);
+     	}*/
+     	Gal[p].DiskMassRings[jj] -= SNIIEjectaMass + SNIaEjectaMass + AGBEjectaMass;
+     	Gal[p].MetalsDiskMassRings[jj][0] -= SNIIUnProcessedMetals;
+     	Gal[p].MetalsDiskMassRings[jj][1] -= SNIaUnProcessedMetals;
+     	Gal[p].MetalsDiskMassRings[jj][2] -= AGBUnProcessedMetals;
+     	/*if (Gal[p].MetalsDiskMassRings[jj][2] < 0.0) {
+     		printf("\nMetalsDiskMassRings[%i][2] before = %e | MetalsDiskMassRings[%i][2] after = %e | AGBUnProcessedMetals = %e \nMetals = %e | UnprocessedMetals = %e | UnprocessedMetalsScaleFactor = %e\n",
+     				jj, Gal[p].MetalsDiskMassRings[jj][2]+AGBUnProcessedMetals, jj, Gal[p].MetalsDiskMassRings[jj][2], AGBUnProcessedMetals,
+					Metals, UnprocessedMetals, UnprocessedMetalsScaleFactor);
+     	}*/
+
 #endif
 	    mass_checks(p,"model_yields.c",__LINE__);
 #ifdef INDIVIDUAL_ELEMENTS
 
-     	for(ee=0;ee<NUM_ELEMENTS;ee++)
+	    for(ee=0;ee<NUM_ELEMENTS;ee++)
      	  {
      	    Gal[p].DiskMass_elements[ee] -= SNIIUnProcessedElements[ee]+SNIaUnProcessedElements[ee]+AGBUnProcessedElements[ee];
 #ifdef H2_AND_RINGS
+     	    /*if (Gal[p].DiskMassRings_elements[jj][ee] < SNIIUnProcessedElements[ee]+SNIaUnProcessedElements[ee]+AGBUnProcessedElements[ee]) {
+     	    	printf("WARNING: Gal[p].DiskMassRings_elements[%i][%i] = %e | TotUnprocessedElements[%i] = %e\n", jj, ee, Gal[p].DiskMassRings_elements[jj][ee], ee, SNIIUnProcessedElements[ee]+SNIaUnProcessedElements[ee]+AGBUnProcessedElements[ee]);
+     	    	exit(1);
+     	    }*/
      	    Gal[p].DiskMassRings_elements[jj][ee] -= (SNIIUnProcessedElements[ee]+SNIaUnProcessedElements[ee]+AGBUnProcessedElements[ee]);
 #endif
      	  }
@@ -453,13 +553,6 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 
     	mass_checks(p,"model_yields.c",__LINE__);
     } //if (Gal[p].sfh_DiskMass[i] > 0.0) -> all disk properties updated
-
-
-
-
-
-
-
 
 
 
@@ -511,50 +604,99 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 #endif //H2_AND_RINGS
 
 #ifdef BINARYC
-    	Zi = find_initial_metallicity(BulgeMetallicity, 1, 5);
+    	Zi = find_initial_metallicity(BulgeMetallicity, 5); //Find the metallicity bin BELOW the true metallicity in the SFH bin
+    	Zi_disp = (BulgeMetallicity - bcMetallicities[Zi])/(bcMetallicities[Zi+1] - bcMetallicities[Zi]); //Fractional position of the SFH metallicity between the bcMetallicities bins.
 #else //BINARYC
-    	Zi = find_initial_metallicity(BulgeMetallicity, 1, 2);
+    	Zi = find_initial_metallicity(BulgeMetallicity, 1); //Find the metallicity bin BELOW the true metallicity in the SFH bin
+    	Zi_disp = (BulgeMetallicity - lifetimeMetallicities[Zi])/(lifetimeMetallicities[Zi+1] - lifetimeMetallicities[Zi]); //Fractional position of the SFH metallicity between the bcMetallicities bins.
 #endif //BINARYC
-    	//Interpolate the bulge luminosity on the lifetimeMetallicities tables:
-    	Zi_disp = (BulgeMetallicity - lifetimeMetallicities[Zi])/(lifetimeMetallicities[Zi+1] - lifetimeMetallicities[Zi]);
     	if (Zi_disp < 0.0) Zi_disp = 0.0; //Don't want to extrapolate yields down below lifetimeMetallicities[0]=0.0004. Instead, assume constant yield below this metallicity.
 
+#ifdef DETAILED_DUST //For use in update_dust_mass() later on
+#ifdef H2_AND_RINGS
+    	Zi_bulge_saved[jj][ii] = Zi;
+		Zi_bulge_disp_saved[jj][ii] = Zi_disp;
+#else
+		Zi_bulge_saved[ii] = Zi;
+		Zi_bulge_disp_saved[ii] = Zi_disp;
+#endif //H2_AND_RINGS
+#endif
 
 #ifndef INDIVIDUAL_ELEMENTS
     	compute_actual_eject_rates(TimeBin, ii, Zi, Zi_disp, Gal[p].sfh_ibin, BulgeSFRxStep, BulgeSFRxStep_Phys, BulgeMetallicity, timestep_width,
-				   &SNIIEjectaMass, &SNIIAllMetals, &SNIIUnProcessedMetals,
-				   &SNIaEjectaMass, &SNIaAllMetals, &SNIaUnProcessedMetals,
-				   &AGBEjectaMass, &AGBAllMetals, &AGBUnProcessedMetals,
-				   &SNIIRate, &SNIaRate, &AGBRate);
-
-#else
-    	compute_actual_eject_rates(TimeBin, ii, Zi, Zi_disp, Gal[p].sfh_ibin, BulgeSFRxStep, BulgeSFRxStep_Phys, BulgeMetallicity, BulgeMetallicityElement_Phys, timestep_width,
-				   &SNIIEjectaMass, &SNIIAllMetals, &SNIIUnProcessedMetals,
-				   &SNIaEjectaMass, &SNIaAllMetals, &SNIaUnProcessedMetals,
-				   &AGBEjectaMass, &AGBAllMetals, &AGBUnProcessedMetals,
-				   &SNIIRate, &SNIaRate, &AGBRate,
-				   SNIIAllElements, SNIIUnProcessedElements, SNIaAllElements, SNIaUnProcessedElements, AGBAllElements, AGBUnProcessedElements);
-#endif
-
-    	//If mass return or unprocessed metals larger than what is currently in the stellar population, re-adjust
-    	double SNIImetals, SNIametals, AGBmetals;
-
+								   &SNIIEjectaMass, &SNIIAllMetals, &SNIIUnProcessedMetals,
+								   &SNIaEjectaMass, &SNIaAllMetals, &SNIaUnProcessedMetals,
+								   &AGBEjectaMass, &AGBAllMetals, &AGBUnProcessedMetals,
+								   &SNIIRate, &SNIaRate, &AGBRate);
 #ifdef H2_AND_RINGS
-    	SNIImetals = Gal[p].MetalsBulgeMassRings[jj][0];
-    	SNIametals = Gal[p].MetalsBulgeMassRings[jj][1];
-    	AGBmetals = Gal[p].MetalsBulgeMassRings[jj][2];
-#else
-    	SNIImetals = Gal[p].MetalsBulgeMass[0];
-    	SNIametals = Gal[p].MetalsBulgeMass[1];
-    	AGBmetals = Gal[p].MetalsBulgeMass[2];
-#endif
-    	if(SNIIUnProcessedMetals>SNIImetals)
-    		SNIIUnProcessedMetals=SNIImetals;
-    	if(SNIaUnProcessedMetals>SNIametals)
-    		SNIaUnProcessedMetals=SNIametals;
-    	if(AGBUnProcessedMetals>AGBmetals)
-    		AGBUnProcessedMetals=AGBmetals;
+    	rescale_ejected_material(p, jj, "BulgeMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals);
+#else //H2_AND_RINGS
+		rescale_ejected_material(p, "BulgeMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals);
+#endif //H2_AND_RINGS
+#else //INDIVIDUAL_ELEMENTS
+    	compute_actual_eject_rates(TimeBin, ii, Zi, Zi_disp, Gal[p].sfh_ibin, BulgeSFRxStep, BulgeSFRxStep_Phys, BulgeMetallicity, BulgeMetallicityElement_Phys, timestep_width,
+								   &SNIIEjectaMass, &SNIIAllMetals, &SNIIUnProcessedMetals,
+								   &SNIaEjectaMass, &SNIaAllMetals, &SNIaUnProcessedMetals,
+								   &AGBEjectaMass, &AGBAllMetals, &AGBUnProcessedMetals,
+								   &SNIIRate, &SNIaRate, &AGBRate,
+								   SNIIAllElements, SNIIUnProcessedElements, SNIaAllElements, SNIaUnProcessedElements, AGBAllElements, AGBUnProcessedElements);
+#ifdef H2_AND_RINGS
+    	//ROB: (08-07-22): New way to scale unprocessed components:
+    	rescale_ejected_material(p, jj, "BulgeMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
+								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
+								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+#else //H2_AND_RINGS
+		rescale_ejected_material(p, "BulgeMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
+								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
+								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+#endif //H2_AND_RINGS
+#endif //INDIVIDUAL_ELEMENTS
 
+//Store for use in dust_yields.c:
+#ifdef DETAILED_DUST
+#ifdef DUST_HOTGAS
+#ifdef H2_AND_RINGS
+		//We have not included dust destruction from SN shocks in the bulge yet, so these variables are not yet needed: (01-03-23):
+		//BulgeSNIIRate_current_ts[jj] += SNIIRate;
+		//BulgeSNIaRate_current_ts[jj] += SNIaRate;
+		//BulgeAGBRate_current_ts[jj] += AGBRate; //Not currently used, but calculated anyway. (29-11-21)
+#ifdef INDIVIDUAL_ELEMENTS
+		for(ee=0;ee<NUM_ELEMENTS;ee++) {
+			BulgeSNIIAllElements_ts[jj][ee] += SNIIAllElements[ee];
+			BulgeSNIaAllElements_ts[jj][ee] += SNIaAllElements[ee];
+			BulgeAGBAllElements_ts[jj][ee] += AGBAllElements[ee];
+		}
+#endif //INDIVIDUAL_ELEMENTS
+#else //H2_AND_RINGS
+		//BulgeSNIIRate_current_ts += SNIIRate;
+		//BulgeSNIaRate_current_ts += SNIaRate;
+		//BulgeAGBRate_current_ts += AGBRate; //Not currently used, but calculated anyway. (29-11-21)
+#ifdef INDIVIDUAL_ELEMENTS
+		for(ee=0;ee<NUM_ELEMENTS;ee++) {
+			BulgeSNIIAllElements_ts[ee] += SNIIAllElements[ee];
+			BulgeSNIaAllElements_ts[ee] += SNIaAllElements[ee];
+			BulgeAGBAllElements_ts[ee] += AGBAllElements[ee];
+		}
+#endif //INDIVIDUAL_ELEMENTS
+#endif //H2_AND_RINGS
+#endif //DUST_HOTGAS
+#endif //DETAILED_DUST
+
+		/*rescale_ejected_material(p, jj, "BulgeMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
+								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
+								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+*/
+		mass_checks(p,"model_yields.c",__LINE__);
 
 
     	//*****************************
@@ -573,8 +715,43 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	Gal[igal].MetalsHotGas[2] += AGBAllMetals;
 
 #ifdef INDIVIDUAL_ELEMENTS
-    	for(ee=0;ee<NUM_ELEMENTS;ee++)
+
+    	for(ee=0;ee<NUM_ELEMENTS;ee++) {
+    		/*if (Gal[igal].HotGas_elements[ee] < 0.0)
+					printf("IN update_yields_and_return_mass() 1b: %i: %i: Gal[%i].HotGas_elements[%i] = %e | Gal[%i].ColdGasRings_elements[%i][%i] = %e\n",
+							ii, jj, igal, ee, Gal[igal].HotGas_elements[ee], p, jj, ee, Gal[p].ColdGasRings_elements[jj][ee]);*/
+
+    		//printf("Gal[%i].ColdGasRings_elements[%i][%i] = %e\n", p, jj, ee, Gal[p].ColdGasRings_elements[jj][ee]);
+
     	  Gal[igal].HotGas_elements[ee] += SNIIAllElements[ee]+SNIaAllElements[ee]+AGBAllElements[ee];
+
+    	  /*if (Gal[igal].HotGas_elements[ee] < 0.0) {
+    		  printf("IN update_yields_and_return_mass() 1c: %i: %i: Gal[%i].HotGas_elements[%i] = %e | Gal[%i].ColdGasRings_elements[%i][%i] = %e\n",
+					ii, jj, igal, ee, Gal[igal].HotGas_elements[ee], p, jj, ee, Gal[p].ColdGasRings_elements[jj][ee]);
+    		  printf("SNIIAllElements[%i] = %e | SNIaAllElements[%i] = %e | AGBAllElements[%i] = %e | AGBElementCorrectionFactor = %e | AGBEjectaMass = %e | TotAGBElementsEjected = %e\n",
+    				  ee, SNIIAllElements[ee], ee, SNIaAllElements[ee], ee, AGBAllElements[ee], AGBElementCorrectionFactor, AGBEjectaMass*1.e10/Hubble_h, TotAGBElementsEjected);
+    	  	  exit(1);
+    	  }*/
+    	}
+
+#ifdef DETAILED_DUST
+#ifdef H2_AND_RINGS
+#ifndef MAINELEMENTS
+     		SNII_prevstep_Hot_bulge_Cb[jj][ii] += SNIIAllElements[Cb_NUM];
+     		SNII_prevstep_Hot_bulge_Si[jj][ii] += SNIIAllElements[Si_NUM];
+#endif //MAINELEMENTS
+     		SNII_prevstep_Hot_bulge_Fe[jj][ii] += SNIIAllElements[Fe_NUM];
+     		SNIa_prevstep_Hot_bulge_Fe[jj][ii] += SNIaAllElements[Fe_NUM];
+#else //H2_AND_RINGS
+#ifndef MAINELEMENTS
+     		SNII_prevstep_Hot_bulge_Cb[ii] += SNIIAllElements[Cb_NUM];
+     		SNII_prevstep_Hot_bulge_Si[ii] += SNIIAllElements[Si_NUM];
+#endif //MAINELEMENTS
+     		SNII_prevstep_Hot_bulge_Fe[ii] += SNIIAllElements[Fe_NUM];
+     		SNIa_prevstep_Hot_bulge_Fe[ii] += SNIaAllElements[Fe_NUM];
+#endif //H2_AND_RINGS
+#endif //DETAILED_DUST
+
 #endif //INDIVIDUAL_ELEMENTS
 
 
@@ -611,10 +788,6 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 
 
 
-
-
-
-
     	//*****************************
     	// UPDATE BULGE MASS COMPONENTS:
     	//*****************************
@@ -623,12 +796,13 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	Gal[p].MetalsBulgeMass[1] -= SNIaUnProcessedMetals;
     	Gal[p].MetalsBulgeMass[2] -= AGBUnProcessedMetals;
     	Gal[p].BulgeSNIIRate += SNIIRate/STEPS; //in 1/(time code units).
+    	Gal[p].BulgeSNIaRate += SNIaRate/STEPS; //in 1/(time code units).
 
 #ifdef H2_AND_RINGS
-    	Gal[p].BulgeMassRings[jj]-= (SNIIEjectaMass + SNIaEjectaMass + AGBEjectaMass);
-    	Gal[p].MetalsBulgeMassRings[jj][0]-= SNIIUnProcessedMetals;
-    	Gal[p].MetalsBulgeMassRings[jj][1]-= SNIaUnProcessedMetals;
-    	Gal[p].MetalsBulgeMassRings[jj][2]-= AGBUnProcessedMetals;
+    	Gal[p].BulgeMassRings[jj] -= SNIIEjectaMass + SNIaEjectaMass + AGBEjectaMass;
+    	Gal[p].MetalsBulgeMassRings[jj][0] -= SNIIUnProcessedMetals;
+    	Gal[p].MetalsBulgeMassRings[jj][1] -= SNIaUnProcessedMetals;
+    	Gal[p].MetalsBulgeMassRings[jj][2] -= AGBUnProcessedMetals;
 #endif
 
 #ifdef INDIVIDUAL_ELEMENTS
@@ -684,14 +858,23 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 #endif
 
 #ifdef BINARYC
-    	Zi = find_initial_metallicity(ICMMetallicity, 1, 5);
+    	Zi = find_initial_metallicity(ICMMetallicity, 5); //Find the metallicity bin BELOW the true metallicity in the SFH bin
+    	Zi_disp = (ICMMetallicity - bcMetallicities[Zi])/(bcMetallicities[Zi+1] - bcMetallicities[Zi]); //Fractional position of the SFH metallicity between the bcMetallicities bins.
 #else //BINARYC
-    	Zi = find_initial_metallicity(ICMMetallicity, 1, 3);
+    	Zi = find_initial_metallicity(ICMMetallicity, 1); //Find the metallicity bin BELOW the true metallicity in the SFH bin
+    	Zi_disp = (ICMMetallicity - lifetimeMetallicities[Zi])/(lifetimeMetallicities[Zi+1] - lifetimeMetallicities[Zi]); //Fractional position of the SFH metallicity between the bcMetallicities bins.
 #endif //BINARYC
-    	//Interpolate the ICM metallicity on the lifetimeMetallicities tables:
-    	Zi_disp = (ICMMetallicity - lifetimeMetallicities[Zi])/(lifetimeMetallicities[Zi+1] - lifetimeMetallicities[Zi]);
     	if (Zi_disp < 0.0) Zi_disp = 0.0; //Don't want to extrapolate yields down below lifetimeMetallicities[0]=0.0004. Instead, assume constant yield below this metallicity.
 
+#ifdef DETAILED_DUST //For use in update_dust_mass() later on
+#ifdef H2_AND_RINGS
+    	Zi_ICM_saved[jj][ii] = Zi;
+		Zi_ICM_disp_saved[jj][ii] = Zi_disp;
+#else
+		Zi_ICM_saved[ii] = Zi;
+		Zi_ICM_disp_saved[ii] = Zi_disp;
+#endif //H2_AND_RINGS
+#endif
 
 #ifndef INDIVIDUAL_ELEMENTS
     	compute_actual_eject_rates(TimeBin, ii, Zi, Zi_disp, Gal[p].sfh_ibin, ICMSFRxStep, ICMSFRxStep_Phys, ICMMetallicity, timestep_width,
@@ -700,28 +883,72 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 				   &AGBEjectaMass, &AGBAllMetals, &AGBUnProcessedMetals,
 				   &SNIIRate, &SNIaRate, &AGBRate);
 
-#else
+#ifdef H2_AND_RINGS
+    	rescale_ejected_material(p, jj, "ICM", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+    									 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+    									 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals);
+#else //H2_AND_RINGS
+    	rescale_ejected_material(p, "ICM", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+										 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+										 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals);
+#endif //H2_AND_RINGS
+
+#else //INDIVIDUAL_ELEMENTS
     	compute_actual_eject_rates(TimeBin, ii, Zi, Zi_disp, Gal[p].sfh_ibin, ICMSFRxStep, ICMSFRxStep_Phys, ICMMetallicity, ICMMetallicityElement_Phys, timestep_width,
 				   &SNIIEjectaMass, &SNIIAllMetals, &SNIIUnProcessedMetals,
 				   &SNIaEjectaMass, &SNIaAllMetals, &SNIaUnProcessedMetals,
 				   &AGBEjectaMass, &AGBAllMetals, &AGBUnProcessedMetals,
 				   &SNIIRate, &SNIaRate, &AGBRate,
 				   SNIIAllElements, SNIIUnProcessedElements, SNIaAllElements, SNIaUnProcessedElements, AGBAllElements, AGBUnProcessedElements);
-#endif
 
-    	//If mass return or unprocessed metals larger than what is currently in the stellar population, re-adjust
-    	double SNIImetals, SNIametals, AGBmetals;
+#ifdef H2_AND_RINGS
+    	//ROB: (08-07-22): New way to scale unprocessed components:
+    	rescale_ejected_material(p, jj, "ICM", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
+								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
+								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+#else //H2_AND_RINGS
+		rescale_ejected_material(p, "ICM", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
+								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
+								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
+								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
+								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+#endif //H2_AND_RINGS
+#endif //INDIVIDUAL_ELEMENTS
 
-    	SNIImetals = Gal[p].MetalsICM[0];
-    	SNIametals = Gal[p].MetalsICM[1];
-    	AGBmetals = Gal[p].MetalsICM[2];
+//Store for use in dust_yields.c:
+#ifdef DETAILED_DUST
+#ifdef DUST_HOTGAS
+#ifdef H2_AND_RINGS
+		//We have not included dust destruction from SN shocks in the stellar halo yet, so these variables are not yet needed: (01-03-23):
+		//ICMSNIIRate_current_ts[jj] += SNIIRate;
+		//ICMSNIaRate_current_ts[jj] += SNIaRate;
+		//ICMAGBRate_current_ts[jj] += AGBRate; //Not currently used, but calculated anyway. (29-11-21)
+#ifdef INDIVIDUAL_ELEMENTS
+		for(ee=0;ee<NUM_ELEMENTS;ee++) {
+			ICMSNIIAllElements_ts[jj][ee] += SNIIAllElements[ee];
+			ICMSNIaAllElements_ts[jj][ee] += SNIaAllElements[ee];
+			ICMAGBAllElements_ts[jj][ee] += AGBAllElements[ee];
+		}
+#endif //INDIVIDUAL_ELEMENTS
+#else //H2_AND_RINGS
+		//ICMSNIIRate_current_ts += SNIIRate;
+		//ICMSNIaRate_current_ts += SNIaRate;
+		//ICMAGBRate_current_ts += AGBRate; //Not currently used, but calculated anyway. (29-11-21)
+#ifdef INDIVIDUAL_ELEMENTS
+		for(ee=0;ee<NUM_ELEMENTS;ee++) {
+			ICMSNIIAllElements_ts[ee] += SNIIAllElements[ee];
+			ICMSNIaAllElements_ts[ee] += SNIaAllElements[ee];
+			ICMAGBAllElements_ts[ee] += AGBAllElements[ee];
+		}
+#endif //INDIVIDUAL_ELEMENTS
+#endif //H2_AND_RINGS
+#endif //DUST_HOTGAS
+#endif //DETAILED_DUST
 
-    	if(SNIIUnProcessedMetals>SNIImetals)
-    		SNIIUnProcessedMetals=SNIImetals;
-    	if(SNIaUnProcessedMetals>SNIametals)
-    		SNIaUnProcessedMetals=SNIametals;
-    	if(AGBUnProcessedMetals>AGBmetals)
-    		AGBUnProcessedMetals=AGBmetals;
+		mass_checks(p,"model_yields.c",__LINE__);
+
 
     	//*****************************
     	// UPDATE HOT GAS COMPONENTS:
@@ -741,6 +968,24 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 #ifdef INDIVIDUAL_ELEMENTS
     	for(ee=0;ee<NUM_ELEMENTS;ee++)
     	  Gal[igal].HotGas_elements[ee] += SNIIAllElements[ee] + SNIaAllElements[ee] + AGBAllElements[ee];
+
+#ifdef DETAILED_DUST
+#ifdef H2_AND_RINGS
+#ifndef MAINELEMENTS
+     		SNII_prevstep_Hot_ICM_Cb[jj][ii] += SNIIAllElements[Cb_NUM];
+     		SNII_prevstep_Hot_ICM_Si[jj][ii] += SNIIAllElements[Si_NUM];
+#endif //MAINELEMENTS
+     		SNII_prevstep_Hot_ICM_Fe[jj][ii] += SNIIAllElements[Fe_NUM];
+     		SNIa_prevstep_Hot_ICM_Fe[jj][ii] += SNIaAllElements[Fe_NUM];
+#else //H2_AND_RINGS
+#ifndef MAINELEMENTS
+     		SNII_prevstep_Hot_ICM_Cb[ii] += SNIIAllElements[Cb_NUM];
+     		SNII_prevstep_Hot_ICM_Si[ii] += SNIIAllElements[Si_NUM];
+#endif //MAINELEMENTS
+     		SNII_prevstep_Hot_ICM_Fe[ii] += SNIIAllElements[Fe_NUM];
+     		SNIa_prevstep_Hot_ICM_Fe[ii] += SNIaAllElements[Fe_NUM];
+#endif //H2_AND_RINGS
+#endif //DETAILED_DUST
 #endif //INDIVIDUAL_ELEMENTS
 
 
@@ -752,6 +997,7 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	Gal[p].MetalsICM[1] -= SNIaUnProcessedMetals;
     	Gal[p].MetalsICM[2] -= AGBUnProcessedMetals;
     	Gal[p].ICMSNIIRate += SNIIRate/STEPS; //in 1/(time code units).
+    	Gal[p].ICMSNIaRate += SNIaRate/STEPS; //in 1/(time code units).
 
 #ifdef INDIVIDUAL_ELEMENTS
     	for(ee=0;ee<NUM_ELEMENTS;ee++)
@@ -808,7 +1054,7 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 
 #ifndef DETAILED_DUST
 	// IF DETAILED_DUST is switched ON
-	// SN-Feedback must be called AFTER BOTH model_yields AND model_dustyields
+	// SN feedback must be called AFTER BOTH model_yields AND model_dust_yields
 	// and now appears inside main.c if this is the case!
 #ifdef FEEDBACK_COUPLED_WITH_MASS_RETURN
 
@@ -823,6 +1069,11 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 #endif
     	Gal[p].MassReturnRateToColdGas += TotalMassReturnedToColdDiskGas / (dt * STEPS); //ROB: Store mass return rate by SNe and stellar winds to the gas phases.
     }
+
+	  /*for (int ee=0;ee<NUM_ELEMENTS;ee++)
+			if (Gal[p].HotGas_elements[ee] < 0.0)
+				printf("IN update_yields_and_return_mass() 2: Gal[%i].HotGas_elements[%i] = %e | Gal[%i].EjectedMass_elements[%i] = %e\n",
+						p, ee, Gal[p].HotGas_elements[ee], p, ee, Gal[p].EjectedMass_elements[ee]);*/
 
     //this mass will only result in ejection, no reheating
     if(TotalMassReturnedToHotGas>0.) {
@@ -839,6 +1090,11 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 #endif
 		Gal[p].MassReturnRateToHotGas += TotalMassReturnedToHotGas / (dt * STEPS); //ROB: Store mass return rate by SNe and stellar winds to the gas phases (from disk stars, bulge stars, and ICL stars).
       }
+
+	/*for (int ee=0;ee<NUM_ELEMENTS;ee++)
+		if (Gal[p].EjectedMass_elements[ee] < 0.0)
+			printf("IN update_yields_and_return_mass() 3: Gal[%i].EjectedMass_elements[%i] = %e | TotalMassReturnedToHotGas = %e\n",
+					p, ee, Gal[p].EjectedMass_elements[ee], TotalMassReturnedToHotGas);*/
 
     if(TotalMetalsReturnedToHotGas>0.) {
     	//NOTE: Only metals returned to the HotGas from disc stars & SNe are considered in TotalMetalsReturnedToHotGas (i.e. not from the bulge or ICL):
@@ -890,6 +1146,9 @@ void compute_actual_eject_rates(int TimeBin, int ii, int Zi, double Zi_disp, int
 				 double *SNIaAllElements, double *SNIaUnProcessedElements,
 				 double *AGBAllElements, double *AGBUnProcessedElements)
 #endif
+//This function interpolates between the normalised ejecta masses from the discreet metallicity bins generated in yields_integrals.c,
+//to find the true normalised ejecta masses at the actual metallicity of the SFH bin.
+//Analogous to calc_ejecta_limits() in yields_integrals.c, but interpolating across metallicity bins, rather than mass or time bins. (10-05-22)
 {
   double NormSNIIMassEjecRate_actual, NormSNIaMassEjecRate_actual, NormAGBMassEjecRate_actual;
   double NormSNIIMetalEjecRate_actual, NormSNIaMetalEjecRate_actual, NormAGBMetalEjecRate_actual;
@@ -916,6 +1175,10 @@ void compute_actual_eject_rates(int TimeBin, int ii, int Zi, double Zi_disp, int
       NormSNIIYieldRate_actual[ee] = NormSNIIYieldRate[TimeBin][ii][Zi][ee] + ((NormSNIIYieldRate[TimeBin][ii][Zi+1][ee] - NormSNIIYieldRate[TimeBin][ii][Zi][ee])*Zi_disp);
       NormSNIaYieldRate_actual[ee] = NormSNIaYieldRate[TimeBin][ii][Zi][ee] + ((NormSNIaYieldRate[TimeBin][ii][Zi+1][ee] - NormSNIaYieldRate[TimeBin][ii][Zi][ee])*Zi_disp);
       NormAGBYieldRate_actual[ee] = NormAGBYieldRate[TimeBin][ii][Zi][ee] + ((NormAGBYieldRate[TimeBin][ii][Zi+1][ee] - NormAGBYieldRate[TimeBin][ii][Zi][ee])*Zi_disp);
+      /*if (NormAGBYieldRate_actual[ee] < 0.0)
+          	  printf("\nHere1: NormAGBYieldRate_actual[%i] = %e | NormAGBYieldRate[%i][%i][%i][%i] = %e | NormAGBYieldRate[%i][%i][%i][%i] = %e | Zi_disp = %e\n",
+          			  ee, NormAGBYieldRate_actual[ee], TimeBin, ii, Zi, ee, NormAGBYieldRate[TimeBin][ii][Zi][ee], TimeBin, ii, Zi+1, ee, NormAGBYieldRate[TimeBin][ii][Zi+1][ee], Zi_disp);
+      */
     }
 #endif
 
@@ -940,20 +1203,18 @@ void compute_actual_eject_rates(int TimeBin, int ii, int Zi, double Zi_disp, int
 
 
   //SNII
-  *SNIIEjectaMass = SFRxStep * NormSNIIMassEjecRate_actual;
+  *SNIIEjectaMass = SFRxStep * NormSNIIMassEjecRate_actual; //ROB: Why is there no option for an unprocessed component to be added (for the P98 yield set) here? (17-05-22) <-- Ans: Because the masses in the P98 yield tables are *total* ejected masses (newly synth + unproc), unlike the metals and lements which are only newly synth. (04-07-22)
 #ifdef INSTANTANEOUS_RECYCLE
   *SNIIAllMetals = SFRxStep * (NormSNIIMetalEjecRate_actual + Metallicity * NormSNIIMassEjecRate_actual);
-#else
-#ifdef PORTINARI
-  *SNIIAllMetals = SFRxStep * (NormSNIIMetalEjecRate_actual + Metallicity * NormSNIIMassEjecRate_actual);
-#endif
-#ifdef CHIEFFI
-  //ROB: No unsynth component required for SN-II ejecta, when using the Chieffi & Limongi (2007) yield tables/
+#else //INSTANTANEOUS_RECYCLE
+#if defined(CHIEFFI) || defined(BINARYC)
+  //ROB: No unsynth component required for SN-II ejecta, when using the Chieffi & Limongi (2007) or binary_c yield tables
   *SNIIAllMetals = SFRxStep * NormSNIIMetalEjecRate_actual;
+#elif defined(PORTINARI)
+  *SNIIAllMetals = SFRxStep * (NormSNIIMetalEjecRate_actual + Metallicity * NormSNIIMassEjecRate_actual);
 #endif
 #endif //INSTANTANEOUS_RECYCLE
   *SNIIUnProcessedMetals = SFRxStep * Metallicity * NormSNIIMassEjecRate_actual;
-  ////*SNIIRate = (SFRxStep/timestep_width) * NormSNIINum_actual; //This is the SNII rate in [1/(10^10/h)(time code units)] in this timestep. So should divide by ((UnitTime_in_s / SEC_PER_YEAR) * (1.e10/Hubble_h)) in save.c to get "per year" before outputting).
   *SNIIRate = (SFRxStep_Phys/timestep_width) * NormSNIINum_actual; //This is the SNII rate in [1/(time code units)] in this timestep. So should divide by (UnitTime_in_s / SEC_PER_YEAR) in save.c to get "per year" before outputting).
 
   //SNIa
@@ -965,28 +1226,93 @@ void compute_actual_eject_rates(int TimeBin, int ii, int Zi, double Zi_disp, int
 
   //AGB
   *AGBEjectaMass = SFRxStep * NormAGBMassEjecRate_actual;
+#ifdef BINARYC
+  //ROB: No unsynth component required for AGB ejecta, when using the binary_c yield tables
+  *AGBAllMetals = SFRxStep * NormAGBMetalEjecRate_actual;
+#else //BINARYC
   *AGBAllMetals = SFRxStep * (NormAGBMetalEjecRate_actual + (Metallicity * NormAGBMassEjecRate_actual));
+#endif //BINARYC
   *AGBUnProcessedMetals = SFRxStep * Metallicity * NormAGBMassEjecRate_actual;
   *AGBRate = (SFRxStep_Phys/timestep_width) * NormAGBNum_actual; //This is the AGB rate in [1/(time code units)] in this timestep. So should divide by (UnitTime_in_s / SEC_PER_YEAR) in save.c to get "per year" before outputting).
 
 #ifdef INDIVIDUAL_ELEMENTS
-  for(ee=0;ee<NUM_ELEMENTS;ee++)
-    {
-#ifdef PORTINARI
+  //double SNII_ele_sum=0.0,  SNIa_ele_sum=0.0, AGB_ele_sum=0.0; //sum of all element masses removed (see below)
+  //double SNII_met_ele_sum=0.0,  SNIa_met_ele_sum=0.0, AGB_met_ele_sum=0.0; //sum of all metal element masses removed (see below)
+  //double SNII_met_rem_factor=1.0, SNIa_met_rem_factor=1.0, AGB_met_rem_factor=1.0; //metal removal scale factors (see below)
+  for(ee=0;ee<NUM_ELEMENTS;ee++) {
+#if defined(CHIEFFI) || defined(BINARYC)
+      SNIIAllElements[ee] = SFRxStep_Phys * NormSNIIYieldRate_actual[ee];
+#elif defined(PORTINARI)
       SNIIAllElements[ee] = SFRxStep_Phys * (NormSNIIYieldRate_actual[ee] + MetallicityElement_Phys[ee] * NormSNIIMassEjecRate_actual);
 #endif
-#ifdef CHIEFFI
-      SNIIAllElements[ee] = SFRxStep_Phys * NormSNIIYieldRate_actual[ee];
-#endif
       SNIIUnProcessedElements[ee] = SFRxStep_Phys * MetallicityElement_Phys[ee] * NormSNIIMassEjecRate_actual;
+      /*if (SNIIUnProcessedElements[ee] > SNIIAllElements[ee]) {
+    	  printf("\nSNIIAllElements[%i] = %e | SNIIUnProcessedElements[%i] = %e | NormSNIIYieldRate_actual[%i] = %e | MetallicityElement_Phys[%i] = %e | NormSNIIMassEjecRate_actual = %e\n",
+    			  ee, SNIIAllElements[ee], ee, SNIIUnProcessedElements[ee], ee, NormSNIIYieldRate_actual[ee], ee, MetallicityElement_Phys[ee], NormSNIIMassEjecRate_actual);
+    	  SNIIUnProcessedElements[ee] = SNIIAllElements[ee];
+    	  printf("SNIIAllElements[%i] = %e | SNIIUnProcessedElements[%i] = %e | NormSNIIYieldRate_actual[%i] = %e | MetallicityElement_Phys[%i] = %e | NormSNIIMassEjecRate_actual = %e\n",
+				  ee, SNIIAllElements[ee], ee, SNIIUnProcessedElements[ee], ee, NormSNIIYieldRate_actual[ee], ee, MetallicityElement_Phys[ee], NormSNIIMassEjecRate_actual);
+      }*/
 
       SNIaAllElements[ee] = SFRxStep_Phys * NormSNIaYieldRate_actual[ee];
       SNIaUnProcessedElements[ee] = SFRxStep_Phys * MetallicityElement_Phys[ee] * NormSNIaMassEjecRate_actual;
+      /*if (SNIaUnProcessedElements[ee] > SNIaAllElements[ee]) {
+    	  printf("SNIaAllElements[%i] = %e | SNIaUnProcessedElements[%i] = %e | NormSNIaYieldRate_actual[%i] = %e | MetallicityElement_Phys[%i] = %e | NormSNIaMassEjecRate_actual = %e\n",
+    			  ee, SNIaAllElements[ee], ee, SNIaUnProcessedElements[ee], ee, NormSNIaYieldRate_actual[ee], ee, MetallicityElement_Phys[ee], NormSNIaMassEjecRate_actual);
+    	  SNIaUnProcessedElements[ee] = SNIaAllElements[ee];
+    	  printf("SNIaAllElements[%i] = %e | SNIaUnProcessedElements[%i] = %e | NormSNIaYieldRate_actual[%i] = %e | MetallicityElement_Phys[%i] = %e | NormSNIaMassEjecRate_actual = %e\n",
+    			  ee, SNIaAllElements[ee], ee, SNIaUnProcessedElements[ee], ee, NormSNIaYieldRate_actual[ee], ee, MetallicityElement_Phys[ee], NormSNIaMassEjecRate_actual);
+      }*/
 
+#ifdef BINARYC
+      AGBAllElements[ee] = SFRxStep_Phys * NormAGBYieldRate_actual[ee];
+      /*if (AGBAllElements[ee] < 0.0)
+          	  printf("Here2: AGBAllElements[%i] = %e | SFRxStep_Phys = %e | NormAGBYieldRate_actual[%i] = %e | MetallicityElement_Phys[%i] = %e | NormAGBMassEjecRate_actual = %e\n",
+          			  ee, AGBAllElements[ee], SFRxStep_Phys, ee, NormAGBYieldRate_actual[ee], ee, MetallicityElement_Phys[ee], NormAGBMassEjecRate_actual);*/
+#else //BINARYC
       AGBAllElements[ee] = SFRxStep_Phys * (NormAGBYieldRate_actual[ee] + MetallicityElement_Phys[ee] * NormAGBMassEjecRate_actual);
+      /*if (AGBAllElements[ee] < 0.0)
+    	  printf("Here2: AGBAllElements[%i] = %e | SFRxStep_Phys = %e | NormAGBYieldRate_actual[%i] = %e | MetallicityElement_Phys[%i] = %e | NormAGBMassEjecRate_actual = %e\n",
+    			  ee, AGBAllElements[ee], SFRxStep_Phys, ee, NormAGBYieldRate_actual[ee], ee, MetallicityElement_Phys[ee], NormAGBMassEjecRate_actual);*/
+
+
+#endif //BINARYC
       AGBUnProcessedElements[ee] = SFRxStep_Phys * MetallicityElement_Phys[ee] * NormAGBMassEjecRate_actual;
-    }
-#endif
+      /*if (AGBAllElements[ee] < 0.0)
+		  printf("Here2: AGBAllElements[%i] = %e | AGBUnProcessedElements[%i] = %e | SFRxStep_Phys = %e | NormAGBYieldRate_actual[%i] = %e | MetallicityElement_Phys[%i] = %e | NormAGBMassEjecRate_actual = %e\n",
+				  ee, AGBAllElements[ee], ee, AGBUnProcessedElements[ee], SFRxStep_Phys, ee, NormAGBYieldRate_actual[ee], ee, MetallicityElement_Phys[ee], NormAGBMassEjecRate_actual);
+      */
+      /*if (AGBUnProcessedElements[ee] > AGBAllElements[ee]) {
+    	  printf("AGBAllElements[%i] = %e | AGBUnProcessedElements[%i] = %e | NormAGBYieldRate_actual[%i] = %e | MetallicityElement_Phys[%i] = %e | NormAGBMassEjecRate_actual = %e\n",
+    			  ee, AGBAllElements[ee], ee, AGBUnProcessedElements[ee], ee, NormAGBYieldRate_actual[ee], ee, MetallicityElement_Phys[ee], NormAGBMassEjecRate_actual);
+    	  AGBUnProcessedElements[ee] = AGBAllElements[ee];
+    	  printf("AGBAllElements[%i] = %e | AGBUnProcessedElements[%i] = %e | NormAGBYieldRate_actual[%i] = %e | MetallicityElement_Phys[%i] = %e | NormAGBMassEjecRate_actual = %e\n",
+    			  ee, AGBAllElements[ee], ee, AGBUnProcessedElements[ee], ee, NormAGBYieldRate_actual[ee], ee, MetallicityElement_Phys[ee], NormAGBMassEjecRate_actual);
+      }*/
+	  /*if (AGBAllElements[ee] < 0.0)
+		  printf("IN compute_actual_ejecta_rates(): AGBAllElements[%i] = %e | NormAGBYieldRate_actual[%i] = %e | MetallicityElement_Phys[%i] = %e | NormAGBMassEjecRate_actual = %e\n",
+				  ee, AGBAllElements[ee], ee, NormAGBYieldRate_actual[ee], ee, MetallicityElement_Phys[ee], NormAGBMassEjecRate_actual);*/
+  }
+
+  /*
+  //This is a new mod to scale the element masses removed from the stellar component to the total mass removed from the stellar component (ROB, 26-05-22):
+  //The if statements here prevent NaN values of e.g. SNII_met_rem_factor from propagating through to e.g. SNIIUnProcessedElements[ee]
+  if (NormSNIIMassEjecRate_actual > 0.0) {
+	  SNII_met_rem_factor = *SNIIEjectaMass*(1.e10/Hubble_h) / SNII_ele_sum; //These three metal removal factors should all be identical.
+  }
+  if (NormSNIaMassEjecRate_actual > 0.0) {
+	  SNIa_met_rem_factor = *SNIaEjectaMass*(1.e10/Hubble_h) / SNIa_ele_sum;
+  }
+  if (NormAGBMassEjecRate_actual > 0.0) {
+	  AGB_met_rem_factor = *AGBEjectaMass*(1.e10/Hubble_h) / AGB_ele_sum;
+  }
+  for(ee=0;ee<NUM_ELEMENTS;ee++) {
+	  SNIIUnProcessedElements[ee] = SNII_met_rem_factor * SFRxStep_Phys * MetallicityElement_Phys[ee] * NormSNIIMassEjecRate_actual;
+	  SNIaUnProcessedElements[ee] = SNIa_met_rem_factor * SFRxStep_Phys * MetallicityElement_Phys[ee] * NormSNIaMassEjecRate_actual;
+	  AGBUnProcessedElements[ee] = AGB_met_rem_factor * SFRxStep_Phys * MetallicityElement_Phys[ee] * NormAGBMassEjecRate_actual;
+  }*/
+
+#endif //INDIVIDUAL_ELEMENTS
 
 }
 
@@ -997,7 +1323,7 @@ void compute_actual_eject_rates(int TimeBin, int ii, int Zi, double Zi_disp, int
 
 
 
-int find_initial_metallicity(double metallicity, int table_type, int component_type)
+int find_initial_metallicity(double metallicity, int table_type) //, int component_type
 {
 	int i, Zi_bin;
 	Zi_bin = -1;
@@ -1005,6 +1331,7 @@ int find_initial_metallicity(double metallicity, int table_type, int component_t
 
 	switch (table_type)
 	{
+#ifndef BINARYC
 	case 1: //Lifetime metallicity table
 	  while (Zi_bin == -1)
 		{
@@ -1016,7 +1343,6 @@ int find_initial_metallicity(double metallicity, int table_type, int component_t
 		  else Zi_bin = i;
 		}
 	  break;
-#ifndef BINARYC
 	case 2: //SN-II metallicity table
 	  while (Zi_bin == -1)
 	    {
@@ -1059,6 +1385,194 @@ int find_initial_metallicity(double metallicity, int table_type, int component_t
 	else return Zi_bin-1;
 
 }
+
+
+
+
+#ifdef INDIVIDUAL_ELEMENTS
+#ifdef H2_AND_RINGS
+void rescale_ejected_material(int p, int jj, char component[], double SNIIEjectaMass, double SNIaEjectaMass, double AGBEjectaMass,
+							  double* SNIIUnProcessedMetals, double* SNIaUnProcessedMetals, double* AGBUnProcessedMetals,
+							  double* SNIIAllMetals, double* SNIaAllMetals, double* AGBAllMetals,
+							  double* SNIIAllElements, double* SNIaAllElements, double* AGBAllElements,
+							  double* SNIIUnProcessedElements, double* SNIaUnProcessedElements, double* AGBUnProcessedElements) {
+#else //H2_AND_RINGS
+void rescale_ejected_material(int p, char component[], double SNIIEjectaMass, double SNIaEjectaMass, double AGBEjectaMass,
+							  double* SNIIUnProcessedMetals, double* SNIaUnProcessedMetals, double* AGBUnProcessedMetals,
+							  double* SNIIAllMetals, double* SNIaAllMetals, double* AGBAllMetals,
+							  double* SNIIAllElements, double* SNIaAllElements, double* AGBAllElements,
+							  double* SNIIUnProcessedElements, double* SNIaUnProcessedElements, double* AGBUnProcessedElements) {
+#endif //H2_AND_RINGS
+#else //INDIVIDUAL_ELEMENTS
+#ifdef H2_AND_RINGS
+void rescale_ejected_material(int p, int jj, char component[],
+							  double* SNIIUnProcessedMetals, double* SNIaUnProcessedMetals, double* AGBUnProcessedMetals,
+							  double* SNIIAllMetals, double* SNIaAllMetals, double* AGBAllMetals) {
+#else //H2_AND_RINGS
+void rescale_ejected_material(int p, char component[],
+							  double* SNIIUnProcessedMetals, double* SNIaUnProcessedMetals, double* AGBUnProcessedMetals,
+							  double* SNIIAllMetals, double* SNIaAllMetals, double* AGBAllMetals) {
+#endif //H2_AND_RINGS
+#endif //INDIVIDUAL_ELEMENTS
+//ROB: (07-07-22): New way to scale unprocessed components:
+//First, correct element ejected masses so that total elements ejected matches total mass ejected
+//Second, correct metal ejected & unprocessed masses so that total metals ejected matches total metal elements ejected
+//Third, redistribute unprocessed masses from AGB and SNe-Ia to SNe-II, if necessary
+	//#####
+	//0) Assign metal sub-components (SNe-II, SNe-Ia, or AGBs) for the correct mass component (DiskMass, BulgeMass, or ICM):
+	double SNIImetals, SNIametals, AGBmetals;
+#ifdef H2_AND_RINGS
+	if (strcmp(component,"DiskMass") == 0) {
+		SNIImetals = Gal[p].MetalsDiskMassRings[jj][0];
+		SNIametals = Gal[p].MetalsDiskMassRings[jj][1];
+		AGBmetals = Gal[p].MetalsDiskMassRings[jj][2];
+	}
+	else if (strcmp(component,"BulgeMass") == 0) {
+		SNIImetals = Gal[p].MetalsBulgeMassRings[jj][0];
+		SNIametals = Gal[p].MetalsBulgeMassRings[jj][1];
+		AGBmetals = Gal[p].MetalsBulgeMassRings[jj][2];
+	}
+	else if (strcmp(component,"ICM") == 0) {
+		SNIImetals = Gal[p].MetalsICM[0];
+		SNIametals = Gal[p].MetalsICM[1];
+		AGBmetals = Gal[p].MetalsICM[2];
+	}
+	else  {
+		printf("\nERROR: rescale_ejected_material(): Component %c is invalid. Choose from DiskMass, BulgeMass, or ICM.\n", component);
+		exit(1);
+	}
+#else //H2_AND_RINGS
+	if (strcmp(component,"DiskMass") == 0) {
+		SNIImetals = Gal[p].MetalsDiskMass[0];
+		SNIametals = Gal[p].MetalsDiskMass[1];
+		AGBmetals = Gal[p].MetalsDiskMass[2];
+	}
+	else if (strcmp(component,"BulgeMass") == 0) {
+		SNIImetals = Gal[p].MetalsBulgeMass[0];
+		SNIametals = Gal[p].MetalsBulgeMass[1];
+		AGBmetals = Gal[p].MetalsBulgeMass[2];
+	}
+	else if (strcmp(component,"ICM") == 0) {
+		SNIImetals = Gal[p].MetalsICM[0];
+		SNIametals = Gal[p].MetalsICM[1];
+		AGBmetals = Gal[p].MetalsICM[2];
+	}
+	else  {
+		printf("\nERROR: rescale_ejected_material(): Component %c is invalid. Choose from DiskMass, BulgeMass, or ICM.\n", component);
+		exit(1);
+	}
+#endif //H2_AND_RINGS
+
+#ifdef INDIVIDUAL_ELEMENTS
+	int ee;
+	double TotSNIIElementsEjected = 0.0, TotSNIaElementsEjected = 0.0, TotAGBElementsEjected = 0.0;
+	double SNIIElementCorrectionFactor = 1.0, SNIaElementCorrectionFactor = 1.0, AGBElementCorrectionFactor = 1.0;
+	double TotMetalSNIIElementsEjected = 0.0, TotMetalSNIaElementsEjected = 0.0, TotMetalAGBElementsEjected = 0.0;
+	double SNIIMetalCorrectionFactor = 1.0, SNIaMetalCorrectionFactor = 1.0, AGBMetalCorrectionFactor = 1.0;
+	double TotMetalSNIIUnProcessedElements = 0.0, TotMetalSNIaUnProcessedElements = 0.0, TotMetalAGBUnProcessedElements = 0.0;
+	double SNIIMetalExcessFactor, SNIaMetalExcessFactor1, SNIaMetalExcessFactor2, AGBMetalExcessFactor1, AGBMetalExcessFactor2;
+	double SNIaElementExcessFactor[NUM_ELEMENTS], AGBElementExcessFactor[NUM_ELEMENTS];
+	for(ee=0;ee<NUM_ELEMENTS;ee++) {
+		SNIaElementExcessFactor[ee] = 0.0;
+		AGBElementExcessFactor[ee] = 0.0;
+	}
+
+	//#####
+	//1) Correct element unprocessed masses so that total elements ejected matches total mass ejected:
+	for(ee=0;ee<NUM_ELEMENTS;ee++) {
+		TotSNIIElementsEjected += SNIIAllElements[ee];
+		TotSNIaElementsEjected += SNIaAllElements[ee];
+		TotAGBElementsEjected += AGBAllElements[ee];
+	}
+	if (TotSNIIElementsEjected > 0.0)
+		SNIIElementCorrectionFactor = (SNIIEjectaMass*1.e10/Hubble_h)/TotSNIIElementsEjected;
+	if (TotSNIaElementsEjected > 0.0)
+		SNIaElementCorrectionFactor = (SNIaEjectaMass*1.e10/Hubble_h)/TotSNIaElementsEjected;
+	if (TotAGBElementsEjected > 0.0)
+		AGBElementCorrectionFactor = (AGBEjectaMass*1.e10/Hubble_h)/TotAGBElementsEjected;
+	//if (AGBElementCorrectionFactor < 0.0)
+	//	printf("AGBElementCorrectionFactor = %e | AGBEjectaMass = %e | TotAGBElementsEjected = %e\n", AGBElementCorrectionFactor,AGBEjectaMass,TotAGBElementsEjected);
+	for(ee=0;ee<NUM_ELEMENTS;ee++) {
+		SNIIAllElements[ee] *= SNIIElementCorrectionFactor;
+		SNIaAllElements[ee] *= SNIaElementCorrectionFactor;
+		AGBAllElements[ee] *= AGBElementCorrectionFactor;
+	}
+
+	//#####
+	//2) Correct metal unprocessed masses so that total metals ejected matches total metal elements ejected:
+	for(ee=2;ee<NUM_ELEMENTS;ee++) { //Metal elements only
+		TotMetalSNIIElementsEjected += SNIIAllElements[ee];
+		TotMetalSNIaElementsEjected += SNIaAllElements[ee];
+		TotMetalAGBElementsEjected += AGBAllElements[ee];
+		TotMetalSNIIUnProcessedElements += SNIIUnProcessedElements[ee];
+		TotMetalSNIaUnProcessedElements += SNIaUnProcessedElements[ee];
+		TotMetalAGBUnProcessedElements += AGBUnProcessedElements[ee];
+	}
+
+	if (*SNIIAllMetals > 0.0)
+		SNIIMetalCorrectionFactor = TotMetalSNIIElementsEjected/(*SNIIAllMetals*1.e10/Hubble_h);
+	if (*SNIaAllMetals > 0.0)
+		SNIaMetalCorrectionFactor = TotMetalSNIaElementsEjected/(*SNIaAllMetals*1.e10/Hubble_h);
+	if (*AGBAllMetals > 0.0)
+		AGBMetalCorrectionFactor = TotMetalAGBElementsEjected/(*AGBAllMetals*1.e10/Hubble_h);
+	*SNIIUnProcessedMetals = TotMetalSNIIUnProcessedElements*(Hubble_h/1.e10);
+	*SNIIAllMetals *= SNIIMetalCorrectionFactor;
+	*SNIaUnProcessedMetals = TotMetalSNIaUnProcessedElements*(Hubble_h/1.e10);
+	*SNIaAllMetals *= SNIaMetalCorrectionFactor;
+	*AGBUnProcessedMetals = TotMetalAGBUnProcessedElements*(Hubble_h/1.e10);
+	*AGBAllMetals *= AGBMetalCorrectionFactor;
+
+	//#####
+	//3) Check that removed (i.e. unprocessed) material doesn't exceed the amount of material currently in the stellar components:
+	if (AGBmetals < *AGBUnProcessedMetals && *AGBUnProcessedMetals > 0.0) {
+		AGBMetalExcessFactor1 = AGBmetals / *AGBUnProcessedMetals;
+		AGBMetalExcessFactor2 = *AGBUnProcessedMetals - AGBmetals; //in code units
+		*AGBUnProcessedMetals *= AGBMetalExcessFactor1;
+		for(ee=2;ee<NUM_ELEMENTS;ee++) {
+			AGBElementExcessFactor[ee] = AGBUnProcessedElements[ee] - (AGBUnProcessedElements[ee]*AGBMetalExcessFactor1);
+			AGBUnProcessedElements[ee] *= AGBMetalExcessFactor1;
+		}
+		*SNIIUnProcessedMetals += AGBMetalExcessFactor2;
+		for(ee=2;ee<NUM_ELEMENTS;ee++)
+			SNIIUnProcessedElements[ee] += AGBElementExcessFactor[ee];
+	}
+	if (SNIametals < *SNIaUnProcessedMetals && *SNIaUnProcessedMetals > 0.0) {
+		SNIaMetalExcessFactor1 = SNIametals / *SNIaUnProcessedMetals;
+		SNIaMetalExcessFactor2 = *SNIaUnProcessedMetals - SNIametals; //in code units
+		*SNIaUnProcessedMetals *= SNIaMetalExcessFactor1;
+		for(ee=2;ee<NUM_ELEMENTS;ee++) {
+			SNIaElementExcessFactor[ee] = SNIaUnProcessedElements[ee] - (SNIaUnProcessedElements[ee]*SNIaMetalExcessFactor1);
+			SNIaUnProcessedElements[ee] *= SNIaMetalExcessFactor1;
+		}
+		*SNIIUnProcessedMetals += SNIaMetalExcessFactor2;
+		for(ee=2;ee<NUM_ELEMENTS;ee++)
+			SNIIUnProcessedElements[ee] += SNIaElementExcessFactor[ee];
+	}
+	if (SNIImetals < *SNIIUnProcessedMetals && *SNIIUnProcessedMetals > 0.0) {
+		/*if (*SNIIUnProcessedMetals - SNIImetals > TINY_MASS) //N.B. TINY_MASS should equal 1.e-08
+			printf("WARNING: rescale_ejected_material(): SNIIUnProcessedMetals = %e exceeded SNIImetals = %e by more than %e [code units] \nNow fixed to: SNIIUnProcessedMetals = SNIImetals\n",
+					*SNIIUnProcessedMetals, SNIImetals, TINY_MASS);*/
+		SNIIMetalExcessFactor = SNIImetals / *SNIIUnProcessedMetals;
+		*SNIIUnProcessedMetals *= SNIIMetalExcessFactor;
+		for(ee=2;ee<NUM_ELEMENTS;ee++)
+			SNIIUnProcessedElements[ee] *= SNIIMetalExcessFactor;
+	}
+#else //INDIVIDUAL_ELEMENTS
+	//OLD METHOD: If mass return or unprocessed metals larger than what is currently in the stellar population, re-adjust:
+	if(SNIIUnProcessedMetals>SNIImetals)
+		SNIIUnProcessedMetals=SNIImetals;
+
+	if(SNIaUnProcessedMetals>SNIametals)
+		SNIaUnProcessedMetals=SNIametals;
+
+	if(AGBUnProcessedMetals>AGBmetals)
+		AGBUnProcessedMetals=AGBmetals;
+#endif //INDIVIDUAL_ELEMENTS
+}
+
+
+
+
 
 
 #ifdef INSTANTANEOUS_RECYCLE //to recover results from instantaneous recycling approximation
