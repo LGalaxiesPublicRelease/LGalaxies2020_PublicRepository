@@ -327,30 +327,17 @@ void integrate_yields()
 											   SNIIRates_lower_actual, SNIIRates_upper_actual,
 											   &IL, &IU, &EjectedMasses_lower, &EjectedMasses_upper, &TotalMetals_lower, &TotalMetals_upper, &Rates_lower, &Rates_upper);
 #endif //INDIVIDUAL_ELEMENTS
-						  //printf("SNeII: calc_integral_limits(): Bin %i | IL = %e | IU = %e | EjectedMasses_lower = %e | EjectedMasses_upper = %e\n", j, IL, IU, EjectedMasses_lower, EjectedMasses_upper);
-						  /*if (mb == mbmax && IU == Mi_upper_actual && IU < Mi_lower_lastTS[i][Zi][0])
-							  IU = Mi_lower_lastTS[i][Zi][0]; //only for last mass bin integrated over
-						  if (IU > Mi_lower_lastTS[i][Zi][0] && Mi_lower_lastTS[i][Zi][0] > 0.0)
-							  IU = Mi_lower_lastTS[i][Zi][0];
-						  if (IU < IL)
-							  IL = IU;*/
-
 						  //Calc yield ejected in timestep step from stars born in minibin mb of SFH bin i:
-						  //NormSNIINum[(STEPS*snap)+step][i][Zi] += 0.0;  //NOTE: Set to 0.0 for now. Should get from binary_c and add as read-in table. (06-05-22) //(IU-IL) * (Chabrier_IMF(IL) + Chabrier_IMF(IU))/2.0; //Number of SNe-II exploding in this timestep from minibin mb of SFHBin i [units: # / Msun]
 						  NormSNIINum[(STEPS*snap)+step][i][Zi] += (IU-IL) * ((Rates_lower + Rates_upper)/2.0); //* dt*(UnitTime_in_years/Hubble_h); //This quantity is in Num/Msun, so should be multiplied by SFR (i.e. M_starsFormedInSFHBin*dt_SFH, in model_yields.c) to get units of [Num/yr]
 						  NormSNIIMassEjecRate[(STEPS*snap)+step][i][Zi] += (IU-IL) * ((EjectedMasses_lower + EjectedMasses_upper)/2.0); //This is a unitless quantity, which must be multiplied by SFR (i.e. M_starsFormedInSFHBin*dt_SFH, in model_yields.c) to get units of [Msun/yr], and then by dt (i.e. timestep width, also in model_yields.c) to get units of [Msun]. (22-05-20)
 						  NormSNIIMetalEjecRate[(STEPS*snap)+step][i][Zi] += (IU-IL) * ((TotalMetals_lower + TotalMetals_upper)/2.0); //This is a unitless quantity, which must be multiplied by SFR (in model_yields.c) to get units of [Msun/yr], and then by dt (also in model_yields.c) to get units of [Msun]. (22-05-20) //NO! --> //IN [MSun/yr] //The rate of ejection of 'newly synthesised' metals from a 1 Msun stellar population.
-						  //printf("SNeII: NormSNIIMassEjecRate[%i][%i][%i] += %e\n", (STEPS*snap)+step, i, Zi, NormSNIIMassEjecRate[(STEPS*snap)+step][i][Zi]);
 #ifdef INDIVIDUAL_ELEMENTS
-						  //printf("\n-----------\n");
 						  for (kk=0;kk<NUM_ELEMENTS;kk++) {
 #ifndef MAINELEMENTS
 							  NormSNIIYieldRate[(STEPS*snap)+step][i][Zi][kk] += (IU-IL) * ((Yields_lower[kk] + Yields_upper[kk])/2.0); //IN [Msun/yr] //The rate of ejection of individual elements from a 1 Msun stellar population.
 #else //MAINELEMENTS
-							  //printf("BEFORE: %i\n", kk);
 							  switch(kk){case 0: kk=0; break; case 1: kk=1; break; case 2: kk=4; break; case 3: kk=6; break; case 4: kk=10; break;}
 							  NormSNIIYieldRate[(STEPS*snap)+step][i][Zi][kk] += (IU-IL) * ((Yields_lower[kk] + Yields_upper[kk])/2.0); //IN [Msun/yr] //The rate of ejection of individual elements from a 1 Msun stellar population.
-							  //printf("AFTER: %i\n\n", kk);
 #endif //MAINELEMENTS
 						  }
 #endif //INDIVIDUAL_ELEMENTS
@@ -370,7 +357,6 @@ void integrate_yields()
 										 &SNIaEjectedMasses_lower_actual, &SNIaEjectedMasses_upper_actual, &SNIaTotalMetals_lower_actual, &SNIaTotalMetals_upper_actual,
 										 &SNIaRates_lower_actual, &SNIaRates_upper_actual);
 #endif //INDIVIDUAL_ELEMENTS
-					  //printf("SNeIa: calc_ejecta_limits(): SNIaEjectedMasses_lower_actual = %e | SNIaEjectedMasses_upper_actual = %e\n", SNIaEjectedMasses_lower_actual, SNIaEjectedMasses_upper_actual);
 					  for (j=ti_lower;j<=ti_upper;j++) { //loop over binary_c timebins of relevance
 						  //Calc time integral limits for each time bin:
 #ifdef INDIVIDUAL_ELEMENTS
@@ -387,12 +373,10 @@ void integrate_yields()
 											   SNIaRates_lower_actual, SNIaRates_upper_actual,
 											   &IL, &IU, &EjectedMasses_lower, &EjectedMasses_upper, &TotalMetals_lower, &TotalMetals_upper, &Rates_lower, &Rates_upper);
 #endif //INDIVIDUAL_ELEMENTS
-						  //printf("SNeIa: calc_integral_limits(): Bin %i | IL = %e | IU = %e | EjectedMasses_lower = %e | EjectedMasses_upper = %e\n", j, IL, IU, EjectedMasses_lower, EjectedMasses_upper);
 						  //Calc yield ejected in timestep step from stars born in minibin mb of SFH bin i:
 						  NormSNIaNum[(STEPS*snap)+step][i][Zi] += (IU-IL) * ((Rates_lower + Rates_upper)/2.0); //* dt*(UnitTime_in_years/Hubble_h); //This quantity is in Num/Msun, so should be multiplied by SFR (i.e. M_starsFormedInSFHBin*dt_SFH, in model_yields.c) to get units of [Num/yr]
 						  NormSNIaMassEjecRate[(STEPS*snap)+step][i][Zi] += (IU-IL) * ((EjectedMasses_lower + EjectedMasses_upper)/2.0); //This is a unitless quantity, which must be multiplied by SFR (i.e. M_starsFormedInSFHBin*dt_SFH, in model_yields.c) to get units of [Msun/yr], and then by dt (i.e. timestep width, also in model_yields.c) to get units of [Msun]. (22-05-20)
 						  NormSNIaMetalEjecRate[(STEPS*snap)+step][i][Zi] += (IU-IL) * ((TotalMetals_lower + TotalMetals_upper)/2.0); //This is a unitless quantity, which must be multiplied by SFR (in model_yields.c) to get units of [Msun/yr], and then by dt (also in model_yields.c) to get units of [Msun]. (22-05-20) //NO! --> //IN [MSun/yr] //The rate of ejection of 'newly synthesised' metals from a 1 Msun stellar population.
-						  //printf("SNeIa: NormSNIaMassEjecRate[%i][%i][%i] += %e\n", (STEPS*snap)+step, i, Zi, NormSNIaMassEjecRate[(STEPS*snap)+step][i][Zi]);
 #ifdef INDIVIDUAL_ELEMENTS
 						  for (kk=0;kk<NUM_ELEMENTS;kk++) {
 #ifndef MAINELEMENTS
@@ -419,7 +403,6 @@ void integrate_yields()
 										 &AGBEjectedMasses_lower_actual, &AGBEjectedMasses_upper_actual, &AGBTotalMetals_lower_actual, &AGBTotalMetals_upper_actual,
 										 &AGBRates_lower_actual, &AGBRates_upper_actual);
 #endif //INDIVIDUAL_ELEMENTS
-					  //printf("AGBs:  calc_ejecta_limits(): AGBEjectedMasses_lower_actual = %e | AGBEjectedMasses_upper_actual = %e\n", AGBEjectedMasses_lower_actual, AGBEjectedMasses_upper_actual);
 					  for (j=ti_lower;j<=ti_upper;j++) { //loop over binary_c timebins of relevance
 						  //Calc time integral limits for each time bin:
 #ifdef INDIVIDUAL_ELEMENTS
@@ -436,12 +419,10 @@ void integrate_yields()
 											   AGBRates_lower_actual, AGBRates_upper_actual,
 											   &IL, &IU, &EjectedMasses_lower, &EjectedMasses_upper, &TotalMetals_lower, &TotalMetals_upper, &Rates_lower, &Rates_upper);
 #endif //INDIVIDUAL_ELEMENTS
-						  //printf("AGB:  calc_integral_limits(): Bin %i | IL = %e | IU = %e | EjectedMasses_lower = %e | EjectedMasses_upper = %e\n", j, IL, IU, EjectedMasses_lower, EjectedMasses_upper);
 						  //Calc yield ejected in timestep step from stars born in minibin mb of SFH bin i:
 						  NormAGBNum[(STEPS*snap)+step][i][Zi] += (IU-IL) * ((Rates_lower + Rates_upper)/2.0); //* dt*(UnitTime_in_years/Hubble_h); //This quantity is in Num/Msun, so should be multiplied by SFR (i.e. M_starsFormedInSFHBin*dt_SFH, in model_yields.c) to get units of [Num/yr]
 						  NormAGBMassEjecRate[(STEPS*snap)+step][i][Zi] += (IU-IL) * ((EjectedMasses_lower + EjectedMasses_upper)/2.0); //This is a unitless quantity, which must be multiplied by SFR (i.e. M_starsFormedInSFHBin*dt_SFH, in model_yields.c) to get units of [Msun/yr], and then by dt (i.e. timestep width, also in model_yields.c) to get units of [Msun]. (22-05-20)
 						  NormAGBMetalEjecRate[(STEPS*snap)+step][i][Zi] += (IU-IL) * ((TotalMetals_lower + TotalMetals_upper)/2.0); //This is a unitless quantity, which must be multiplied by SFR (in model_yields.c) to get units of [Msun/yr], and then by dt (also in model_yields.c) to get units of [Msun]. (22-05-20) //NO! --> //IN [MSun/yr] //The rate of ejection of 'newly synthesised' metals from a 1 Msun stellar population.
-						  //printf("AGB:  NormAGBMassEjecRate[%i][%i][%i] += %e\n", (STEPS*snap)+step, i, Zi, NormAGBMassEjecRate[(STEPS*snap)+step][i][Zi]);
 #ifdef INDIVIDUAL_ELEMENTS
 						  for (kk=0;kk<NUM_ELEMENTS;kk++) {
 #ifndef MAINELEMENTS
@@ -468,7 +449,6 @@ void integrate_yields()
 					  //N.B. Only the first condition is ever actually met here (in the current version of the code). But the others are possible eventualities which could arise with e.g. different compilers, new bugs added, etc. (26-04-22)
 					  if (Mi_upper_actual > SNII_MAX_MASS || Mi_upper_actual <= 0.0 || Mi_upper == LIFETIME_MASS_NUM-1 || lifetimeMasses[Mi_upper] >= SNII_MAX_MASS)
 						  Mi_upper_actual = SNII_MAX_MASS;
-					  //printf("Mi_upper = %i | Mi_upper_actual = %e\n", Mi_upper, Mi_upper_actual);
 
 					  if (mb == 1) { //i.e. if this is the first minibin of this SFH bin
 						  Mi_lower_lastTS[i][Zi][0] = Mi_lower_lastTS[i][Zi][1]; //Shift lowest mass threshold from previous timestep to the 0th array element (for use below).
@@ -489,8 +469,6 @@ void integrate_yields()
 						  if (Mi_lower_lt_SNII <= Mi_upper_lt_SNII) {
 							  Mi_lower_SNII = find_SNII_mass_bin(lifetimeMasses[Mi_lower_lt_SNII]); //Mass bin (SNe-II arrays) corresp. to lowest mass of star to 'die' in current timestep from SFH bin i.
 							  Mi_upper_SNII = find_SNII_mass_bin(lifetimeMasses[Mi_upper_lt_SNII]); //Mass bin (SNe-II arrays) corresp. to highest mass of star to 'die' in current timestep from SFH bin i.
-							  //if (lifetimeMasses[Mi_upper_lt_SNII] > 50.)
-							  //	  printf("Mi_upper_lt_SNII = %i | Mi_upper_actual_SNII = %e\n", Mi_upper_lt_SNII, lifetimeMasses[Mi_upper_lt_SNII]);
 							  //Redefine the lower/upper allowed masses, given the mass range for SNe-II:
 							  Mi_upper_actual_SNII = Mi_upper_actual; //Cannot be > SNII_MAX_MASS, due to checks above (including in find_SNII_mass_bin()).
 							  if (Mi_lower_actual < SNII_MIN_MASS)
@@ -539,7 +517,6 @@ void integrate_yields()
 									  NormFactor = 1.0-A_FACTOR; //For mass range where both SN-II and SN-Ia progenitors are possible
 								  else
 									  NormFactor = 1.0; //For mass range where only SN-II progenitors are possible
-								  //SNII_Rate[(STEPS*snap)+step][Zi] += NormFactor * (IU-IL) * ((Chabrier_IMF(IL)*TheSFH[i]/First_SFH_bin_width) + (Chabrier_IMF(IU)*TheSFH[i]/First_SFH_bin_width))/2.0;
 								  SNII_Rate[(STEPS*snap)+step][Zi] += NormFactor * (IU-IL) * ((Chabrier_IMF(IL) + Chabrier_IMF(IU))*TheSFH[i]/First_SFH_bin_width)/2.0;
 								  NormSNIINum[(STEPS*snap)+step][i][Zi] += NormFactor * (IU-IL) * (Chabrier_IMF(IL) + Chabrier_IMF(IU))/2.0; //Number of SNe-II exploding in this timestep from minibin mb of SFHBin i [units: # / Msun]
 								  NormSNIIMassEjecRate[(STEPS*snap)+step][i][Zi] += NormFactor * (IU-IL) * ((EjectedMasses_lower + EjectedMasses_upper)/2.0); //This is a unitless quantity, which must be multiplied by SFR (i.e. M_starsFormedInSFHBin*dt_SFH, in model_yields.c) to get units of [Msun/yr], and then by dt (i.e. timestep width, also in model_yields.c) to get units of [Msun]. (22-05-20)
@@ -583,7 +560,6 @@ void integrate_yields()
 								  NormSNIaNum[(STEPS*snap)+step][i][Zi] += A_FACTOR * F316 * KALPHA * (lifetimes_upper-lifetimes_lower) * (DTD_lower + DTD_upper)/2.0; //Number of SNe-Ia exploding in this timestep from minibin mb of SFHBin i [units: # / Msun]
 								  NormSNIaMassEjecRate[(STEPS*snap)+step][i][Zi] += A_FACTOR * F316 * KALPHA * (lifetimes_upper-lifetimes_lower) * ((DTD_lower + DTD_upper)*SNIAEJECMASS)/2.0; //IN [Msun/yr]
 								  NormSNIaMetalEjecRate[(STEPS*snap)+step][i][Zi] = NormSNIaMassEjecRate[(STEPS*snap)+step][i][Zi];
-								  //if (snap == 2 && step < 10) printf("%i %i %i %i %i %i | %i | NormSNIaMassEjecRate[%i][%i][%i] = %f\n", snap, step, i, mb, Zi, j, stat, (STEPS*snap)+step, i, Zi, NormSNIaMassEjecRate[(STEPS*snap)+step][i][Zi]);
 #ifdef INDIVIDUAL_ELEMENTS
 								  int k;
 								  for (k=0;k<NUM_ELEMENTS;k++) {
@@ -597,8 +573,6 @@ void integrate_yields()
 #endif //MAINELEMENTS
 								  }
 #endif //INDIVIDUAL_ELEMENTS
-								  //if (NormSNIaMassEjecRate[(STEPS*snap)+step][i][Zi] < 0.0)
-									  //printf("%i %i %i %i %i %i | %i | NormSNIaMassEjecRate[%i][%i][%i] = %.7e | lifetimes_lower = %.7e | lifetimes_upper = %.7e\n", snap, step, i, mb, Zi, j, stat, (STEPS*snap)+step, i, Zi, NormSNIaMassEjecRate[(STEPS*snap)+step][i][Zi], lifetimes_lower, lifetimes_upper);
 							  } //for (j=t_lower_lifetime; j>=t_upper_lifetime; j--)
 						  } //if ((lifetimes[Zi][Mi_lower] > SNIA_MIN_TIME) && (lifetimes[Zi][Mi_upper] < SNIA_MAX_TIME) && (t_upper > SNIA_MIN_TIME) && (t_lower < SNIA_MAX_TIME))
 #endif //DTD
@@ -608,13 +582,10 @@ void integrate_yields()
 						  //AGB Winds (Disc and Bulge):
 						  //*****************************************
 						  Zi_AGB = find_initial_metallicity_comp(Zi, 4);
-						  //printf("\nsnap %i | step %i | SFH bin %i | minibin %i | Zi %i\n", snap, step, i, mb, Zi);
-						  //printf("find_initial_metallicity_comp(): Zi = %i | Zi_AGB = %i | lifetimeMetallicities[Zi] = %f | AGBMetallicities[Zi_AGB] = %f\n", Zi, Zi_AGB, lifetimeMetallicities[Zi], AGBMetallicities[Zi_AGB]);
 
 						  //Check if mass range is within range for AGB stars:
 						  Mi_lower_lt_AGB = max_Mi_lower(Mi_lower,4); //Mass bin (lifetime arrays) corresp. to lowest mass of star to 'die' in current timestep from SFH bin i.
 						  Mi_upper_lt_AGB = min_Mi_upper(Mi_upper,4); //Mass bin (lifetime arrays) corresp. to highest mass of star to 'die' in current timestep from SFH bin i.
-						  //if (Mi_lower_actual > AGB_MAX_MASS) printf("%i %i %i %i %i | Mi_lower=%i | Mi_upper=%i | Mi_lower_lt_AGB=%i | Mi_upper_lt_AGB=%i | Mi_lower_actual=%f | Mi_upper_actual=%f\n", snap, step, i, mb, Zi, Mi_lower, Mi_upper, Mi_lower_lt_AGB, Mi_upper_lt_AGB, Mi_lower_actual, Mi_upper_actual); //if (snap == 2 && step < 10)
 						  if (Mi_lower_lt_AGB <= Mi_upper_lt_AGB && Mi_lower_actual <= AGB_MAX_MASS) {
 							  Mi_lower_AGB = find_agb_mass_bin(lifetimeMasses[Mi_lower_lt_AGB]); //Mass bin (AGB arrays) corresp. to lowest mass of star to 'die' in current timestep from SFH bin i.
 							  Mi_upper_AGB = find_agb_mass_bin(lifetimeMasses[Mi_upper_lt_AGB]); //Mass bin (AGB arrays) corresp. to highest mass of star to 'die' in current timestep from SFH bin i.
@@ -635,7 +606,6 @@ void integrate_yields()
 												 AGB_MASS_NUM, AGB_Z_NUM, AGBMasses, AGBEjectedMasses, AGBTotalMetals,
 												 &AGBEjectedMasses_lower_actual, &AGBEjectedMasses_upper_actual, &AGBTotalMetals_lower_actual, &AGBTotalMetals_upper_actual);
 #endif
-							  //if (Mi_upper_actual >= 7.0) printf("%i %i %i %i %i | Mi_lower_actual = %f | Mi_upper_actual = %f | AGBEjectedMasses_lower_actual = %f | AGBEjectedMasses_upper_actual = %f\n", snap, step, i, mb, Zi, Mi_lower_actual, Mi_upper_actual, AGBEjectedMasses_lower_actual, AGBEjectedMasses_upper_actual);
 
 							  //NUMERICALLY INTEGRATE OVER THE MASS RANGE APPLICABLE FOR AGBs:
 							  int j, kk;
@@ -654,12 +624,7 @@ void integrate_yields()
 													   AGBEjectedMasses_lower_actual, AGBEjectedMasses_upper_actual, AGBTotalMetals_lower_actual, AGBTotalMetals_upper_actual,
 													   &IL, &IU, &EjectedMasses_lower, &EjectedMasses_upper, &TotalMetals_lower, &TotalMetals_upper);
 #endif //INDIVIDUAL_ELEMENTS
-								  /*if (mb == mbmax && IU == Mi_upper_actual && IU < Mi_lower_lastTS[i][Zi][0])
-									  IU = Mi_lower_lastTS[i][Zi][0]; //only for last mass bin integrated over
-								  if (IU > Mi_lower_lastTS[i][Zi][0] && Mi_lower_lastTS[i][Zi][0] > 0.0)
-									  IU = Mi_lower_lastTS[i][Zi][0];
-								  if (IU < IL)
-									  IL = IU;*/
+
 								  //**********
 								  //Calculate rates:
 								  //**********
@@ -671,10 +636,6 @@ void integrate_yields()
 								  for (kk=0;kk<NUM_ELEMENTS;kk++) {
 #ifndef MAINELEMENTS
 									  NormAGBYieldRate[(STEPS*snap)+step][i][Zi][kk] += (IU-IL) * ((Yields_lower[kk] + Yields_upper[kk])/2.0); //IN [Msun/yr] //The rate of ejection of individual elements from a 1 Msun stellar population.
-									  /*if (NormAGBYieldRate[(STEPS*snap)+step][i][Zi][kk] < 0.0)
-										  printf("NormAGBYieldRate[%i][%i][%i][%i] = %e | IL = %e, IU = %e, Yields_lower[%i] %e | Yields_upper[%i] = %e\n",
-												  (STEPS*snap)+step, i, Zi, kk, NormAGBYieldRate[(STEPS*snap)+step][i][Zi][kk], IL, IU, kk, Yields_lower[kk], kk, Yields_upper[kk]);
-									   */
 #else
 									  switch(kk){case 0: kk=0; break; case 1: kk=1; break; case 2: kk=4; break; case 3: kk=6; break; case 4: kk=10; break;}
 									  NormAGBYieldRate[(STEPS*snap)+step][i][Zi][kk] += (IU-IL) * ((Yields_lower[kk] + Yields_upper[kk])/2.0); //IN [Msun/yr] //The rate of ejection of individual elements from a 1 Msun stellar population.
@@ -702,9 +663,6 @@ void integrate_yields()
 						  }
 					  }
 #endif //WRITE_YIELD_DATA
-					  /*if (NormAGBMetalEjecRate[(STEPS*snap)+step][i][Zi] < 0.0) {
-						  printf("NormAGBMetalEjecRate[%i][%i][%i] = %e\n",(STEPS*snap)+step, i, Zi, NormAGBMetalEjecRate[(STEPS*snap)+step][i][Zi]);
-					  }*/
 				  } //for (Zi=0;Zi<ARRAY_Z_NUM;Zi++) //METALLICITIES
 			  } //for (mb=1;mb<=mbmax;mb++) //MINI_BINS
 #ifdef WRITE_YIELD_DATA //Store total yields
@@ -730,36 +688,6 @@ void integrate_yields()
 			  }
 #endif //WRITE_YIELD_DATA
 		  } //for (i=0;i<=SFH_ibin[snap][step];i++)
-		  /*Tot_SNII += SNII_Rate[(STEPS*snap)+step][Zi_pick]*(dt*(UnitTime_in_years/Hubble_h));
-		  Tot_SNIa += SNIa_Rate[(STEPS*snap)+step][Zi_pick]*(dt*(UnitTime_in_years/Hubble_h));
-		  Tot_NormSNIINum += NormSNIINum[(STEPS*snap)+step][i_pick][Zi_pick]; //Summing up all the SNe that exploded in every timestep from all the minibins of SFHBin i_pick at metallicity Zi_pick. //*(dt*(UnitTime_in_years/Hubble_h))/First_SFH_bin_width;
-		  Tot_SNe = Tot_SNII+Tot_SNIa;
-		  Tot_NormSNIIMetalEjecRate += NormSNIIMetalEjecRate[(STEPS*snap)+step][0][Zi_pick];
-		  Tot_NormSNIIMassEjecRate += NormSNIIMassEjecRate[(STEPS*snap)+step][0][Zi_pick];
-		  Tot_SNII_MetEjecMass += ((dt*(UnitTime_in_years/Hubble_h))/First_SFH_bin_width) * (NormSNIIMetalEjecRate[(STEPS*snap)+step][0][0] + lifetimeMetallicities[Zi_pick]*NormSNIIMetalEjecRate[(STEPS*snap)+step][0][Zi_pick]);
-		  */
-		  /*if (snap >= 45 && snap < 50) {
-			  printf("\nSnap %i | Step %i | Lookback time = %e [Myr]:\n", snap, step, timet*(UnitTime_in_years/Hubble_h)/1.e6);
-			  printf("SNeII: NormSNIIMassEjecRate[%i][%i][%i] += %e\n", (STEPS*snap)+step, i_pick, Zi_pick, NormSNIIMassEjecRate[(STEPS*snap)+step][i_pick][Zi_pick]);
-			  printf("SNeIa: NormSNIaMassEjecRate[%i][%i][%i] += %e\n", (STEPS*snap)+step, i_pick, Zi_pick, NormSNIaMassEjecRate[(STEPS*snap)+step][i_pick][Zi_pick]);
-			  printf("AGB:   NormAGBMassEjecRate[%i][%i][%i]  += %e\n", (STEPS*snap)+step, i_pick, Zi_pick, NormAGBMassEjecRate[(STEPS*snap)+step][i_pick][Zi_pick]);
-		  }*/
-		  //Print timestep lookback times to z=0 in Myr:
-		  //printf("%e,", timet*(UnitTime_in_years/Hubble_h)/1.e6);
-		  //Print (unitless) total ejected mass yields for every timestep from SFHbin i_pick at metallicity Zi_pick:
-		  //printf("%.4e,", NormSNIIMassEjecRate[(STEPS*snap)+step][i_pick][Zi_pick]);
-		  //printf("%.4e,", NormSNIaMassEjecRate[(STEPS*snap)+step][i_pick][Zi_pick]);
-		  //printf("%e,", NormAGBMassEjecRate[(STEPS*snap)+step][i_pick][Zi_pick]);
-		  //Print total unitless mass ejected from all SFH bins of each timestep:
-		  /*double EjRate=0.;
-		  for (int iSFH=0; iSFH<=SFH_ibin[snap][step]; iSFH++) {
-			  //EjRate += NormSNIIMassEjecRate[(STEPS*snap)+step][iSFH][Zi_pick];
-			  //EjRate += NormSNIaMassEjecRate[(STEPS*snap)+step][iSFH][Zi_pick];
-			  EjRate += NormAGBMassEjecRate[(STEPS*snap)+step][iSFH][Zi_pick];
-		  }
-		  printf("%e,", EjRate);
-		  printf("%e\n\n", TotNormAGBEjMass[(STEPS*snap)+step][Zi_pick]);*/
-		  //printf("snap = %i | step = %i | cum step = %i | t_lb = %e [yr] | dt= %e [yr]\n", snap, step, (STEPS*snap)+step, timet * (UnitTime_in_years/Hubble_h), dt * (UnitTime_in_years/Hubble_h));
       } //for(step=0;step<STEPS;step++)
    } //for(snap=0;snap<LastDarkMatterSnapShot;snap++)
 #ifdef PARALLEL
@@ -772,53 +700,32 @@ void integrate_yields()
   for(snap=0;snap<LastDarkMatterSnapShot;snap++) //LOOP OVER SNAPSHOTS
     for(step=0;step<STEPS;step++)
       for(jj=0;jj<SFH_NBIN;jj++)
-    	  for(k=0;k<ARRAY_Z_NUM;k++)
-	  {
-
-	    ii=(STEPS*snap)+step;
-
-	    /*if(NormAGBMassEjecRate[ii][jj][k]>0.3)
-	      {
-		printf("ii=%d snap=%d step=%d jj=%d k=%d AGB_Rate=%0.2f\n",ii,snap, step,jj,k, NormAGBMassEjecRate[ii][jj][k]);
-		terminate("AGB rate too high");
-	      }
-	    if(NormSNIaMassEjecRate[ii][jj][k]>0.7)
-	      {
-		printf("ii=%d jj=%d k=%d SNIa_Rate=%0.2f\n",ii,jj,k, NormSNIaMassEjecRate[ii][jj][k]);
-		terminate("SNIa rate too high");
-	      }*/
-
-	    if(NormSNIIMassEjecRate[ii][jj][k]<0.)
-	      NormSNIIMassEjecRate[ii][jj][k]=0.;
-	    if(NormSNIaMassEjecRate[ii][jj][k]<0.)
-	      NormSNIaMassEjecRate[ii][jj][k]=0.;
-	    if(NormAGBMassEjecRate[ii][jj][k]<0.)
-	      NormAGBMassEjecRate[ii][jj][k]=0.;
-	    if(NormSNIIMetalEjecRate[ii][jj][k]<0.)
-	      NormSNIIMetalEjecRate[ii][jj][k]=0.;
-	    if(NormSNIaMetalEjecRate[ii][jj][k]<0.)
-	      NormSNIaMetalEjecRate[ii][jj][k]=0.;
-	    if(NormAGBMetalEjecRate[ii][jj][k]<0.)
-	      NormAGBMetalEjecRate[ii][jj][k]=0.;
-	  }
+    	  for(k=0;k<ARRAY_Z_NUM;k++) {
+				ii=(STEPS*snap)+step;
+				if(NormSNIIMassEjecRate[ii][jj][k]<0.)
+				  NormSNIIMassEjecRate[ii][jj][k]=0.;
+				if(NormSNIaMassEjecRate[ii][jj][k]<0.)
+				  NormSNIaMassEjecRate[ii][jj][k]=0.;
+				if(NormAGBMassEjecRate[ii][jj][k]<0.)
+				  NormAGBMassEjecRate[ii][jj][k]=0.;
+				if(NormSNIIMetalEjecRate[ii][jj][k]<0.)
+				  NormSNIIMetalEjecRate[ii][jj][k]=0.;
+				if(NormSNIaMetalEjecRate[ii][jj][k]<0.)
+				  NormSNIaMetalEjecRate[ii][jj][k]=0.;
+				if(NormAGBMetalEjecRate[ii][jj][k]<0.)
+				  NormAGBMetalEjecRate[ii][jj][k]=0.;
+			  }
 
 #ifdef WRITE_YIELD_DATA //Write to file
     //Write yields from a 1Msun burst (for each metallicity) at the start of the simulation to file:
 #ifdef BINARYC
-	  //char yieldSet[] = "binaryc";
-  	  //char yieldSet[] = "binaryc_origEnsembles_singleStars_rescaled_kroupa2001";
-  	  //char yieldSet[] = "binaryc_origEnsembles_singleStars_100pcSingleStars_kroupa2001";
   	  char yieldSet[] = "binaryc_origEnsembles_binaryStars_kroupa2001";
-	  //char yieldSet[] = "binaryc_origEnsembles_singleStars_kroupa2001";
-	  //char yieldSet[] = "binaryc_binaryStars_chabrier2003";
-	  //char yieldSet[] = "binaryc_singleStars_kroupa2001";
 #endif //BINARYC
   	//SNeII:
 	for(kk=0;kk<ARRAY_Z_NUM;kk++) { //LOOP OVER METALLICITIES
 	  //SNeII:
 	  FILE *SNIIyf;
 	  char filename[100];
-	  //sprintf(filename, "./YieldTables/BurstYields/SNII_burst_yields_Z%.4f.txt", lifetimeMetallicities[kk]);
 #ifdef BINARYC
 	  float BinZ = bcMetallicities[kk];
 #else //BINARYC
@@ -852,7 +759,6 @@ void integrate_yields()
 	for(kk=0;kk<ARRAY_Z_NUM;kk++) { //LOOP OVER METALLICITIES
 	  FILE *SNIayf;
 	  char filename[100];
-	  //sprintf(filename, "./YieldTables/BurstYields/SNIa_burst_yields_Z%.4f.txt", lifetimeMetallicities[kk]);
 #ifdef BINARYC
 	  float BinZ = bcMetallicities[kk];
 #else //BINARYC
@@ -882,7 +788,6 @@ void integrate_yields()
 	for(kk=0;kk<ARRAY_Z_NUM;kk++) { //LOOP OVER METALLICITIES
 	  FILE *AGByf;
 	  char filename[100];
-	  //sprintf(filename, "./YieldTables/BurstYields/AGB_burst_yields_Z%.4f.txt", lifetimeMetallicities[kk]);
 #ifdef BINARYC
 	  float BinZ = bcMetallicities[kk];
 #else //BINARYC
@@ -1047,8 +952,6 @@ int find_initial_metallicity_comp(int Zi, int table_type)
 	}
       break;
     /*
-    //This case isn't actually used when running with binary_c yields (as their own metallicity grid is assumed throughout).
-    //However, one could modify it to allow matching between the binary_c metallicities and P98 lifetime metallicities, if one wanted to.
     case 5: //Binary_c metallicity table
 		while (Zi_bin == -1) {
 			if (bcMetallicities[i] < Z_in) {
@@ -1111,21 +1014,13 @@ int find_bc_timebin(double actual_time) //actual_time should be in yr for this f
   int i=-1;
   if (actual_time <= 0.0) {
 	  i=1;
-	  //printf("find_bc_timebin(): Loop 1: actual_time = %f | bcTimes[%i] = %f\n", actual_time, i-1, bcTimes[i-1]);
 	  return i-1; //If the bin 'touches now', then return the 0th time bin
   }
   else {
-	  /*do {
-		  i++;
-		  bcBinwidth = BC_LOGT_BINWIDTH*bcTimes[i]*log(10.); //Width of binary_c timebin i in (linear) yr
-	  }
-	  while (bcTimes[i]+(0.5*bcBinwidth) < actual_time);
-	  return i-1; //Returns the binary_c dampen in which LGals_time lies, given that bcTimes[] contains the mid-time in each bin*/
 	  do {
 		  i++;
 	  }
 	  while (bcTimes[i] < actual_time);
-	  //printf("find_bc_timebin(): Loop 2: actual_time = %f [yr] | bcTimes[%i] = %f [yr]\n", actual_time, i-1, bcTimes[i-1]);
 	  return i-1; //Returns the binary_c timebin (which are cosmic times) directly BELOW the actual_time given (mimicking what is done in find_initial_mass())
   }
 
@@ -1191,16 +1086,14 @@ int min_Mi_upper(int Mi_upper, int channel_type)
   {
     case 2: //SNII mass limits
       if (lifetimeMasses[Mi_upper] < SNII_MAX_MASS) return Mi_upper;
-      //else return LIFETIME_MASS_NUM-1;
       else
-	{
-	  int i;
-	  //i = LIFETIME_MASS_NUM-1;
-	  i = LIFETIME_MASS_NUM;
-	  do { i--; }
-	  while (lifetimeMasses[i] > SNII_MAX_MASS);
-	  return i;
-	}
+		{
+		  int i;
+		  i = LIFETIME_MASS_NUM;
+		  do { i--; }
+		  while (lifetimeMasses[i] > SNII_MAX_MASS);
+		  return i;
+		}
       break;
 #ifndef DTD
     case 3: //SNIa mass limits
@@ -1220,7 +1113,6 @@ int min_Mi_upper(int Mi_upper, int channel_type)
       else
 	{
 	  int i;
-	  //i = LIFETIME_MASS_NUM-1;
 	  i = LIFETIME_MASS_NUM;
 	  do { i--; }
 	  while (lifetimeMasses[i] > AGB_MAX_MASS);
@@ -1376,10 +1268,6 @@ void calc_ejecta_limits(double x_lower_actual, double x_upper_actual, int x_lowe
   int k, kk;
   //Lower limits:
   *EjectedMasses_lower_actual = EjectedMasses[Zi][x_lower] + ((EjectedMasses[Zi][x_lower+1]-EjectedMasses[Zi][x_lower]) * ((x_lower_actual-x_bins[x_lower])/(x_bins[x_lower+1]-x_bins[x_lower])));
-//  printf("calc_ejecta_limits(): x_lower = %i | x_lower+1 = %i | x_lower_actual = %f | x_bins[x_lower] = %f | x_bins[x_lower+1] = %f\n",
-//		  x_lower, x_lower+1, x_lower_actual, x_bins[x_lower], x_bins[x_lower+1]);
-//  printf("calc_ejecta_limits(): %e = %e + ((%e-%e) * ((%f-%f)/(%f-%f)))\n",
-//		  *EjectedMasses_lower_actual, EjectedMasses[Zi][x_lower], EjectedMasses[Zi][x_lower+1], EjectedMasses[Zi][x_lower], x_lower_actual, x_bins[x_lower], x_bins[x_lower+1], x_bins[x_lower]);
   *TotalMetals_lower_actual = TotalMetals[Zi][x_lower] + ((TotalMetals[Zi][x_lower+1]-TotalMetals[Zi][x_lower]) * ((x_lower_actual-x_bins[x_lower])/(x_bins[x_lower+1]-x_bins[x_lower])));
 #ifdef INDIVIDUAL_ELEMENTS
   for (k=0;k<NUM_ELEMENTS;k++) {
