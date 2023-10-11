@@ -12,6 +12,7 @@
  * 17-11-21: Cleaned up to remove the counters, comments, etc, that aren't frequently needed. An uncleaned version called yields_integrals_17-11-21.c has been saved.
  * 04-04-22: Revised/simplified coding to make things clearer. Should return exactly the same result.
  * 05-05-22: Modified to account for binary_c yields, which need to be integrated over time for AGBs, SNe-II, and SNe-Ia.
+ * 11-10-23: Cleaned-up for uploading to GitHub
  */
 
 #include <stdio.h>
@@ -149,13 +150,6 @@ void integrate_yields()
   int Zi_pick, i_pick;
   Zi_pick = 3; //3 //Choose which of the discrete lifetime metallicities to assume when calculating the SN-II yields: [0.0004, 0.004, 0.008, 0.02, 0.05, 1]
   i_pick = 0; //13; //5; //Choose which SFH bin you want to print out SNII numbers in timestep "step" for. (22-05-20)
-
-  /*int counta;
-  TheSFH[0] = 1.0; ///(tau_dt[0]*UnitTime_in_years/Hubble_h);
-  for(counta=1;counta<SFH_NBIN;counta++)
-    {
-      TheSFH[counta] = 0.0; ///(tau_dt[counta]*UnitTime_in_years/Hubble_h);
-    }*/
 
 #ifndef BINARYC
   //Set KALPHA //Integral of the Chabrier IMF (by number) from 0.1 - MAX Msun:
