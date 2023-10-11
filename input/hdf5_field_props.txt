@@ -55,9 +55,12 @@ MetalsBulgeMassRings, 10^10/h Msun , Mass in metals in stars in each annular rin
 MetalsHotGas, 10^10/h Msun , Mass in metals in the hot gas
 MetalsEjectedMass, 10^10/h Msun , Mass in metals in the ejected gas
 MetalsICM, 10^10/h Msun , Mass in metals in intra-cluster stars, for type 0,1
-DiskSNIIRate,yr^-1 ,Rate of SN-II explosions from the disc
-BulgeSNIIRate,yr^-1 ,Rate of SN-II explosions from the bulge
-ICMSNIIRate,yr^-1 ,Rate of SN-II explosions from the halo stars
+DiskSNIIRate,yr^-1 ,Rate of SN-II explosions from the disc (averaged over a whole snapshot)
+BulgeSNIIRate,yr^-1 ,Rate of SN-II explosions from the bulge (averaged over a whole snapshot)
+ICMSNIIRate,yr^-1 ,Rate of SN-II explosions from the halo stars (averaged over a whole snapshot)
+DiskSNIaRate,yr^-1 ,Rate of SN-Ia explosions from the disc (averaged over a whole snapshot)
+BulgeSNIaRate,yr^-1 ,Rate of SN-Ia explosions from the bulge (averaged over a whole snapshot)
+ICMSNIaRate,yr^-1 ,Rate of SN-Ia explosions from the halo stars (averaged over a whole snapshot)
 MassReturnRateToColdGas, Msun/yr , rate of mass returned by SNe and stellar winds to the ColdGas in this snapshot
 MassReturnRateToHotGas, Msun/yr , rate of mass returned by SNe and stellar winds to the HotGas in this snapshot
 MetalsReturnRateToHotGas, Msun/yr , rate of metal mass returned by SNe and stellar winds to the HotGas in this snapshot
@@ -71,9 +74,7 @@ CoolingRate_beforeAGN, Msun/yr , What the cooling rate of the hot gas would have
 QuasarAccretionRate, Msun/yr , Rate at which cold gas is accreted into the central black hole in the quasar mode.
 RadioAccretionRate, Msun/yr , Rate at which hot gas is accreted into the central black hole in the radio mode.
 Sfr, Msun/yr , Star formation rate
-SfrInst, Msun/yr , Instantaneous star formation rate (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts)
 SfrRings, Msun/yr , Star formation rate within each annular ring
-SfrInstRings, Msun/yr , Instantaneous star formation rate within each annular ring (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts)
 SfrBulge, Msun/yr , Star formation rate in bulge.
 XrayLum, log10(erg/sec) , (log_10 of) X-Ray luminosity
 BulgeSize, Mpc/h , Half mass radius of bulge
@@ -112,3 +113,22 @@ ColdGasRings_elements, Msun , Mass of elements locked up in cold gas in each ann
 HotGas_elements, Msun , Mass of elements locked up in hot gas.
 ICM_elements, Msun , Mass of elements locked up in stars in the ICM
 EjectedMass_elements, Msun , Mass of elements locked up in ejected gas.
+t_des, ,
+t_sput_HotGas, ,
+t_sput_EjectedMass, ,
+,struct DustRates DustColdGasRates; , ? // Rates of creation and destruction of dust
+DustColdGasRates, ? , Rates of creation and destruction of dust in the ColdGas
+DustHotGasRates, ? , Rates of creation and destruction of dust in the Hotgas
+DustEjectedMassRates,,Rate of destruction of dust in the EjectedMass
+t_acc, ,
+f_cmax, unitless , max fraction of molecular media //ROB: I think this is actually the maximum mass fraction of element ee in clouds that is in dust.
+ColdGasDiff_elements, Msun , Mass of elements in the diffused phase (in ColdGas)
+ColdGasClouds_elements, Msun , Mass of elements in the cloud phase (in ColdGas)
+DustColdGasDiff_elements, Msun , Mass of elements in the diffuse phase locked up in dust (in ColdGas)
+DustColdGasClouds_elements, Msun , Mass of elements in the cloud phase locked up in dust (in ColdGas)
+DustHotGas_elements, Msun , Mass of elements locked up in dust (in HotGas)
+DustEjectedMass_elements, Msun , Mass of elements locked up in dust (in EjectedMass)
+ColdGasDiffRings_elements, Msun , Mass of elements in diffuse gas in each annular ring
+ColdGasCloudsRings_elements, Msun , Mass of elements in clouds in each annular ring
+DustColdGasDiffRings_elements, Msun , Mass of elements in diffuse gas locked up in dust in each annular ring
+DustColdGasCloudsRings_elements, Msun , Mass of elements in diffuse gas locked up in dust in each annular ring

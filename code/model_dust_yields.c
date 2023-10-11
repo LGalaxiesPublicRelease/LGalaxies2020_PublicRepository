@@ -10,6 +10,9 @@
  *
  *  Edited from: Nov2021
  *  Author: robyates
+ *
+ *  Updates:
+ *  11-10-23: Cleaned-up for uploading to GitHub.
  */
 
 #include <stdio.h>
@@ -21,20 +24,6 @@
 #include "allvars.h"
 #include "proto.h"
 
-/*
-
-Notes:
-* Dust elements are a sub-component of diffuse/cloud elements, which are a sub-component of ColdGas elements. (ROB: Correct?)
-* ColdGasDiff + ColdGasClouds = ColdGas
-* fI = fraction of metals locked up in dust in the diffuse medium
-     = DustColdGasDiff/MetalsColdGasDiff
-* fC = fraction of metals locked up in dust in cold clouds
-     = DustColdGasClouds/MetalsColdGasClouds
-* Any dust production mechanism except for growth in molecular clouds enriches the diffuse medium. 
-* When SNe destroys dust, a fraction of dust in both the diffuse and the molecular medium is destroyed.
-* There is also a slow sputtering of dust (by cosmic rays and hot gas) that occurs in the diffuse medium.
-* Also we do not include Nitrogen, Neon and Sulphur in our dust growth model.
-*/
 
 #ifdef H2_AND_RINGS
 	void update_fractions(float dt_bin, float t_acc, float t_exch, float mu, int p, int n, int jj) {
@@ -83,23 +72,7 @@ void drop_fnan(int n, int p) {
 #ifdef DUST_DESTRUCTION
 double calc_cleared_mass(double frac_Cb) {
 	double m_cleared; //_clouds, m_cleared_diff;
-	/*
-	//Option 1) Default way (use fixed value of m_cleared used by Vijayan+19):
-	m_cleared = M_CLEARED; //[Msun]
-	*/
-
-	/*
-	//Option 2) Harder way (requires an estimate of n_H and fitting formulae from Hu+19 (eqn.29)):
-	double log_nH, m_cleared_C_th, m_cleared_Si_th, m_cleared_C_nth, m_cleared_Si_nth;
-	log_nH = log10(((1.-Gal[p].H2fraction)*Gal[p].ColdGas_elements[0])/ringVol); //[1/cm^3] The volumetric number density of atomic H in the Cold Gas is used here, to mimic the "hydrogen number density of gas" used in Hu+19
-	m_cleared_C_th   = pow(10, 2.65 + 0.061*log_nH - 0.100*(log_nH*log_nH));
-	m_cleared_C_nth  = pow(10, 2.74 - 0.360*log_nH + 0.023*(log_nH*log_nH) + 0.049*(log_nH*log_nH*log_nH) - 0.028*(log_nH*log_nH*log_nH*log_nH));
-	m_cleared_Si_th  = pow(10, 2.70 + 0.018*log_nH - 0.100*(log_nH*log_nH));
-	m_cleared_Si_nth = pow(10, 2.93 - 0.370*log_nH + 0.010*(log_nH*log_nH) + 0.040*(log_nH*log_nH*log_nH) - 0.024*(log_nH*log_nH*log_nH*log_nH));
-	//...
-	*/
-
-	//Option 3) Easier way (assume the "typical SN environment density of n_H = 0.3 cm^-3" quoted by Hu+19, and the C/(C+Si) ratio to weight the overall m_cleared):
+	//Easiest way (assume the "typical SN environment density of n_H = 0.3 cm^-3" quoted by Hu+19, and the C/(C+Si) ratio to weight the overall m_cleared):
 	m_cleared = (frac_Cb*M_CLEARED_Cb) + ((1.-frac_Cb)*M_CLEARED_Si);
 
 	return m_cleared;
@@ -114,7 +87,6 @@ double calc_NFW_scale_length(int p) {
 	//Eqn. 2 from Yates+17, i.e. the LCDM concentration from Dolag+04:
 	concentration = (c0 / (1.+ZZ[Gal[p].SnapNum]))*pow(Gal[p].Mvir/1.e4, alpha); //unitless //N.B. (Mvir*1.e10/h)/(1.e14/h) = Mvir/1.e4
 	scale_length = Gal[p].Rvir / concentration; //internal distance unit (i.e. Mpc/h)
-	//printf("\nConcentration = %f | Scale length = %e [Mpc]\n", concentration, scale_length/Hubble_h);
 	return scale_length;
 }
 

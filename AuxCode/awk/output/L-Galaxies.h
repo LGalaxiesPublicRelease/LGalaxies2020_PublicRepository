@@ -1,5 +1,5 @@
 struct LGalaxy {
-     int Type;
+      int Type;
       int HaloIndex;
       float HaloM_Mean200;
       float HaloM_Crit200;
@@ -59,6 +59,9 @@ struct LGalaxy {
       float DiskSNIIRate;
       float BulgeSNIIRate;
       float ICMSNIIRate;
+      float DiskSNIaRate;
+      float BulgeSNIaRate;
+      float ICMSNIaRate;
       float MassReturnRateToColdGas;
       float MassReturnRateToHotGas;
       float MetalsReturnRateToHotGas;
@@ -72,9 +75,7 @@ struct LGalaxy {
       float QuasarAccretionRate;
       float RadioAccretionRate;
       float Sfr;
-      float SfrInst;
       float SfrRings[RNUM];
-      float SfrInstRings[RNUM];
       float SfrBulge;
       float XrayLum;
       float BulgeSize;
@@ -112,6 +113,24 @@ struct LGalaxy {
       float HotGas_elements[NUM_ELEMENTS];
       float ICM_elements[NUM_ELEMENTS];
       float EjectedMass_elements[NUM_ELEMENTS];
+    float t_des[RNUM];
+   float t_sput_HotGas;
+   float t_sput_EjectedMass;
+      float DustColdGasRates[NUM_COLDGAS_DUST_RATES];
+    float DustHotGasRates[NUM_HOTGAS_DUST_RATES];
+    float DustEjectedMassRates;
+    float t_acc[RNUM];
+   float f_cmax[RNUM][NUM_ELEMENTS];
+    float ColdGasDiff_elements[NUM_ELEMENTS];
+    float ColdGasClouds_elements[NUM_ELEMENTS];
+    float DustColdGasDiff_elements[NUM_ELEMENTS];
+    float DustColdGasClouds_elements[NUM_ELEMENTS];
+    float DustHotGas_elements[NUM_ELEMENTS];
+    float DustEjectedMass_elements[NUM_ELEMENTS];
+      float ColdGasDiffRings_elements[RNUM][NUM_ELEMENTS];
+      float ColdGasCloudsRings_elements[RNUM][NUM_ELEMENTS];
+      float DustColdGasDiffRings_elements[RNUM][NUM_ELEMENTS];
+      float DustColdGasCloudsRings_elements[RNUM][NUM_ELEMENTS];
 };
 struct MoMaFGalaxy {
      long long GalID;

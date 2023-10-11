@@ -61,6 +61,9 @@ CREATE TABLE GALAXIES (
 ,  diskSNIIRate REAL NOT NULL 
 ,  bulgeSNIIRate REAL NOT NULL 
 ,  iCMSNIIRate REAL NOT NULL 
+,  diskSNIaRate REAL NOT NULL 
+,  bulgeSNIaRate REAL NOT NULL 
+,  iCMSNIaRate REAL NOT NULL 
 ,  massReturnRateToColdGas REAL NOT NULL 
 ,  massReturnRateToHotGas REAL NOT NULL 
 ,  metalsReturnRateToHotGas REAL NOT NULL 
@@ -74,7 +77,6 @@ CREATE TABLE GALAXIES (
 ,  quasarAccretionRate REAL NOT NULL 
 ,  radioAccretionRate REAL NOT NULL 
 ,  sfr REAL NOT NULL 
-,  sfrInst REAL NOT NULL 
 ,  sfrBulge REAL NOT NULL 
 ,  xrayLum REAL NOT NULL 
 ,  bulgeSize REAL NOT NULL 
@@ -104,6 +106,9 @@ CREATE TABLE GALAXIES (
 ,  rbandWeightAge REAL NOT NULL 
 ,  sfh_ibin INTEGER NOT NULL 
 ,  sfh_numbins INTEGER NOT NULL 
+,  t_sput_HotGas REAL NOT NULL 
+,  t_sput_EjectedMass REAL NOT NULL 
+,  dustEjectedMassRates REAL NOT NULL 
 )
 CREATE TABLE SFH_Times (
  snapnum INTEGER NOT NULL 

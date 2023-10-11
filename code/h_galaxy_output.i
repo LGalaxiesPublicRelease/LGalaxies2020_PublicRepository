@@ -1,5 +1,5 @@
 # 0 "./code/h_galaxy_output.h"
-# 1 "/cygdrive/c/Users/ry22aas/robyates/Astro/L-Galaxies/L-Galaxies2020_plusBinaries/L-Galaxies2020_plusBinaries_version//"
+# 1 "/cygdrive/c/Users/ry22aas/robyates/Astro/L-Galaxies/LGalaxies2020_code_git//"
 # 0 "<built-in>"
 # 0 "<command-line>"
 # 1 "./code/h_galaxy_output.h"
@@ -21,10 +21,18 @@ struct GALAXY_OUTPUT {
 
 
 
-
+    float HaloM_Mean200; // 1e10 Msun/h // M200 cf mean last time this halo was a type 0
 
     float HaloM_Crit200; // 1e10 Msun/h // M200 cf critical last time this halo was a type 0
-# 91 "./code/h_galaxy_output.h"
+
+    float HaloM_TopHat; // 1e10 Msun/h // Virial mass last time this halo was a type 0
+    float HaloPos[3]; // Mpc/h // Comoving position of halo.
+    float HaloVel[3]; // km/s // Mean velocity of halo.
+    float HaloVelDisp; // km/s // Velocity dispersion of halo.
+    float HaloVmax; // km/s // Maximum circular velocity of halo.
+    float HaloSpin[3]; // km/s Mpc/h // specific spin of the halo.
+
+
     int SnapNum; // None //The snapshot number where this galaxy was identified.
     float LookBackTimeToSnap; // yr // The time from a given snapshot to z=0
     float CentralMvir; // 10^10/h Msun // virial mass of background (FOF) halo containing this galaxy
@@ -40,6 +48,18 @@ struct GALAXY_OUTPUT {
     float Vmax; // km/s //Maximum rotational velocity of the subhalo, or the last value for type 2's galaxies.
     float ColdGasSpin[3]; // Mpc/h km/s // The specific angular momentum of the cold gas disk
     float DiskSpin[3]; // Mpc/h km/s // The specific angular momentum of the stellar disk
+
+    float InfallVmax; // km/s // Maximum rotational velocity of the host halo of this galaxy at infall (ie last time a type 0)
+    float InfallVmaxPeak; // km/s // ? Peak Vmax along past history
+    int InfallSnap; // None // Most recent (largest) snapnum at which this galaxy's type changed from 0 to 1 or 2
+    float InfallHotGas; // 10^10 Msun/h // Mass in hot gas at the time of infall (same as hotGas for type 0 galaxies).
+    float HotRadius; // Mpc/h // Proper[?] radius out to which hot gas extends: rvir for type 0; 0 for type 2; maximum radius out to which hot gas is not stripped for type 1.
+
+
+    /*dynamical friction merger time*/
+
+    float OriMergTime; // yr // Estimated dynamical friction time when the merger clock is set.
+    float MergTime; //yr // Estimated remaining merging time. 
 # 131 "./code/h_galaxy_output.h"
     /* baryonic reservoirs */
     float ColdGas; // 10^10/h Msun // Mass in cold gas.
@@ -65,7 +85,16 @@ struct GALAXY_OUTPUT {
     /* float BlackHoleGas; // 10^10/h Msun // Mass in BH accretion disk */
     /* ICL magnitude and mass*/
     float ICM; //10^10/h Msun //Total mass in metals in intra-cluster stars, for type 0,1
-# 165 "./code/h_galaxy_output.h"
+
+
+    float MassFromInSitu; // 1e10 Msun/h // Mass formed in situ.
+    float MassFromMergers; // 1e10 Msun/h // Mass accreted from mergers.
+    float MassFromBursts; // 1e10 Msun/h // Mass formed in starbursts
+
+
+
+
+
     float MetalsColdGas[NUM_METAL_CHANNELS]; // 10^10/h Msun // Mass in metals in cold gas.
 
     float MetalsColdGasRings[RNUM][NUM_METAL_CHANNELS]; // 10^10/h Msun // Mass in metals in cold gas in each annular ring
@@ -93,7 +122,30 @@ struct GALAXY_OUTPUT {
     float DiskSNIaRate; //yr^-1 //Rate of SN-Ia explosions from the disc (averaged over a whole snapshot)
     float BulgeSNIaRate; //yr^-1 //Rate of SN-Ia explosions from the bulge (averaged over a whole snapshot)
     float ICMSNIaRate; //yr^-1 //Rate of SN-Ia explosions from the halo stars (averaged over a whole snapshot)
-# 216 "./code/h_galaxy_output.h"
+
+
+    /* misc */
+    float MassReturnRateToColdGas; // Msun/yr // rate of mass returned by SNe and stellar winds to the ColdGas in this snapshot
+    float MassReturnRateToHotGas; // Msun/yr // rate of mass returned by SNe and stellar winds to the HotGas in this snapshot
+    float MetalsReturnRateToHotGas; // Msun/yr // rate of metal mass returned by SNe and stellar winds to the HotGas in this snapshot
+    float PrimordialAccretionRate; // Msun/yr // Accretion rate of primordial gas.
+    float CoolingRadius; // Mpc/h // The radius within which the cooling time scale is shorter than the dynamical timescale
+    /* float CoolingGas; // 10^10/h Msun // Mass of cooling gas */
+
+
+
+
+
+
+
+    float ReheatingRate; // Msun/yr // gross rate at which mass is reheated from coldgas to hotgas. //ROB: storing ReheatingRate for outputting (31-03-20)
+    float MetalsReheatingRate; // Msun/yr // gross rate at which metal mass is reheated from coldgas to hotgas.
+    float EjectionRate; // Msun/yr // gross rate at which mass is ejected hotgas to ejecta reservoir. //ROB: storing EjectionRate for outputting (31-03-20)
+    float CoolingRate; // Msun/yr // Cooling rate of the hot gas
+    float CoolingRate_beforeAGN; // Msun/yr // What the cooling rate of the hot gas would have been if there was no AGN feedback.
+    float QuasarAccretionRate; // Msun/yr // Rate at which cold gas is accreted into the central black hole in the quasar mode.
+    float RadioAccretionRate; // Msun/yr // Rate at which hot gas is accreted into the central black hole in the radio mode.
+
     float Sfr; // Msun/yr // Star formation rate
     float SfrInst; // Msun/yr // Instantaneous star formation rate (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts) //*****ROB*****//
 
@@ -102,19 +154,69 @@ struct GALAXY_OUTPUT {
 
     float SfrBulge; // Msun/yr // Star formation rate in bulge.
 
-
+    float XrayLum; // log10(erg/sec) // (log_10 of) X-Ray luminosity
 
     float BulgeSize; // Mpc/h // Half mass radius of bulge
     float DiskRadius; // Mpc/h // Size of the stellar disk, 3x the scale length.
     float ColdGasRadius; // Mpc/h // Size of the gas disk, 3x the scale length.
     float StellarHalfMassRadius; // Mpc/h // stellar Half mass radius
-# 242 "./code/h_galaxy_output.h"
+
+    float StellarHalfLightRadius; // Mpc/h // stellar Half light radius
+    float CosInclination; // deg // Inclination of the galaxy. Derived from the angle between the stellar spins of the galaxy and the z-axis
+
+
+    int DisruptOn; // None // 0: galaxy merged onto merger center 1: galaxy was disrupted before merging onto its descendant, matter went into ICM of merger center;
+
+    int MergeOn; // None // 0: standard delucia-like merger behaviour for type 1 galaxy; 1: galaxy mass > halo mass, separate dynamical friction time calculated ....
+
+
+
+
        /* magnitudes in various bands */
+
+
+    float MagDust[5]; // AB mag // dust corrected, rest-frame absolute mags
+    float Mag[5]; // AB mag // rest-frame absolute mags
+    float MagBulge[5]; // AB mag // rest-frame absolute mags for the bulge
 # 280 "./code/h_galaxy_output.h"
     float MassWeightAge; //10^9yr //The age of this galaxy weighted by mass of its components.
+
+    float rbandWeightAge; // 10^9yr // The age of this galaxy weighted by mass of its components.
+
+
+
+    int sfh_ibin; // None // Index of highest star formation history bin currently in use
+    int sfh_numbins; // None // Number of non empty star formation history bins
+
+    /* float sfh_time[SFH_NBIN]; // yr // lookback time to middle of star formation history bin. */
+    /* float sfh_dt[SFH_NBIN]; // yr // Width of star formation history bin. */
+    float sfh_DiskMass[SFH_NBIN]; // 10^10 Msun/h // Star formation history in the disk.
+    float sfh_BulgeMass[SFH_NBIN]; // 10^10 Msun/h // Star formation history in the bulge.
+
+    float sfh_DiskMassRings[RNUM][SFH_NBIN]; // 10^10 Msun/h // Star formation history in the disk RINGS.
+    float sfh_BulgeMassRings[RNUM][SFH_NBIN]; // 10^10 Msun/h // Star formation history in the bulge RINGS.
+
+    float sfh_ICM[SFH_NBIN]; // 10^10 Msun/h // Star formation history in intra-cluster stars.
+    float sfh_MetalsDiskMass[SFH_NBIN][NUM_METAL_CHANNELS]; // 10^10 Msun/h // Metal formation history in the disk.
+    float sfh_MetalsBulgeMass[SFH_NBIN][NUM_METAL_CHANNELS]; // 10^10 Msun/h // Metal formation history in the bulge.
+
+
+
+
+    float sfh_MetalsICM[SFH_NBIN][NUM_METAL_CHANNELS]; // 10^10 Msun/h // Metal formation history in the ICM.
 # 318 "./code/h_galaxy_output.h"
     //All: [H][He][Cb][N][O][Ne][Mg][Si][S][Ca][Fe] or //Only [H][He][O][Mg][Fe]
-# 330 "./code/h_galaxy_output.h"
+
+
+    float sfh_DiskMass_elements[SFH_NBIN][NUM_ELEMENTS]; // Msun // History of mass of elements locked up in stars in disk.
+    float sfh_BulgeMass_elements[SFH_NBIN][NUM_ELEMENTS]; // Msun // History of mass of elements locked up in stars in bulge.
+
+
+
+
+    float sfh_ICM_elements[SFH_NBIN][NUM_ELEMENTS]; // Msun // History of mass of elements locked up in stars in the ICM.
+
+
     float DiskMass_elements[NUM_ELEMENTS]; // Msun // Mass of elements locked up in stars in disk.
     float BulgeMass_elements[NUM_ELEMENTS]; // Msun // Mass of elements locked up in stars in bulge.
 

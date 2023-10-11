@@ -1,5 +1,6 @@
 GALAXY_OUTPUT {
-     int Type
+ //    int   NumDisr
+ //***** ROB: Geoff's disruption counter (24-03-20) *****     int Type
  // None //Galaxy type: 0 for central galaxies of a main halo, 1 for central galaxies in sub-halos, 2 for satellites without halo.     int HaloIndex
  // None // ?Unique ID of MPA halo containing this galaxy     float HaloM_Mean200
  // 1e10 Msun/h // M200 cf mean last time this halo was a type 0     float HaloM_Crit200
@@ -62,9 +63,12 @@ GALAXY_OUTPUT {
  // 10^10/h Msun // Mass in metals in the Reheated gas */     float MetalsEjectedMass[NUM_METAL_CHANNELS]
  // 10^10/h Msun // Mass in metals in the ejected gas     float MetalsICM[NUM_METAL_CHANNELS]
  // 10^10/h Msun // Mass in metals in intra-cluster stars, for type 0,1     float DiskSNIIRate
- //yr^-1 //Rate of SN-II explosions from the disc     float BulgeSNIIRate
- //yr^-1 //Rate of SN-II explosions from the bulge     float ICMSNIIRate
- //yr^-1 //Rate of SN-II explosions from the halo stars     /* misc */     float MassReturnRateToColdGas
+ //yr^-1 //Rate of SN-II explosions from the disc (averaged over a whole snapshot)     float BulgeSNIIRate
+ //yr^-1 //Rate of SN-II explosions from the bulge (averaged over a whole snapshot)     float ICMSNIIRate
+ //yr^-1 //Rate of SN-II explosions from the halo stars (averaged over a whole snapshot)     float DiskSNIaRate
+ //yr^-1 //Rate of SN-Ia explosions from the disc (averaged over a whole snapshot)     float BulgeSNIaRate
+ //yr^-1 //Rate of SN-Ia explosions from the bulge (averaged over a whole snapshot)     float ICMSNIaRate
+ //yr^-1 //Rate of SN-Ia explosions from the halo stars (averaged over a whole snapshot)     /* misc */     float MassReturnRateToColdGas
  // Msun/yr // rate of mass returned by SNe and stellar winds to the ColdGas in this snapshot     float MassReturnRateToHotGas
  // Msun/yr // rate of mass returned by SNe and stellar winds to the HotGas in this snapshot     float MetalsReturnRateToHotGas
  // Msun/yr // rate of metal mass returned by SNe and stellar winds to the HotGas in this snapshot     float PrimordialAccretionRate
@@ -79,9 +83,9 @@ GALAXY_OUTPUT {
  // Msun/yr // Rate at which cold gas is accreted into the central black hole in the quasar mode.     float RadioAccretionRate
  // Msun/yr // Rate at which hot gas is accreted into the central black hole in the radio mode.     float Sfr
  // Msun/yr // Star formation rate     float SfrInst
- // Msun/yr // Instantaneous star formation rate (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts)     float SfrRings[RNUM]
+ // Msun/yr // Instantaneous star formation rate (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts) //*****ROB*****//     float SfrRings[RNUM]
  // Msun/yr // Star formation rate within each annular ring     float SfrInstRings[RNUM]
- // Msun/yr // Instantaneous star formation rate within each annular ring (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts)     float SfrBulge
+ // Msun/yr // Instantaneous star formation rate within each annular ring (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts) //*****ROB*****//     float SfrBulge
  // Msun/yr // Star formation rate in bulge.     float XrayLum
  // log10(erg/sec) // (log_10 of) X-Ray luminosity     float BulgeSize
  // Mpc/h // Half mass radius of bulge     float DiskRadius
@@ -123,4 +127,23 @@ GALAXY_OUTPUT {
  // Msun // Mass of elements locked up in hot gas.     /* float ReheatedGas_elements[NUM_ELEMENTS]
  // Msun // Mass of elements locked up in reheated gas. */     float ICM_elements[NUM_ELEMENTS]
  // Msun // Mass of elements locked up in stars in the ICM     float EjectedMass_elements[NUM_ELEMENTS]
+ // Msun // Mass of elements locked up in ejected gas.   float t_des[RNUM]
+   float t_sput_HotGas
+   float t_sput_EjectedMass
+   //struct DustRates DustColdGasRates
+ // ? // Rates of creation and destruction of dust   float DustColdGasRates[NUM_COLDGAS_DUST_RATES]
+ // ? // Rates of creation and destruction of dust in the ColdGas   float DustHotGasRates[NUM_HOTGAS_DUST_RATES]
+ // ? // Rates of creation and destruction of dust in the Hotgas   float DustEjectedMassRates
+ // Rate of destruction of dust in the EjectedMass   float t_acc[RNUM]
+   float f_cmax[RNUM][NUM_ELEMENTS]
+ // unitless // max fraction of molecular media //ROB: I think this is actually the maximum mass fraction of element ee in clouds that is in dust.   float ColdGasDiff_elements[NUM_ELEMENTS]
+ // Msun // Mass of elements in the diffused phase (in ColdGas)   float ColdGasClouds_elements[NUM_ELEMENTS]
+ // Msun // Mass of elements in the cloud phase (in ColdGas)   float DustColdGasDiff_elements[NUM_ELEMENTS]
+ // Msun // Mass of elements in the diffuse phase locked up in dust (in ColdGas)   float DustColdGasClouds_elements[NUM_ELEMENTS]
+ // Msun // Mass of elements in the cloud phase locked up in dust (in ColdGas)   float DustHotGas_elements[NUM_ELEMENTS]
+ // Msun // Mass of elements locked up in dust (in HotGas)   float DustEjectedMass_elements[NUM_ELEMENTS]
+ // Msun // Mass of elements locked up in dust (in EjectedMass)     float ColdGasDiffRings_elements[RNUM][NUM_ELEMENTS]
+ // Msun // Mass of elements in diffuse gas in each annular ring     float ColdGasCloudsRings_elements[RNUM][NUM_ELEMENTS]
+ // Msun // Mass of elements in clouds in each annular ring     float DustColdGasDiffRings_elements[RNUM][NUM_ELEMENTS]
+ // Msun // Mass of elements in diffuse gas locked up in dust in each annular ring     float DustColdGasCloudsRings_elements[RNUM][NUM_ELEMENTS]
 }
