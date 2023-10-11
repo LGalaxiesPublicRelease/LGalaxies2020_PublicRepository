@@ -613,21 +613,6 @@ void prepare_galaxy_for_output(int n, struct GALAXY *g, struct GALAXY_OUTPUT *o)
 #endif //OUTPUT_RINGS
     }
 
-#ifndef MAINELEMENTS
-#ifndef LITE_OUTPUT
-#ifdef AL26
-  for(int mm=0; mm<NUM_METAL_CHANNELS; mm++) {
-	  o->ColdGas_Al26Inst[mm] = g->ColdGas_Al26Inst[mm];
-#ifdef OUTPUT_RINGS
-	  for(ll=0; ll<RNUM; ll++) {
-		  o->ColdGasRings_Al26Inst[ll][mm] = g->ColdGasRings_Al26Inst[ll][mm];
-	  }
-#endif //OUTPUT_RINGS
-  }
-#endif //AL26
-#endif //LITE_OUTPUT
-#endif //MAINELEMENTS
-
 
 #ifdef DETAILED_DUST
 #ifdef FULL_DUST_RATES

@@ -515,9 +515,6 @@ void init_galaxy(int p, int halonr)
       Gal[p].MetalsEjectedMass[ii] = 0.;
 #ifdef INDIVIDUAL_ELEMENTS
 #ifndef MAINELEMENTS
-#ifdef AL26
-      Gal[p].ColdGas_Al26Inst[ii] = 0.;
-#endif //AL26
 #endif //MAINELEMENTS
 #endif //INDIVIDUAL_ELEMENTS
 #ifdef EXCESS_MASS
@@ -549,9 +546,6 @@ void init_galaxy(int p, int halonr)
 	  Gal[p].MetalsBulgeMassRings[j][ii] = 0.;
 #ifdef INDIVIDUAL_ELEMENTS
 #ifndef MAINELEMENTS
-#ifdef AL26
-      Gal[p].ColdGasRings_Al26Inst[j][ii] = 0.;
-#endif //AL26
 #endif //MAINELEMENTS
 #endif //INDIVIDUAL_ELEMENTS
 	}

@@ -255,9 +255,6 @@ struct GALAXY			/* Galaxy data */
   double BulgeMass_elements[NUM_ELEMENTS];
   double ColdGas_elements[NUM_ELEMENTS];
 #ifndef MAINELEMENTS
-#ifdef AL26
-  double ColdGas_Al26Inst[NUM_METAL_CHANNELS]; // Msun //Mass of Al26 that was ejected into the ColdGas by disc SNe-II, SNe-Ia, and AGBs in this timestep
-#endif //AL26
 #endif //MAINELEMENTS
   double HotGas_elements[NUM_ELEMENTS];
   //double ReheatedGas_elements[NUM_ELEMENTS];
@@ -271,9 +268,6 @@ struct GALAXY			/* Galaxy data */
   double BulgeMassRings_elements[RNUM][NUM_ELEMENTS];
   double ColdGasRings_elements[RNUM][NUM_ELEMENTS];
 #ifndef MAINELEMENTS
-#ifdef AL26
-  double ColdGasRings_Al26Inst[RNUM][NUM_METAL_CHANNELS]; // Msun //Mass of Al26 that was ejected into the ColdGasRings by disc SNe-II, SNe-Ia, and AGBs in this timestep
-#endif //AL26
 #endif //MAINELEMENTS
 #endif //H2_AND_RINGS
 #endif //INDIVIDUAL_ELEMENTS

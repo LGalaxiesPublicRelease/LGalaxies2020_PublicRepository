@@ -19,106 +19,9 @@ void read_yield_tables(void)
 #endif //DETAILED_DUST
 
 #ifdef BINARYC
-	static char *bc_yields_filename = "ensemble_output_"; //"ensemble_output-100_"
-#ifdef AL26
-	static char *bc_yields_directory = "./YieldTables/binary_c_yields/Al26_yields/";
-#else //AL26
-	//static char *bc_yields_directory = "./YieldTables/binary_c_yields/default/singleStars/rescaled/";
-	//static char *bc_yields_directory = "./YieldTables/binary_c_yields/default/singleStars/100pc_singleStars/";
+	static char *bc_yields_filename = "ensemble_output_";
 	static char *bc_yields_directory = "./YieldTables/binary_c_yields/default/binaryStars/";
-	//static char *bc_yields_directory = "./YieldTables/binary_c_yields/default/singleStars/";
-	//static char *bc_yields_directory = "./YieldTables/binary_c_yields/new/binaryStars/";
-	//static char *bc_yields_directory = "./YieldTables/binary_c_yields/new/singleStars/kroupa2001/";
-#endif //AL26
-	//static char *bc_SNIa_yields_directory = "SNIa_DD_only/";
-	//static char *bc_SNIa_yields_directory = "SNIa_SD_only/";
-	//static char *bc_SNIa_yields_directory = "SNIa_subCh_only/";
-	//static char *bc_SNIa_yields_directory = "SNIa_DD_SD_subCh_only/";
-	//static char *bc_SNIa_yields_directory = "SNIa_all/";
-	//static char *bc_SNIa_yields_directory = "SNIa_DD_only_x10000/";
 	static char *bc_SNIa_yields_directory = "/";
-
-	/*
-	//------------------------------------------
-	//READ ELEMENTS LIST:
-	//------------------------------------------
-	int numEle = 0;
-	int maxLetters = 5;
-
-	printf("In yields_read_tables.c: %i\n", Num_elements);
-
-	FILE *fd0;
-	char buf0[100];
-	int i0;
-	char m0[maxLetters];
-	static char *name0 = "elements.txt";
-
-	sprintf(buf0, "%s%s%s", bc_yields_directory, bc_yields_filename, name0);
-
-	if(!(fd0 = fopen(buf0, "r"))) {
-		printf("file `%s' not found.\n", buf0);
-		exit(0);
-	}
-
-	// Check how many elements there are:
-	while(fscanf(fd0, "%s") == 1) {
-		numEle++;
-	}
-	fclose(fd0);
-
-	//Write element names to string array:
-	fd0 = fopen(buf0, "r");
-	for(i0=0; i0<numEle; i0++) {
-		fscanf(fd0, "%s", &m0);
-		strcpy(bcElements[i0], m0);
-		printf("|%s|\n", bcElements[i0]);
-	}
-	fclose(fd0);
-	*/
-
-	/*
-	FILE *fd0;
-	char buf0[100];
-	int i0;
-	char m0[numLet];
-	static char *name0 = "elements.txt";
-
-	sprintf(buf0, "%s%s%s", bc_yields_directory, bc_yields_filename, name0);
-
-	if(!(fd0 = fopen(buf0, "r"))) {
-		printf("file `%s' not found.\n", buf0);
-		exit(0);
-	}
-
-	for(i0=0; i0<numEle; i0++) {
-		fscanf(fd0, "%s", &m0); //Store as string
-		//bcElements[i0] = m0;
-		strcpy(bcElements[i0], m0);
-		printf("*************** %s", bcElements[i0]);
-	}
-	fclose(fd0);
-	*/
-
-	/*
-	size_t max = 100;
-	FILE *fd0;
-	char buf0[max];
-	char m0[max];
-	static char *name0 = "elements.txt";
-
-	sprintf(buf0, "%s%s%s", bc_yields_directory, bc_yields_filename, name0);
-
-	if(!(fd0 = fopen(buf0, "r"))) {
-		printf("file `%s' not found.\n", buf0);
-		exit(0);
-	}
-
-	//FILE *fd0 = fopen(buf0, "r");
-	fgets(m0, max, fd0);
-	printf("********* String read: %s\n", m0);
-	fclose(fd0);
-	*/
-
 
 	//------------------------------------------
 	//READ TIMESTEPS LIST:
@@ -141,7 +44,6 @@ void read_yield_tables(void)
 		bcTimes[i1] = pow(10,m1)*1.e6; //[yr] Convert log times to linear times, and Myr to yr.
 	}
 	fclose(fd1);
-	//printf("Binary_c times read.\n");
 
 	//------------------------------------------
 	//READ METALLICITY LIST:
@@ -180,17 +82,8 @@ void read_yield_tables(void)
 		"AGB_Z0.01_EjectedMasses.txt",
 	  	"AGB_Z0.03_EjectedMasses.txt"
 		};
-//	static char *name3[] = {
-//		  	"AGB_Z0.0001_EjectedMasses.txt",
-//		  	"AGB_Z0.0001_EjectedMasses.txt",
-//			"AGB_Z0.0001_EjectedMasses.txt",
-//			"AGB_Z0.0001_EjectedMasses.txt",
-//			"AGB_Z0.0001_EjectedMasses.txt",
-//		  	"AGB_Z0.0001_EjectedMasses.txt"
-//			};
 
 	for(j3=0; j3<BC_Z_NUM; j3++) {
-		//sprintf(buf3, "%s%s%s%s", bc_yields_directory, bc_AGB_yields_directory, bc_yields_filename, name3[j3]);
 		sprintf(buf3, "%s%s%s", bc_yields_directory, bc_yields_filename, name3[j3]);
 
 		if(!(fd3 = fopen(buf3, "r"))) {
@@ -200,11 +93,13 @@ void read_yield_tables(void)
 
 		for(i3=0; i3<BC_TIME_NUM; i3++) {
 			fscanf(fd3, "%lf", &m3); //Store at double precision
-			//bcAGBEjectedMasses[j3][i3] = m3;
 			bcAGBEjectedMasses[j3][i3] = m3 / (bcTimes[i3] * log(10.)); //Convert from log(t/Myr) bins to linear t/yr bins. (For details, see below)
-			//m3 = d(M/Msun)/dlog(t/Myr) * 1/Msun  //Default units
-			//m3 / ((bcTimes[i3] / 1.e6) * log(10.)) = d(M/Msun)/d(t/Myr) * 1/Msun  //N.B. bcTimes[] is in yr
-			//(m3 / ((bcTimes[i3] / 1.e6) * log(10.))) / 1.e6 = m3 / (bcTimes[i3] * log(10.)) = d(M/Msun)/d(t/yr) * 1/Msun  //Units required for yields_integrals.c
+			/*
+			 * Note:
+			 * m3 = d(M/Msun)/dlog(t/Myr) * 1/Msun  //Default units
+			 * m3 / ((bcTimes[i3] / 1.e6) * log(10.)) = d(M/Msun)/d(t/Myr) * 1/Msun  //N.B. bcTimes[] is in yr
+			 * m3 / (bcTimes[i3] * log(10.)) = d(M/Msun)/d(t/yr) * 1/Msun  //Units required for yields_integrals.c
+			*/
 		}
 		fclose(fd3);
 	}
@@ -224,14 +119,6 @@ void read_yield_tables(void)
 		"SNII_Z0.01_EjectedMasses.txt",
 		"SNII_Z0.03_EjectedMasses.txt"
 		};
-//	static char *name4[] = {
-//			"SNII_Z0.0001_EjectedMasses.txt",
-//			"SNII_Z0.0001_EjectedMasses.txt",
-//			"SNII_Z0.0001_EjectedMasses.txt",
-//			"SNII_Z0.0001_EjectedMasses.txt",
-//			"SNII_Z0.0001_EjectedMasses.txt",
-//			"SNII_Z0.0001_EjectedMasses.txt"
-//			};
 
 	for(j4=0; j4<BC_Z_NUM; j4++) {
 		sprintf(buf4, "%s%s%s", bc_yields_directory, bc_yields_filename, name4[j4]);
@@ -244,9 +131,12 @@ void read_yield_tables(void)
 		for(i4=0; i4<BC_TIME_NUM; i4++) {
 			fscanf(fd4, "%lf", &m4); //Store at double precision
 			bcSNIIEjectedMasses[j4][i4] = m4 / (bcTimes[i4] * log(10.)); //Convert from log(t/Myr) bins to linear t/yr bins. (For details, see below)
-			//m3 = d(M/Msun)/dlog(t/Myr) * 1/Msun  //Default units
-			//m3 / ((bcTimes[i3] / 1.e6) * log(10.)) = d(M/Msun)/d(t/Myr) * 1/Msun  //N.B. bcTimes[] is in yr
-			//(m3 / ((bcTimes[i3] / 1.e6) * log(10.))) / 1.e6 = m3 / (bcTimes[i3] * log(10.)) = d(M/Msun)/d(t/yr) * 1/Msun  //Units required for yields_integrals.c
+			/*
+			 * Note:
+			 * m3 = d(M/Msun)/dlog(t/Myr) * 1/Msun  //Default units
+			 * m3 / ((bcTimes[i3] / 1.e6) * log(10.)) = d(M/Msun)/d(t/Myr) * 1/Msun  //N.B. bcTimes[] is in yr
+			 * m3 / (bcTimes[i3] * log(10.)) = d(M/Msun)/d(t/yr) * 1/Msun  //Units required for yields_integrals.c
+			*/
 		}
 		fclose(fd4);
 	}
@@ -266,17 +156,8 @@ void read_yield_tables(void)
 		"SNIa_Z0.01_EjectedMasses.txt",
 		"SNIa_Z0.03_EjectedMasses.txt"
 		};
-//	static char *name5[] = {
-//			"SNIa_Z0.0001_EjectedMasses.txt",
-//			"SNIa_Z0.0001_EjectedMasses.txt",
-//			"SNIa_Z0.0001_EjectedMasses.txt",
-//			"SNIa_Z0.0001_EjectedMasses.txt",
-//			"SNIa_Z0.0001_EjectedMasses.txt",
-//			"SNIa_Z0.0001_EjectedMasses.txt"
-//			};
 
 	for(j5=0; j5<BC_Z_NUM; j5++) {
-		//sprintf(buf5, "%s%s%s", bc_yields_directory, bc_yields_filename, name5[j5]);
 		sprintf(buf5, "%s%s%s%s", bc_yields_directory, bc_SNIa_yields_directory, bc_yields_filename, name5[j5]);
 
 		if(!(fd5 = fopen(buf5, "r"))) {
@@ -286,11 +167,13 @@ void read_yield_tables(void)
 
 		for(i5=0; i5<BC_TIME_NUM; i5++) {
 			fscanf(fd5, "%lf", &m5); //Store at double precision
-			//bcSNIaEjectedMasses[j5][i5] = m5 / (bcTimes[i5] * log(10.)); //Convert from log(t/Myr) bins to linear t/yr bins. (For details, see below)
 			bcSNIaEjectedMasses[j5][i5] = (BC_SNIA_SCALE_FACTOR * m5) / (bcTimes[i5] * log(10.)); //Convert from log(t/Myr) bins to linear t/yr bins. (For details, see below)
-			//m3 = d(M/Msun)/dlog(t/Myr) * 1/Msun  //Default units
-			//m3 / ((bcTimes[i3] / 1.e6) * log(10.)) = d(M/Msun)/d(t/Myr) * 1/Msun  //N.B. bcTimes[] is in yr
-			//(m3 / ((bcTimes[i3] / 1.e6) * log(10.))) / 1.e6 = m3 / (bcTimes[i3] * log(10.)) = d(M/Msun)/d(t/yr) * 1/Msun  //Units required for yields_integrals.c
+			/*
+			 * Note:
+			 * m3 = d(M/Msun)/dlog(t/Myr) * 1/Msun  //Default units
+			 * m3 / ((bcTimes[i3] / 1.e6) * log(10.)) = d(M/Msun)/d(t/Myr) * 1/Msun  //N.B. bcTimes[] is in yr
+			 * m3 / (bcTimes[i3] * log(10.)) = d(M/Msun)/d(t/yr) * 1/Msun  //Units required for yields_integrals.c
+			*/
 		}
 		fclose(fd5);
 	}
@@ -310,17 +193,8 @@ void read_yield_tables(void)
 		"AGB_Z0.01_TotalMetals.txt",
 	  	"AGB_Z0.03_TotalMetals.txt"
 		};
-//	static char *name6[] = {
-//		  	"AGB_Z0.0001_TotalMetals.txt",
-//		  	"AGB_Z0.0001_TotalMetals.txt",
-//			"AGB_Z0.0001_TotalMetals.txt",
-//			"AGB_Z0.0001_TotalMetals.txt",
-//			"AGB_Z0.0001_TotalMetals.txt",
-//		  	"AGB_Z0.0001_TotalMetals.txt"
-//			};
 
 	for(j6=0; j6<BC_Z_NUM; j6++) {
-		//sprintf(buf6, "%s%s%s%s", bc_yields_directory, bc_AGB_yields_directory, bc_yields_filename, name6[j6]);
 		sprintf(buf6, "%s%s%s", bc_yields_directory, bc_yields_filename, name6[j6]);
 
 		if(!(fd6 = fopen(buf6, "r"))) {
@@ -350,14 +224,6 @@ void read_yield_tables(void)
 		"SNII_Z0.01_TotalMetals.txt",
 		"SNII_Z0.03_TotalMetals.txt"
 		};
-//	static char *name7[] = {
-//			"SNII_Z0.0001_TotalMetals.txt",
-//			"SNII_Z0.0001_TotalMetals.txt",
-//			"SNII_Z0.0001_TotalMetals.txt",
-//			"SNII_Z0.0001_TotalMetals.txt",
-//			"SNII_Z0.0001_TotalMetals.txt",
-//			"SNII_Z0.0001_TotalMetals.txt"
-//			};
 
 	for(j7=0; j7<BC_Z_NUM; j7++) {
 		sprintf(buf7, "%s%s%s", bc_yields_directory, bc_yields_filename, name7[j7]);
@@ -389,17 +255,8 @@ void read_yield_tables(void)
 		"SNIa_Z0.01_TotalMetals.txt",
 		"SNIa_Z0.03_TotalMetals.txt"
 		};
-//	static char *name8[] = {
-//			"SNIa_Z0.0001_TotalMetals.txt",
-//			"SNIa_Z0.0001_TotalMetals.txt",
-//			"SNIa_Z0.0001_TotalMetals.txt",
-//			"SNIa_Z0.0001_TotalMetals.txt",
-//			"SNIa_Z0.0001_TotalMetals.txt",
-//			"SNIa_Z0.0001_TotalMetals.txt"
-//			};
 
 	for(j8=0; j8<BC_Z_NUM; j8++) {
-		//sprintf(buf8, "%s%s%s", bc_yields_directory, bc_yields_filename, name8[j8]);
 		sprintf(buf8, "%s%s%s%s", bc_yields_directory, bc_SNIa_yields_directory, bc_yields_filename, name8[j8]);
 
 		if(!(fd8 = fopen(buf8, "r"))) {
@@ -409,7 +266,6 @@ void read_yield_tables(void)
 
 		for(i8=0; i8<BC_TIME_NUM; i8++) {
 			fscanf(fd8, "%lf", &m8); //Store at double precision
-			//bcSNIaTotalMetals[j8][i8] = m8 / (bcTimes[i8] * log(10.)); //Convert from log(t/Myr) bins to linear t/yr bins.
 			bcSNIaTotalMetals[j8][i8] = (BC_SNIA_SCALE_FACTOR * m8) / (bcTimes[i8] * log(10.)); //Convert from log(t/Myr) bins to linear t/yr bins.
 		}
 		fclose(fd8);
@@ -430,17 +286,8 @@ void read_yield_tables(void)
 		"AGB_Z0.01_Yields.txt",
 	  	"AGB_Z0.03_Yields.txt"
 		};
-//	static char *name9[] = {
-//		  	"AGB_Z0.0001_Yields.txt",
-//		  	"AGB_Z0.0001_Yields.txt",
-//			"AGB_Z0.0001_Yields.txt",
-//			"AGB_Z0.0001_Yields.txt",
-//			"AGB_Z0.0001_Yields.txt",
-//		  	"AGB_Z0.0001_Yields.txt"
-//			};
 
 	for(j9=0; j9<BC_Z_NUM; j9++) {
-		//sprintf(buf9, "%s%s%s%s", bc_yields_directory, bc_AGB_yields_directory, bc_yields_filename, name9[j9]);
 		sprintf(buf9, "%s%s%s", bc_yields_directory, bc_yields_filename, name9[j9]);
 
 		if(!(fd9 = fopen(buf9, "r"))) {
@@ -460,7 +307,7 @@ void read_yield_tables(void)
 
 			}
 		}
-		fclose(fd9); //NOTE: The yields files weren't explicitly closed for e.g. the Portinari+98 yields below... (03-05-22)
+		fclose(fd9);
 	}
 
 	//------------------------------------------
@@ -478,14 +325,6 @@ void read_yield_tables(void)
 		"SNII_Z0.01_Yields.txt",
 		"SNII_Z0.03_Yields.txt"
 		};
-//	static char *name10[] = {
-//			"SNII_Z0.0001_Yields.txt",
-//			"SNII_Z0.0001_Yields.txt",
-//			"SNII_Z0.0001_Yields.txt",
-//			"SNII_Z0.0001_Yields.txt",
-//			"SNII_Z0.0001_Yields.txt",
-//			"SNII_Z0.0001_Yields.txt"
-//			};
 
 	for(j10=0; j10<BC_Z_NUM; j10++) {
 		sprintf(buf10, "%s%s%s", bc_yields_directory, bc_yields_filename, name10[j10]);
@@ -523,17 +362,8 @@ void read_yield_tables(void)
 		"SNIa_Z0.01_Yields.txt",
 		"SNIa_Z0.03_Yields.txt"
 		};
-//	static char *name11[] = {
-//			"SNIa_Z0.0001_Yields.txt",
-//			"SNIa_Z0.0001_Yields.txt",
-//			"SNIa_Z0.0001_Yields.txt",
-//			"SNIa_Z0.0001_Yields.txt",
-//			"SNIa_Z0.0001_Yields.txt",
-//			"SNIa_Z0.0001_Yields.txt"
-//			};
 
 	for(j11=0; j11<BC_Z_NUM; j11++) {
-		//sprintf(buf11, "%s%s%s", bc_yields_directory, bc_yields_filename, name11[j11]);
 		sprintf(buf11, "%s%s%s%s", bc_yields_directory, bc_SNIa_yields_directory, bc_yields_filename, name11[j11]);
 
 		if(!(fd11 = fopen(buf11, "r"))) {
@@ -544,7 +374,6 @@ void read_yield_tables(void)
 		for(k11=0; k11<NUM_ELEMENTS; k11++) {
 			for(i11=0; i11<BC_TIME_NUM; i11++) {
 				fscanf(fd11, "%lf", &m11); //Store at double precision
-				//bcSNIaYields[j11][k11][i11] = m11 / (bcTimes[i11] * log(10.)); //Convert from log(t/Myr) bins to linear t/yr bins.
 				bcSNIaYields[j11][k11][i11] = (BC_SNIA_SCALE_FACTOR * m11) / (bcTimes[i11] * log(10.)); //Convert from log(t/Myr) bins to linear t/yr bins.
 				if (bcSNIaYields[j11][k11][i11] < 0.0) {
 					printf("***** WARNING!: [yields_read_tables.c] bcSNIaYields[%i][%i][%i] is negative (= %e | raw yield = %e). *****\n",
@@ -554,15 +383,6 @@ void read_yield_tables(void)
 		}
 		fclose(fd11);
 	}
-
-//	for(k11=0; k11<NUM_ELEMENTS; k11++) {
-//		for(i11=0; i11<BC_TIME_NUM; i11++) {
-//			printf("%.12e, ",bcAGBYields[0][k11][i11]);
-//		}
-//		printf("\n");
-//	}
-//	printf("\n");
-//	exit(0);
 
 	//------------------------------------------
 	//READ AGB RATES LISTS:
@@ -579,17 +399,8 @@ void read_yield_tables(void)
 		"AGB_Z0.01_Rates.txt",
 	  	"AGB_Z0.03_Rates.txt"
 		};
-//	static char *name12[] = {
-//		  	"AGB_Z0.0001_Rates.txt",
-//		  	"AGB_Z0.0001_Rates.txt",
-//			"AGB_Z0.0001_Rates.txt",
-//			"AGB_Z0.0001_Rates.txt",
-//			"AGB_Z0.0001_Rates.txt",
-//		  	"AGB_Z0.0001_Rates.txt"
-//			};
 
 	for(j12=0; j12<BC_Z_NUM; j12++) {
-		//sprintf(buf12, "%s%s%s%s", bc_yields_directory, bc_AGB_yields_directory, bc_yields_filename, name12[j12]);
 		sprintf(buf12, "%s%s%s", bc_yields_directory, bc_yields_filename, name12[j12]);
 
 		if(!(fd12 = fopen(buf12, "r"))) {
@@ -599,10 +410,7 @@ void read_yield_tables(void)
 
 		for(i12=0; i12<BC_TIME_NUM; i12++) {
 			fscanf(fd12, "%lf", &m12); //Store at double precision
-			//bcAGBRates[j12][i12] = m12 / (0.1 * bcTimes[i12] * log(10.)); //[in dNum/dt 1/Msun] I.e. converted from log(t/Myr) bins to linear t/yr bins.
 			bcAGBRates[j12][i12] = m12 / (bcTimes[i12] * log(10.)); //[in dNum/dt 1/Msun] I.e. converted from log(t/Myr) bins to linear t/yr bins.
-			//bcAGBRates[j12][i12] = m12 / (0.1 * 0.7689192604170373 * bcTimes[i12] * log(10.)); //[in dNum/dt 1/Msun] I.e. converted from log(t/Myr) bins to linear t/yr bins.
-			//bcAGBRates[j12][i12] = m12; //[in 1/Msun] I.e. SN values in the binary_c files are already "specific numbers" (i.e. in units of 1/Msun)
 		}
 		fclose(fd12);
 	}
@@ -622,15 +430,6 @@ void read_yield_tables(void)
 		"SNII_Z0.01_Rates.txt",
 		"SNII_Z0.03_Rates.txt"
 		};
-//	static char *name13[] = {
-//			"SNII_Z0.0001_Rates.txt",
-//			"SNII_Z0.0001_Rates.txt",
-//			"SNII_Z0.0001_Rates.txt",
-//			"SNII_Z0.0001_Rates.txt",
-//			"SNII_Z0.0001_Rates.txt",
-//			"SNII_Z0.0001_Rates.txt"
-//			};
-
 
 	for(j13=0; j13<BC_Z_NUM; j13++) {
 		sprintf(buf13, "%s%s%s", bc_yields_directory, bc_yields_filename, name13[j13]);
@@ -642,10 +441,7 @@ void read_yield_tables(void)
 
 		for(i13=0; i13<BC_TIME_NUM; i13++) {
 			fscanf(fd13, "%lf", &m13); //Store at double precision
-			//bcSNIIRates[j13][i13] = m13 / (0.1 * bcTimes[i13] * log(10.)); //[in dNum/dt 1/Msun] I.e. converted from log(t/Myr) bins to linear t/yr bins.
 			bcSNIIRates[j13][i13] = m13 / (bcTimes[i13] * log(10.)); //[in dNum/dt 1/Msun] I.e. converted from log(t/Myr) bins to linear t/yr bins.
-			//bcSNIIRates[j13][i13] = m13 / (0.1 * 0.7689192604170373 * bcTimes[i13] * log(10.)); //[in dNum/dt 1/Msun] I.e. converted from log(t/Myr) bins to linear t/yr bins.
-			//bcSNIIRates[j13][i13] = m13; //[in 1/Msun] I.e. SN values in the binary_c files are already "specific numbers" (i.e. in units of 1/Msun)
 		}
 		fclose(fd13);
 	}
@@ -665,17 +461,8 @@ void read_yield_tables(void)
 		"SNIa_Z0.01_Rates.txt",
 		"SNIa_Z0.03_Rates.txt"
 		};
-//	static char *name14[] = {
-//			"SNIa_Z0.0001_Rates.txt",
-//			"SNIa_Z0.0001_Rates.txt",
-//			"SNIa_Z0.0001_Rates.txt",
-//			"SNIa_Z0.0001_Rates.txt",
-//			"SNIa_Z0.0001_Rates.txt",
-//			"SNIa_Z0.0001_Rates.txt"
-//			};
 
 	for(j14=0; j14<BC_Z_NUM; j14++) {
-		//sprintf(buf14, "%s%s%s", bc_yields_directory, bc_yields_filename, name14[j14]);
 		sprintf(buf14, "%s%s%s%s", bc_yields_directory, bc_SNIa_yields_directory, bc_yields_filename, name14[j14]);
 
 		if(!(fd14 = fopen(buf14, "r"))) {
@@ -685,11 +472,7 @@ void read_yield_tables(void)
 
 		for(i14=0; i14<BC_TIME_NUM; i14++) {
 			fscanf(fd14, "%lf", &m14); //Store at double precision
-			//bcSNIaRates[j14][i14] = m14 / (bcTimes[i14] * log(10.)); //[in dNum/dt 1/Msun] I.e. converted from log(t/Myr) bins to linear t/yr bins.
-			//bcSNIaRates[j14][i14] = (BC_SNIA_SCALE_FACTOR * m14) / (0.1 * bcTimes[i14] * log(10.)); //[d/dlog(t/Myr) 1/Msun --> d/d(t/yr) 1/Msun] I.e. converted from log(t/Myr) bins to linear t/yr bins.
 			bcSNIaRates[j14][i14] = (BC_SNIA_SCALE_FACTOR * m14) / (bcTimes[i14] * log(10.)); //[d/dlog(t/Myr) 1/Msun --> d/d(t/yr) 1/Msun] I.e. converted from log(t/Myr) bins to linear t/yr bins.
-			//bcSNIaRates[j14][i14] = (BC_SNIA_SCALE_FACTOR * m14) / (0.1 * 0.7689192604170373 * bcTimes[i14] * log(10.)); //[d/dlog(t/Myr) 1/Msun --> d/d(t/yr) 1/Msun] I.e. converted from log(t/Myr) bins to linear t/yr bins.
-			//bcSNIaRates[j14][i14] = BC_SNIA_SCALE_FACTOR * m14; //[in 1/Msun] I.e. SN values in the binary_c files are already "specific numbers" (i.e. in units of 1/Msun)
 		}
 		fclose(fd14);
 	}
@@ -731,7 +514,6 @@ void read_yield_tables(void)
 	  lifetimeMasses[i1L] = m1L;
         }
 	fclose(fd1L);
-	//printf("Lifetime masses read.\n");
 
 	//------------------------------------------
 	//READ LIFETIME METALLICITY LIST:
@@ -756,7 +538,6 @@ void read_yield_tables(void)
 	  lifetimeMetallicities[i2L] = m2L;
         }
 	fclose(fd2L);
-	//printf("Lifetime metallicities read.\n");
 
 	//------------------------------------------
 	//READ LIFETIME TABLE:
@@ -784,7 +565,6 @@ void read_yield_tables(void)
           }
         }
 	fclose(fd3L);
-	//printf("Lifetimes read.\n");
 #ifdef PARALLEL
 	if ( ThisTask == 0 )
 #endif
@@ -870,7 +650,6 @@ void read_yield_tables(void)
         {
         	  fscanf(fd6, "%f", &m6);
         	  AGBEjectedMasses[i6][j6] = m6 * Chabrier_IMF(AGBMasses[j6]);
-        	  //AGBEjectedMasses[i6][j6] = 0.0; //Just a test!: To simulate no contribution from AGB stars. (04-03-20)
         }
         fclose(fd6);
 	 }
@@ -902,7 +681,6 @@ void read_yield_tables(void)
 	    {
 	      fscanf(fd7, "%f", &m7);
 	      AGBTotalMetals[i7][j7] = m7 * Chabrier_IMF(AGBMasses[j7]);
-	      //AGBTotalMetals[i7][j7] = 0.0; //Just a test!: To simulate no contribution from AGB stars. (04-03-20)
 	    }
 	  fclose(fd7);
 	}
@@ -936,11 +714,6 @@ void read_yield_tables(void)
             {
             	fscanf(fd8, "%f", &m8);
             	AGBYields[k8][i8][j8] = m8 * Chabrier_IMF(AGBMasses[j8]);
-            	/*printf("AGBYields[%i][%i][%i] = %e | m8 = %e | AGBMasses[%i] = %e | Chabrier_IMF(AGBMasses[%i]) = %e\n",
-            			k8, i8, j8, AGBYields[k8][i8][j8], m8, j8, AGBMasses[j8], j8, Chabrier_IMF(AGBMasses[j8]));*/
-            	//if (i8 == NUM_ELEMENTS-1) {printf("m8 = %f | AGBYields[%i][%i][%i] = %f\n",m8,k8,i8,j8,AGBYields[k8][i8][j8]);}
-            	//if (k8 < AGB_Z_NUM-1 && i8 == 3 && AGBMasses[j8] > 4.0) AGBYields[k8][i8][j8] = 0.2 * m8 * Chabrier_IMF(AGBMasses[j8]); //Just a test!: To simulate reducing the N mass yield from AGB stars below Z=0.019 and above 4Msun by 80%, following the findings of Ritter+18a. (19-06-20)
-            	//AGBYields[k8][i8][j8] = 0.0; //Just a test!: To simulate no contribution from AGB stars. (04-03-20)
             }
           }
     }
@@ -1048,7 +821,6 @@ void read_yield_tables(void)
 	  {
 	    fscanf(fd11, "%f", &m11);
 	    SNIIEjectedMasses[i11][j11] = m11 * Chabrier_IMF(SNIIMasses[j11]);
-	    //SNIIEjectedMasses[i11][j11] = 0.0; //Just a test!: To simulate no contribution from SNe-II. (21-03-20)
 	  }
 	  fclose(fd11);
 	}
@@ -1094,7 +866,6 @@ void read_yield_tables(void)
 	  {
 	    fscanf(fd12, "%f", &m12);
 	    SNIITotalMetals[i12][j12] = m12 * Chabrier_IMF(SNIIMasses[j12]);
-	    //SNIITotalMetals[i12][j12] = 0.0; //Just a test!: To simulate no contribution from SNe-II. (21-03-20)
 	  }
 	  fclose(fd12);
 	}
@@ -1142,20 +913,6 @@ void read_yield_tables(void)
 	    {
 	      fscanf(fd13, "%f", &m13);
 	      SNIIYields[k13][i13][j13] = m13 * Chabrier_IMF(SNIIMasses[j13]);
-	      /*if (i13 == 3) {SNIIYields[k13][i13][j13] = 3.0 * m13 * Chabrier_IMF(SNIIMasses[j13]);} //Just a test!: 3.0 x nitrogen production at ALL Z.
-	      else {SNIIYields[k13][i13][j13] = m13 * Chabrier_IMF(SNIIMasses[j13]);}*/
-	      //SNIIYields[k13][i13][j13] = 0.0; //Just a test!: To simulate no contribution from SNe-II. (21-03-20)
-	      /*if (i13 == 4 && k13 >= SNII_Z_NUM-2) {SNIIYields[k13][i13][j13] = 4.0 * m13 * Chabrier_IMF(SNIIMasses[j13]);} //Just a test!: Quadruple the oxygen production at high Z.
-	      else {SNIIYields[k13][i13][j13] = m13 * Chabrier_IMF(SNIIMasses[j13]);}*/
-	      /*if (i13 == 3 && k13 >= SNII_Z_NUM-2) {SNIIYields[k13][i13][j13] = 1.5 * m13 * Chabrier_IMF(SNIIMasses[j13]);} //Just a test!: 1.5 x nitrogen production at high Z.
-	      else {SNIIYields[k13][i13][j13] = m13 * Chabrier_IMF(SNIIMasses[j13]);}*/
-	      /*if (i13 == 3 && k13 >= SNII_Z_NUM-2) {SNIIYields[k13][i13][j13] = 3.0 * m13 * Chabrier_IMF(SNIIMasses[j13]);} //Just a test!: 3.0 x nitrogen production at high Z.
-	      else {SNIIYields[k13][i13][j13] = m13 * Chabrier_IMF(SNIIMasses[j13]);}*/
-	      /*//Just a test!: Undo R. Wiersma's corrections to the P98 yields:
-	      if (i13 == 2) {SNIIYields[k13][i13][j13] = (m13*2.0) * Chabrier_IMF(SNIIMasses[j13]);}
-	      else if (i13 == 6) {SNIIYields[k13][i13][j13] = (m13*0.5) * Chabrier_IMF(SNIIMasses[j13]);}
-	      else if (i13 == 10) {SNIIYields[k13][i13][j13] = (m13*2.0) * Chabrier_IMF(SNIIMasses[j13]);}
-	      else {SNIIYields[k13][i13][j13] = m13 * Chabrier_IMF(SNIIMasses[j13]);}*/
 	    }
 	  }
 	}
@@ -1289,7 +1046,6 @@ void read_yield_tables(void)
 		     {
 			      fscanf(fd14, "%f", &m14);
 			      SNIaYields[i14] = m14;
-			      //printf("%f, \n", SNIaYields[i14]);
 			  }
 #ifdef PARALLEL
 			 if ( ThisTask == 0 )
@@ -1298,6 +1054,7 @@ void read_yield_tables(void)
 
 #endif
 #endif //BINARYC
+
 
 #ifdef WRITE_YIELD_DATA
 //------------------------------------------
@@ -1393,20 +1150,10 @@ double Chabrier_IMF(double M)
 	}
 	else {printf("Chabrier_IMF(): Normalization constants for IMF not known. Check upper mass limit (IMF_MAX_MASS)."); exit(1);}
 
-	//FOR x = 2.0:
-	//For an IMF normalised over 0.1 --> 120.0 Msun:
-	/*const double A = 0.551390;
-	const double B = 0.154026;
-	A = 0.551390;
-	B = 0.154026;*/
-
-	//const double x = 2.3; //Normal Chabrier IMF x = 2.3. Top-heavy IMF e.g. x = 2.0
 	const double mc = 0.079;
 	const double sigma = 0.69;
-
 	if(M >= 1.0)
 	{
-		//phi = B*M*pow(M,-x); //ROB: For consistency, I have replaced the slope value defined just above as "x" with the global value defined in h_variables.h as "IMF_SLOPE". (11-02-19)
 		phi = B*M*pow(M,-IMF_SLOPE);
 	}
 	else

@@ -107,22 +107,6 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 #endif //H2_AND_RINGS
 #endif //DETAILED_DUST
 
-    //Initialise the Al26 arrays, as these should only be recording the Al26 production in the current timestep (i.e. to be calculated below now):
-#ifdef INDIVIDUAL_ELEMENTS
-#ifndef MAINELEMENTS
-#ifdef AL26
-    for(int mm=0; mm<NUM_METAL_CHANNELS; mm++) {
-    	Gal[p].ColdGas_Al26Inst[mm] = 0.0;
-#ifdef H2_AND_RINGS
-		for(jj=0; jj<RNUM; jj++) {
-			Gal[p].ColdGasRings_Al26Inst[jj][mm] = 0.0;
-#endif //H2_AND_RINGS
-		}
-    }
-#endif //AL26
-#endif //MAINELEMENTS
-#endif //INDIVIDUAL_ELEMENTS
-
     for(n=0;n<NOUT;n++) {
     	AgeCorrectionDisk[n] = 0.0;
     	AgeCorrectionBulge[n] = 0.0;
@@ -375,30 +359,12 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
      	Gal[p].MetalsColdGas[0] += (1.0-fwind_SNII) * SNIIAllMetals;
      	Gal[p].MetalsColdGas[1] += (1.0-fwind_SNIa) * SNIaAllMetals;
      	Gal[p].MetalsColdGas[2] += (1.0-fwind_AGB) * AGBAllMetals;
-#ifdef INDIVIDUAL_ELEMENTS
-#ifndef MAINELEMENTS
-#ifdef AL26
-     	Gal[p].ColdGas_Al26Inst[0] += (1.0-fwind_SNII) * SNIIAllElements[Al26_NUM];
-     	Gal[p].ColdGas_Al26Inst[1] += (1.0-fwind_SNIa) * SNIaAllElements[Al26_NUM];
-     	Gal[p].ColdGas_Al26Inst[2] += (1.0-fwind_AGB) * AGBAllElements[Al26_NUM];
-#endif //AL26
-#endif //MAINELEMENTS
-#endif //INDIVIDUAL_ELEMENTS
 
 #ifdef H2_AND_RINGS
      	Gal[p].ColdGasRings[jj] += ((1.0-fwind_SNII) * SNIIEjectaMass + (1.0-fwind_SNIa) * SNIaEjectaMass + (1.0-fwind_AGB) * AGBEjectaMass);
      	Gal[p].MetalsColdGasRings[jj][0] += (1.0-fwind_SNII) * SNIIAllMetals;
      	Gal[p].MetalsColdGasRings[jj][1] += (1.0-fwind_SNIa) * SNIaAllMetals;
      	Gal[p].MetalsColdGasRings[jj][2] += (1.0-fwind_AGB) * AGBAllMetals;
-#ifdef INDIVIDUAL_ELEMENTS
-#ifndef MAINELEMENTS
-#ifdef AL26
-     	Gal[p].ColdGasRings_Al26Inst[jj][0] += (1.0-fwind_SNII) * SNIIAllElements[Al26_NUM];
-     	Gal[p].ColdGasRings_Al26Inst[jj][1] += (1.0-fwind_SNIa) * SNIaAllElements[Al26_NUM];
-     	Gal[p].ColdGasRings_Al26Inst[jj][2] += (1.0-fwind_AGB) * AGBAllElements[Al26_NUM];
-#endif //AL26
-#endif //MAINELEMENTS
-#endif //INDIVIDUAL_ELEMENTS
 #endif //H2_AND_RINGS
 
     	//Total:

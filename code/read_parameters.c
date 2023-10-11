@@ -644,46 +644,7 @@ void read_parameter_file(char *fname)
   addr[nt] = &UnitMass_in_g;
   id[nt++] = DOUBLE;
 
-/*
-  //------------------------------------------
-  // ELEMENTS
 
-#ifdef BINARYC
-  static char *bc_yields_filename = "ensemble_output_";
-#ifdef AL26
-  static char *bc_yields_directory = "./YieldTables/binary_c_yields/Al26_yields/";
-#else //AL26
-  static char *bc_yields_directory = "./YieldTables/binary_c_yields/default/";
-#endif //AL26
-
-  int numEle = 0;
-  FILE *fd0;
-  char buf0[100];
-  int i0;
-  char m0[5];
-  static char *name0 = "elements.txt";
-
-  sprintf(buf0, "%s%s%s", bc_yields_directory, bc_yields_filename, name0);
-
-  if(!(fd0 = fopen(buf0, "r"))) {
-	printf("file `%s' not found.\n", buf0);
-	exit(0);
-  }
-
-  // Check how many elements there are:
-  while(fscanf(fd0, "%s") == 1) {
-	numEle++;
-  }
-  fclose(fd0);
-
-  // Write number of elements to global variable NUM_ELEMENTS:
-  NUM_ELEMENTS = numEle;
-
-  printf("In read_parameters.c: %i\n", NUM_ELEMENTS);
-#endif //BINARYC
-
-  //------------------------------------------
-*/
 
   if((fd = fopen(fname, "r")))
     {

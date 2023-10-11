@@ -339,12 +339,6 @@ struct GALAXY_OUTPUT {
 #endif     //OUTPUT_RINGS
 #ifndef MAINELEMENTS
 #ifndef LITE_OUTPUT
-#ifdef AL26
-    float ColdGas_Al26Inst[NUM_METAL_CHANNELS]; // Msun //Mass of Al26 that was ejected into the ColdGas by disc SNe-II, SNe-Ia, and AGBs in this timestep
-#ifdef OUTPUT_RINGS
-    float ColdGasRings_Al26Inst[RNUM][NUM_METAL_CHANNELS]; // Msun //Mass of Al26 that was ejected into the ColdGasRings by disc SNe-II, SNe-Ia, and AGBs in this timestep
-#endif //OUTPUT_RINGS
-#endif //AL26
 #endif //LITE_OUTPUT
 #endif //MAINELEMENTS
     float HotGas_elements[NUM_ELEMENTS]; // Msun // Mass of elements locked up in hot gas.

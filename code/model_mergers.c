@@ -623,26 +623,6 @@ void add_galaxies_together(int t, int p, double deltaT)
   //Gal[t].StarMerge += Gal[p].StarMerge;
   //Gal[p].StarMerge=0.;
 
-/*//#ifdef DETAILED_METALS_AND_MASS_RETURN
-#ifdef INDIVIDUAL_ELEMENTS
-#ifndef MAINELEMENTS
-#ifdef AL26
-  for(int mm=0; mm<NUM_METAL_CHANNELS; mm++) {
-	  Gal[t].ColdGas_Al26Inst[mm] += Gal[p].ColdGas_Al26Inst[mm];
-	  Gal[p].ColdGas_Al26Inst[mm] = 0.0;
-#ifdef H2_AND_RINGS
-	  for(int jj=0; jj<RNUM; jj++) {
-		  Gal[t].ColdGasRings_Al26Inst[jj][mm] += Gal[p].ColdGasRings_Al26Inst[jj][mm];
-		  Gal[p].ColdGasRings_Al26Inst[jj][mm] = 0.0;
-	  }
-  }
-#endif //H2_AND_RINGS
-#endif //AL26
-#endif //MAINELEMENTS
-#endif //INDIVIDUAL_ELEMENTS
-//#endif //DETAILED_METALS_AND_MASS_RETURN
-*/
-
   mass_checks(p,"model_mergers.c",__LINE__);
   mass_checks(t,"model_mergers.c",__LINE__);
 
@@ -664,15 +644,6 @@ void add_galaxies_together(int t, int p, double deltaT)
   Gal[t].SfrInst += Gal[p].SfrInst; //*****ROB*****//
   if(BulgeFormationInMinorMergersOn)
     Gal[t].SfrBulge += Gal[p].Sfr;
-
-/*  //ROB: (05-06-23): I am now including the transfer of SfrRings from the satellite to the central here too: <-- Seems to make no difference, so I've commented it out again.
-#ifdef H2_AND_RINGS
-  for(int jj=0; jj<RNUM; jj++) {
-	  Gal[t].SfrRings[jj] += Gal[p].SfrRings[jj];
-	  Gal[t].SfrInstRings[jj] += Gal[p].SfrInstRings[jj];
-  }
-#endif //H2_AND_RINGS
-*/
 
 #ifdef TRACK_NMERGERS
   Gal[t].NMajorMergers += Gal[p].NMajorMergers;
