@@ -102,12 +102,11 @@ double calc_beta_function_integral(double Rmax, double rc, double beta, char for
 			exit(0);
 		}
 	}
-	int res = 25; //50 //500 //100 //Convergence of R_sput vs. stellar mass at z=0 for res >= 25. (09-03-23)
+	int res = 25; //Convergence of R_sput vs. stellar mass at z=0 for res >= 25. (09-03-23)
 	for(int ii=1;ii<=res;ii++) {
 		Rlo = (Rmax/res)*(ii-1);
 		Rup = (Rmax/res)*ii;
 		integral += ((Rup-Rlo)/2.) * ((pow2(Rlo)*pow(1.+pow2(Rlo/rc),-(3.*beta/2.))) + (pow2(Rup)*pow(1.+pow2(Rup/rc),-(3.*beta/2.))));
-		//printf("ii = %i, Rlo = %e, Rup = %e, Rmax = %e | integral = %e, old = %e\n", ii, Rlo, Rup, Rmax, integral, (pow3(Rmax)/2.) * pow((1.+pow2(Rmax/rc)), -(3.*beta/2.)));
 	}
 	return integral; //[distance^3]
 }
@@ -115,17 +114,12 @@ double calc_beta_function_integral(double Rmax, double rc, double beta, char for
 double calc_sputtering(int p, double TotDustMass, double dt, char comp[]) {
 	//Destruction of dust in the HotGas and/or EjectedMass from thermal sputtering:
 	double CompMass, Tvir, core_radius, beta, IsothermalGasDensity, GasDensity, Delta_grainRadius, tau_sput_core, tau_sput, dMsput;
-
-	Tvir = 0.5 * MUMH * pow2(UnitVelocity_in_cm_per_s*Gal[p].Vvir) / BOLTZMANN; //[Kelvin] //ROB: Should prob be ~10^4 to ~10^6 K (see EAGLE analysis in Tumlinson+18)??
+	Tvir = 0.5 * MUMH * pow2(UnitVelocity_in_cm_per_s*Gal[p].Vvir) / BOLTZMANN; //[Kelvin]
 
 #ifdef USE_BETA_MODEL
 	//Calculate beta:
-	//a) Assuming the expected beta = 2/3 for virialised clusters:
+	//Assuming the expected beta = 2/3 for virialised clusters:
 	beta = 2./3.;
-	/*//b) Assuming a temp-dependent beta, with r200/r500 = 1.5 and eqns. 6 & 7 from Yates+17:
-	double Tew = 5.968*Tvir; //[Kelvin]
-	beta = 0.439 * pow(Tew*BOLTZMANN, 0.20); //Eqn. 17 from Yates+17, i.e. fit from Sanderson+03
-	*/
 #endif //USE_BETA_MODEL
 
 	if (strcmp(comp,"HotGas")==0)
@@ -135,8 +129,7 @@ double calc_sputtering(int p, double TotDustMass, double dt, char comp[]) {
 
 	//*****
 	//Calculate gas density:
-	//NOTE: Need to check Hubble_h factors for all of these constants! (See h_params.h)
-	IsothermalGasDensity = (CompMass*UnitMass_in_g) / ((4./3.) * PI * pow3(Gal[p].Rvir*UnitLength_in_cm/Hubble_h)); //[g/cm^3] //ROB: Should prob be ~10^-26 to ~10^-29 g/cm^3 (see EAGLE analysis in Tumlinson+18)??
+	IsothermalGasDensity = (CompMass*UnitMass_in_g) / ((4./3.) * PI * pow3(Gal[p].Rvir*UnitLength_in_cm/Hubble_h)); //[g/cm^3]
 #ifdef USE_BETA_MODEL
 	core_radius = calc_NFW_scale_length(p); //internal distance unit (i.e. Mpc/h) //Assuming the core radius equals the DM halo's scale length
 	if (strcmp(comp,"HotGas")==0) {
@@ -144,7 +137,6 @@ double calc_sputtering(int p, double TotDustMass, double dt, char comp[]) {
 	}
 	else if (strcmp(comp,"EjectedMass")==0) {
 		GasDensity = IsothermalGasDensity; //[g/cm^3]
-		//GasDensity = (CompMass*UnitMass_in_g/Hubble_h) / (4. * PI * calc_beta_function_integral((Gal[p].Rvir*UnitLength_in_cm/Hubble_h), (core_radius*UnitLength_in_cm/Hubble_h), beta, "single")); //[g/cm^3] //This is the core density of the beta model profile
 	}
 #endif //USE_BETA_MODEL
 
@@ -213,7 +205,6 @@ void update_dust_mass(int p, int centralgal, double dt, int nstep, int halonr) {
 #ifdef H2_AND_RINGS
 	int j;
 	double Clouds_tot[RNUM], DustClouds_init[RNUM], DustDiff_init[RNUM], DustClouds_tot[RNUM], DustDiff_new[RNUM], DustClouds_new[RNUM];
-	//double DustColdGasCloudsRings_elements_test1, DustColdGasCloudsRings_elements_test2, DustColdGasCloudsRings_elements_test2a, DustColdGasCloudsRings_elements_test2b, DustColdGasCloudsRings_elements_test2c, DustColdGasCloudsRings_elements_test3, DustColdGasCloudsRings_elements_test4;
 	for(j=0;j<RNUM;j++) {
 		Clouds_tot[j] = 0.0;
 		DustClouds_init[j] = 0.0;
@@ -234,7 +225,6 @@ void update_dust_mass(int p, int centralgal, double dt, int nstep, int halonr) {
 	double HotGasDust, EjectedMassDust, Delta_Msput;
 #endif //defined(DUST_HOTGAS) || defined(DUST_EJECTEDMASS)
 	double frac_Cb, m_cleared, tdes, survive_frac, R_SN=0.0;
-	//double frac_Cb_clouds, frac_Cb_diff, m_cleared_clouds, m_cleared_diff, tdes_clouds, tdes_diff, survive_frac_clouds, survive_frac_diff, R_SN=0.0;
 #endif //DUST_DESTRUCTION
 	double timestep_width; //Width of current timestep in CODE UNITS
 	int TimeBin; //Bin in Yield arrays corresponding to current timestep
@@ -258,7 +248,7 @@ void update_dust_mass(int p, int centralgal, double dt, int nstep, int halonr) {
 	mass_checks(p,"Start of model_dust_yields.c",__LINE__);
 	
 	timestep_width = dt; //Width of current timestep in CODE UNITS (units cancel out when dividing by SFH bin width, sfh_dt) (12-04-12)
-	TimeBin = (STEPS*(Halo[Gal[p].HaloNr].SnapNum-1.0))+nstep; //TimeBin = (STEPS*Gal[p].SnapNum)+nstep; //Bin in Yield tables corresponding to current timestep //TEST!: BRUNO: Snapnum would be +1 too low for a 'jumping' galaxy (14-11-13)
+	TimeBin = (STEPS*(Halo[Gal[p].HaloNr].SnapNum-1.0))+nstep; //Bin in Yield tables corresponding to current timestep
 
 //**************************************************
 //Dust grain destruction from supernova shock waves
@@ -303,14 +293,9 @@ void update_dust_mass(int p, int centralgal, double dt, int nstep, int halonr) {
 
 		if (tdes != tdes)
 			survive_frac = 1.0; //This accounts for cases where there is no dust to destroy, which causes tdes = -nan
-			//printf("check1\n");}
 		else
 			survive_frac = exp(-dt*UnitTime_in_years/tdes);
 
-		//We assume that the SNR will destroy equal amounts of dust in cold clouds and 
-		//the diffuse medium, but all those will end up as diffuse gas, I guess.  
-		//Then some will be reaccreted onto cold clouds.
-	    //Simplest approximation is just to destroy the same fraction in each.
 #ifdef FULL_DUST_RATES
 		for (ee=0; ee<NUM_ELEMENTS; ee++) {
 #ifdef H2_AND_RINGS
@@ -334,47 +319,6 @@ void update_dust_mass(int p, int centralgal, double dt, int nstep, int halonr) {
 #endif //H2_AND_RINGS
 	    }
 
-	    /*
-		#ifdef DCR_Dest
-		    //****************************
-		    //Destruction of dust from miscellaneous processes, only done in the diffuse medium
-		    //****************************
-		    //Timescale of destruction chosen to be 1Gyr (arbitrary)
-		    float CR_timescale = 1e9;
-	        survive_frac = exp(-(dt*UnitTime_in_years/CR_timescale));
-		    
-		    Gal[p].DustColdGasDiff_elements=elements_add(elements_init(),Gal[p].DustColdGasDiff_elements,survive_frac);
-
-	    #endif    
-		
-		#ifdef DDestHIIregion
-		    //****************************
-		    //Dust destruction in the diffused medium by evaporation in HII regions
-		    //****************************
-		    //This is a rough implementation based on the mass of HII regions created by OB stars
-		    //as presented in Tielens' book on ISM. Need to get better values of the photon flux for
-		    //the star of average mass produced in the particular time step. Current implementation
-		    //has only negligible effect on the dust mass.
-		    float MetClouds_tot = elements_total(Gal[p].ColdGasClouds_elements);
-		    
-	        float MetDiff_tot = elements_total(Gal[p].ColdGasDiff_elements);
-		    
-		    double sfr = Gal[p].Sfr * UNITMASS_IN_G / UnitTime_in_s * SEC_PER_YEAR / SOLAR_MASS;
-		    double gas_cleared = (0.0496173*sfr*dt*UnitTime_in_years/13.7054)*2.24;
-		    double frac_diff = gas_cleared/MetDiff_tot;
-		    double frac_clouds = 0.;
-		    
-		    if (frac_diff > 1.) {
-		    
-		        frac_diff = 1.;
-		        frac_clouds = (gas_cleared-MetDiff_tot)/MetClouds_tot;
-	        }
-	        
-            Gal[p].DustColdGasDiff_elements=elements_add(Gal[p].DustColdGasDiff_elements,Gal[p].DustColdGasDiff_elements,-frac_diff);
-		    Gal[p].DustColdGasClouds_elements=elements_add(Gal[p].DustColdGasDiff_elements,Gal[p].DustColdGasDiff_elements,-frac_clouds);
-		#endif    
-		*/
-
 #ifdef FULL_DUST_RATES
 	    for (ee=0; ee<NUM_ELEMENTS; ee++) {
 #ifdef H2_AND_RINGS
@@ -388,7 +332,6 @@ void update_dust_mass(int p, int centralgal, double dt, int nstep, int halonr) {
 
 #ifdef FULL_DUST_RATES
 		Gal[p].DustColdGasRates[4] += (total_dust_before - total_dust_after)/(deltaT * UnitTime_in_years);
-		//if (p == 0 && Gal[p].SnapNum < 16) printf("Ring = %i | total_dust_before = %e | total_dust_after = %e | Gal[p].DustColdGasRates[4] = %e\n", j, total_dust_before, total_dust_after, Gal[p].DustColdGasRates[4]);
 #endif //FULL_DUST_RATES
 		}
 #ifdef H2_AND_RINGS
@@ -480,10 +423,6 @@ for (j=Rings) {
 }
 */
 
-  //(28-01-22): partition_gas_and_dust_elements() was moved here from just above grain growth. Didn't make any difference to the outputs, but is more consistent when checking the diff/cloud mass fractions for AGB/SN dust production.
-  //(02-02-22): Note that partition_gas_and_dust_elements() now has it's own internal loop over rings, so make sure it is only called outside of a loop over rings in this function (i.e. here at the top).
-  //(09-03-22): partition_gas_and_dust_elements() has now been moved to the end of update_h2fraction(), so that the cloud and diffuse gas components are always in sync with the current H2 fraction.
-  //partition_gas_and_dust_elements(p);
   mass_checks(p,"Before dust production: model_dust_yields.c",__LINE__);
 
 #ifdef SEPARATE_DUST_EJEC_FRACTIONS
@@ -521,11 +460,6 @@ for (j=Rings) {
 			  DiskSFR_physical_units = DiskSFR * (1.0e10/Hubble_h); //Note: This is NOT in physical units (i.e. NOT in Msun/yr, but in Msun/[code_time_units]). But this is ok, as code_time_units cancel out when multiplying by timestep_width to get 'step_width_times_DiskSFR_physical_units' on the line below ('DiskSFR_physical_units' is never used itself).
 			  step_width_times_DiskSFR_physical_units = timestep_width * DiskSFR_physical_units; //ROB: This is the same as DiskSFRxStep_Phys in moedl_yields.c. (17-01-22)
 
-			/* ROB: The Zi and Zi_disp variables are not needed in model_dust_yields.c, as they calculated in model_yields.c and stored in the global variables Zi_disk_saved and Zi_disk_disp_saved instead. (04-01-22)
-			 * 	// Note: This approach is ok, but only if update_dust_mass() is called after update_yields_and_return_mass() in main.c, and both are looking at the same galaxy.
-			 * 	// Alternative approach would be to run find_initial_metallicity_dust() here, to re-calculate Zi and Zi_disp again, independently of model_yields.c.
-			 */
-
 		  //interpolates yields from lookup tables we produced in dust_yield_integrals.c
 			  for (k=0;k<AGB_DUST_TYPE_NUM;k++) {
 #ifdef H2_AND_RINGS
@@ -544,9 +478,6 @@ for (j=Rings) {
 			  }
 
 			//Calculate the TOTAL amount of AGB dust produced ----------------------------------------------------------------------
-			//These are calculated based on pre-code calculations in dustyield_integrals.c and then multiplied
-			//by the SFR here to get the amount of dust created for each specific type(quartz, iron, carbon etc.)
-			//and for 3 types of star (M,C,S).
 			//N.B. There is no "unprocessed" component to dust yields, so just the newly-synthesised masses are calculated here:
 			  Dust_Forsterite = step_width_times_DiskSFR_physical_units * NormAGBDustYieldRate_actual[0]; //M_forsterite
 			  Dust_Fayalite = step_width_times_DiskSFR_physical_units * NormAGBDustYieldRate_actual[1]; //M_fayalite
@@ -567,8 +498,6 @@ for (j=Rings) {
 		//Element Conversion for TOTAL dust produced (N.B. some of this could be directly ejected into the HotGas) ---------------
 		//Conversion of dust species (i.e. Ferrosilite) into Actual elements to store in correct arrays (i.e. Forsterite -> Mg/Si/O)
 		//All the following conversions are done by mass fraction
-		//Corrections added at places to avoid dust masses going beyond the mass in gas-phase elements left to form dust from
-		//(given that the newly-formed elements have already been added to the gas in model_yields.c).
 		for (ee=0; ee<NUM_ELEMENTS; ee++) {
 #ifdef H2_AND_RINGS
 			H2frac = Gal[p].H2fractionRings[j];
@@ -587,7 +516,6 @@ for (j=Rings) {
 								+ (Dust_Ferrosilite * FERROSILITE_Si_FRAC) + (Dust_Quartz * QUARTZ_Si_FRAC) + (Dust_SiC * SILICONCARBIDE_Si_FRAC)) * H2frac;
 			}
 #endif //MAINELEMENTS
-			//else if (ee == O_NUM) { //O
 			if (ee == O_NUM) { //O
 				New_dust_diff = ((Dust_Forsterite * FORSTERITE_O_FRAC) + (Dust_Fayalite * FAYALITE_O_FRAC) + (Dust_Enstatite * ENSTATITE_O_FRAC)
 							  + (Dust_Ferrosilite * FERROSILITE_O_FRAC) + (Dust_Quartz * QUARTZ_O_FRAC)) * (1.0 - H2frac);
@@ -615,8 +543,6 @@ for (j=Rings) {
 			AGBAllElementsClouds_avail = DiskAGBAllElements_ts[j][ee] * Gal[p].H2fractionRings[j]; //TOTAL newly-ejected element mass into clouds available to form dust
 
 			//Add newly-formed dust to ColdGas:
-			//if ((ColdGasDiff_avail < AGBAllElementsDiff_avail) || (ColdGasClouds_avail < AGBAllElementsClouds_avail))
-			//	printf("ColdGasDiff_avail = %e | AGBAllElementsDiff_avail = %e | ColdGasClouds_avail = %e | AGBAllElementsClouds_avail = %e\n", ColdGasDiff_avail, AGBAllElementsDiff_avail, ColdGasClouds_avail, AGBAllElementsClouds_avail);
 			Gal[p].DustColdGasDiffRings_elements[j][ee]  += min((1.0-fwind_dust_AGB)*New_dust_diff, min(ColdGasDiff_avail, (1.0-fwind_dust_AGB)*AGBAllElementsDiff_avail));
 			Gal[p].DustColdGasCloudsRings_elements[j][ee]  += min((1.0-fwind_dust_AGB)*New_dust_clouds, min(ColdGasClouds_avail, (1.0-fwind_dust_AGB)*AGBAllElementsClouds_avail));
 
@@ -637,16 +563,11 @@ for (j=Rings) {
 
 #ifdef DUSTRICHWIND
 			//Check how much gas there is actually available to form dust in the HotGas:
-			//ColdGas_avail = min(0.0, (ColdGasDiff_avail - DustColdGasDiff_add) + (ColdGasClouds_avail - DustColdGasClouds_add)); //Amount of ColdGas left to convert to directly-ejected dust (after ColdGas dust is produced).
 			HotGasDiff_avail = Gal[p].HotGas_elements[ee] - Gal[p].DustHotGas_elements[ee]; //Total HotGas available to host dust
 
 			//Add newly-formed dust to HotGas:
 			Gal[p].DustHotGas_elements[ee] += min(fwind_dust_AGB*(New_dust_diff+New_dust_clouds), min(HotGasDiff_avail, fwind_dust_AGB*(AGBAllElementsDiff_avail+AGBAllElementsClouds_avail)));
-			/*printf("AGBs:  %i %i %i | Dust added = %e | NewDust = %e | HotGas_avail = %e | EjectedMetal_avail = %e\n", i, j, ee, min(fwind_AGB*(New_dust_diff+New_dust_clouds), min(HotGasDiff_avail, fwind_AGB*(AGBAllElementsDiff_avail+AGBAllElementsClouds_avail)))
-																				, fwind_AGB*(New_dust_diff+New_dust_clouds)
-																				, HotGasDiff_avail
-																				, fwind_AGB*(AGBAllElementsDiff_avail+AGBAllElementsClouds_avail));
-			*/
+
 #endif //DUSTRICHWIND
 		} //for (ee=0; ee<NUM_ELEMENTS; ee++) {
 	} //if ( (Gal[p].sfh_DiskMass[i] > 0.0) && (Gal[p].MetalsColdGas[2] > 0.0) )
@@ -668,7 +589,6 @@ for (j=Rings) {
 #endif //FULL_DUST_RATES
 
 #ifdef H2_AND_RINGS
-    //DustColdGasCloudsRings_elements_test4 = Gal[p].DustColdGasCloudsRings_elements[0][O_NUM];
     if ((Gal[p].sfh_DiskMassRings[j][i] > 0.0) && (Gal[p].MetalsColdGasRings[j][0] > 0.0)) {
 #ifdef FULL_DUST_RATES
     	//This is estimating the dust in various compounds (say silicates) using the amount of the particular element (say silicon) produced in a process
@@ -694,8 +614,7 @@ for (j=Rings) {
 		//Create dust (based on the prescription of Zhukovska2008)---------------------------
 		//SNII_prevstep_x is calculated in model_yields.c
 		//It is the amount of a specific metal (i.e. Si) returned to gas phase from SFH_BIN i. //produced in the last timestep
-
-		//ROB: Here, the mass of newly-formed dust is determined by the mass of the "key element" that has just been returned by SNe.
+		//Here, the mass of newly-formed dust is determined by the mass of the "key element" that has just been returned by SNe.
 		//So, e.g. if the key element makes up 25% of the total dust mass, then the mass of dust formed is 1/0.25 = 4 times greater than the mass of the key element formed * the conversion efficiency (eta).
 		//This is why the A_dust/A_key_element terms are included here.
 #ifndef MAINELEMENTS
@@ -725,13 +644,9 @@ for (j=Rings) {
 #endif //MAINELEMENTS
             
 		//Element conversion -----------------------------------------------------------------
-		//Conversion of dust species (i.e. Silicates) into Actual elements to store
+		//Conversion of dust species (i.e. Silicates) into actual elements to store
 		//in correct arrays (i.e. Silicates -> Mg/Si/Fe/O)
 		//All the following conversions are done by mass fraction
-		//SNII Silicates -------------------
-		//ROB: (04-01-22) The mass fractions used here don't make sense to me.
-		//Assuming that the silicate mass is just olivines + pyroxenes (and f_ol = 0.32), I get A_Sil_dust = 121.62, close to the quoted value used here (in h_params.h).
-		//But, e.g. A_Si / A_Sil_dust = 0.2310, whereas 0.210432 is used here...
 		for (ee=0; ee<NUM_ELEMENTS; ee++) {
 #ifdef H2_AND_RINGS
 			H2frac = Gal[p].H2fractionRings[j];
@@ -793,11 +708,6 @@ for (j=Rings) {
 				HotGasDiff_avail = Gal[p].HotGas_elements[ee] - Gal[p].DustHotGas_elements[ee];
 				//Add newly-formed dust to HotGas:
 				Gal[p].DustHotGas_elements[ee] += min(fwind_dust_SNII*(New_dust_diff+New_dust_clouds), min(HotGasDiff_avail, fwind_dust_SNII*(SNIIAllElementsDiff_avail+SNIIAllElementsClouds_avail)));
-				/*printf("SN-II: %i %i %i | Dust added = %e | NewDust = %e | HotGas_avail = %e | EjectedMetal_avail = %e\n", i, j, ee, min(fwind_SNII*(New_dust_diff+New_dust_clouds), min(HotGasDiff_avail, fwind_SNII*(SNIIAllElementsDiff_avail+SNIIAllElementsClouds_avail)))
-																	, fwind_SNII*(New_dust_diff+New_dust_clouds)
-																	, HotGasDiff_avail
-																	, fwind_SNII*(SNIIAllElementsDiff_avail+SNIIAllElementsClouds_avail));
-				*/
 #endif //DUSTRICHWIND
 			} //for (ee=0; ee<NUM_ELEMENTS; ee++)
 
@@ -832,7 +742,7 @@ for (j=Rings) {
 #endif //H2_AND_RINGS
 		
 #ifdef H2_AND_RINGS
-		//ROB: I have added an extra condition here - that the newly-added dust doesn't exceed the newly-added metals from this enrichment channel: (28-01-22):
+		//Extra condition added here - that the newly-added dust doesn't exceed the newly-added metals from this enrichment channel: (28-01-22):
 		Gal[p].DustColdGasDiffRings_elements[j][Fe_NUM] += min((1-fwind_dust_SNIa) * Dust_Iron * 1.0 * (1.0-Gal[p].H2fractionRings[j]),
 												   min(Gal[p].ColdGasDiffRings_elements[j][Fe_NUM] - Gal[p].DustColdGasDiffRings_elements[j][Fe_NUM],
 													   (1.0-fwind_dust_SNIa) * DiskSNIaAllElements_ts[j][Fe_NUM] * (1.0-Gal[p].H2fractionRings[j])));
@@ -893,7 +803,7 @@ for (j=Rings) {
     	if ((Gal[p].sfh_BulgeMass[i] > 0.0) && (Gal[p].MetalsHotGas[2] > 0.0)) {
     		BulgeSFR = Gal[p].sfh_BulgeMass[i]/Gal[p].sfh_dt[i];
 #endif
-			//pre-calculations to speed up the code
+			//pre-calculations to speed up the code:
 			BulgeSFR_physical_units = BulgeSFR * (1.0e10/Hubble_h); //Note: This is NOT in physical units (i.e. NOT in Msun/yr, but in Msun/[code_time_units]). But this is ok, as code_time_units cancel out when multiplying by timestep_width to get 'step_width_times_DiskSFR_physical_units' on the line below ('DiskSFR_physical_units' is never used itself).
 			step_width_times_BulgeSFR_physical_units = timestep_width * BulgeSFR_physical_units; //ROB: This is the same as DiskSFRxStep_Phys in moedl_yields.c. (17-01-22)
 
@@ -1077,7 +987,7 @@ for (j=Rings) {
 			#endif
 #endif //H2_AND_RINGS
 
-			//ROB: I have added an extra condition here - that the newly-added dust doesn't exceed the newly-added metals from this enrichment channel: (28-01-22):
+			//Extra condition added here - that the newly-added dust doesn't exceed the newly-added metals from this enrichment channel: (28-01-22):
 			New_dust_diff = Dust_Iron * 1.0;
 			HotGasDiff_avail = Gal[p].HotGas_elements[Fe_NUM] - Gal[p].DustHotGas_elements[Fe_NUM]; //Total HotGas available to form dust
 #ifdef H2_AND_RINGS
@@ -1293,7 +1203,7 @@ for (j=Rings) {
 			#endif
 #endif //H2_AND_RINGS
 
-			//ROB: I have added an extra condition here - that the newly-added dust doesn't exceed the newly-added metals from this enrichment channel: (28-01-22):
+			//Extra condition added here - that the newly-added dust doesn't exceed the newly-added metals from this enrichment channel: (28-01-22):
 			New_dust_diff = Dust_Iron * 1.0;
 			HotGasDiff_avail = Gal[p].HotGas_elements[Fe_NUM] - Gal[p].DustHotGas_elements[Fe_NUM]; //Total HotGas available to form dust
 #ifdef H2_AND_RINGS
@@ -1334,9 +1244,7 @@ if (((Gal[p].MetalsColdGas[0]+Gal[p].MetalsColdGas[1]+Gal[p].MetalsColdGas[2])>0
 
         mass_checks(p,"Dust from growth: model_dust_yields.c",__LINE__);
         
-        //The number of CO molecules that can be produced from available Carbon and Oxygen
-        //in the clouds. By default, assuming only 30% C is locked up as CO in clouds.
-        //ROB (10-01-22): This sets the number of CO molecules in the gas phase of the ISM to the minimum of either:
+        //(10-01-22): This sets the number of CO molecules in the gas phase of the ISM to the minimum of either:
         //		(a) number of carbon atoms in gas phase
         //		(b) Cmax_CO (= 0.3): Fraction of total carbon atoms in gas and dust (this is the max amount of carbon allowed in CO, set in input file)
         //		(c) number of oxygen atoms in gas phase
@@ -1346,7 +1254,7 @@ if (((Gal[p].MetalsColdGas[0]+Gal[p].MetalsColdGas[1]+Gal[p].MetalsColdGas[2])>0
                      min(Gal[p].ColdGasCloudsRings_elements[j][Cb_NUM]/A_Cb*Cmax_CO, (Gal[p].ColdGasCloudsRings_elements[j][O_NUM]-Gal[p].DustColdGasCloudsRings_elements[j][O_NUM])/A_O));
 
         //Mass of Carbon and Oxygen available in the gas+dust of clouds for grain growth:
-        //double Cb_clouds = Gal[p].ColdGasClouds_elements[Cb_NUM] - num_CO*A_Cb; //ROB: Note, Cb_clouds isn't used anywhere... (17-01-22)
+        //double Cb_clouds = Gal[p].ColdGasClouds_elements[Cb_NUM] - num_CO*A_Cb; //Note, Cb_clouds isn't used anywhere (17-01-22)
         O_clouds = Gal[p].ColdGasCloudsRings_elements[j][O_NUM] - num_CO*A_O;
 #else
         num_CO = min((Gal[p].ColdGasClouds_elements[Cb_NUM]-Gal[p].DustColdGasClouds_elements[Cb_NUM])/A_Cb,
@@ -1366,30 +1274,19 @@ if (((Gal[p].MetalsColdGas[0]+Gal[p].MetalsColdGas[1]+Gal[p].MetalsColdGas[2])>0
         //*********************************************
         //Silicates:
         //*********************************************
-        /*
-        We assume that oxygen is volatile such that it can exist in the dust phase only in the 
-        form of compounds. We adopt from Zhukovska et al.(2008) that the dominant silicate species
-        are olivine and pyroxene in the ratio 32:68. 
-        Olivine: [Mg_x Fe_{1-x}]_2 Si O_4
-        Pyroxene: Mg_x Fe_{1-x} Si O_3 
-        x is assumed to be 0.8 in their paper, this value doesn't seem to affect the dust masses 
-        that much. It is because this doesn't significantly affect the amount of oxygen left in 
-        the cold gas.
-        */
-        /* ROB (10-01-22): Olivine ([Mg,Fe]2SiO4) describes the range of magnesium iron silicates between Forsterite (Mg2SiO4) and Fayalite (Fe2SiO4).
+        /* (10-01-22): Olivine ([Mg,Fe]2SiO4) describes the range of magnesium iron silicates between Forsterite (Mg2SiO4) and Fayalite (Fe2SiO4).
          * Forsterite contains no Fe, and Fayalite contains no Mg. All Olivines in between contain some mixture of Mg and Fe.
          * Here, we follow the simplification of Zhukovska+08 by only considering a typical Olivine mix of Mg:Fe = 0.8:0.2 = number ratio of Mg to Fe.
          * The same typical mix is assumed for Pyroxene ([Mg,Fe]SiO3).
          * Also, it is assumed that the number ratio of olivine to pyroxene is 32:68.
          * This gives rise to the parameters x =  0.8 and f_ol = 0.32, which I have now made parameters in h_params.h.
-         * I have also re-written these "number of atoms per typical olivine/pyroxene silicate molecule" variables for O, Mg, Si, and Fe calculations accordingly.
          */
         float N_O = OLIVINE_NUMFRAC*4. + (1.-OLIVINE_NUMFRAC)*3.; //number of O atoms per typical silicate molecule
 		float N_Mg = OLIVINE_NUMFRAC*2.*OLIVINE_Mg_NUMFRAC + (1.-OLIVINE_NUMFRAC)*PYROXENE_Mg_NUMFRAC;
 		float N_Fe = OLIVINE_NUMFRAC*2.*(1-OLIVINE_Mg_NUMFRAC) + (1.-OLIVINE_NUMFRAC)*(1.-PYROXENE_Mg_NUMFRAC);
 #ifndef MAINELEMENTS
 		float N_Si = OLIVINE_NUMFRAC*1. + (1.-OLIVINE_NUMFRAC)*1.;
-		//ROB: This is a nested min() function to find number of olivine/pyroxene silicate molecules formed, given the mass available of the least-abundant constituent element in the gas phase of the molecular clouds:
+		//A nested min() function to find number of olivine/pyroxene silicate molecules formed, given the mass available of the least-abundant constituent element in the gas phase of the molecular clouds:
 #ifdef H2_AND_RINGS
 		float num_Silicates = max(0., min((O_clouds-Gal[p].DustColdGasCloudsRings_elements[j][O_NUM])/(N_O*A_O),
         								 min((Gal[p].ColdGasCloudsRings_elements[j][Mg_NUM]-Gal[p].DustColdGasCloudsRings_elements[j][Mg_NUM])/(N_Mg*A_Mg),
@@ -1409,13 +1306,6 @@ if (((Gal[p].MetalsColdGas[0]+Gal[p].MetalsColdGas[1]+Gal[p].MetalsColdGas[2])>0
         //*********************************************
         //Iron Oxide:
         //*********************************************
-        /* ROB (10-01-22): I didn't like the way the number of iron oxide molecules was calculated here.
-         * There is a hidden normalisation constant of N_Fe_IronOxide floating around, because N_Oxide is actually the number ratio of N_O_IronOxide/N_Fe_IronOxide.
-         * Therefore, I have re-written this bit to be exactly the same as for silicates above, with variables like N_O_IronOxide and num_iron_oxide properly
-         * representing the unnormalised "number" of molecules.
-         */
-        //float N_O_IronOxide = (HEMATITE_NUMFRAC*4. + (1.-HEMATITE_NUMFRAC)*3.);
-        //float N_Fe_IronOxide = (HEMATITE_NUMFRAC*3. + (1.-HEMATITE_NUMFRAC)*2.);
         float N_O_IronOxide = (HEMATITE_NUMFRAC*3. + (1.-HEMATITE_NUMFRAC)*4.); //First term is from hematite (Fe2 O3), second term is from magnetite [(Fe^2+) (Fe^3+)2 O4].
         float N_Fe_IronOxide = (HEMATITE_NUMFRAC*2. + (1.-HEMATITE_NUMFRAC)*3.); //First term is from hematite (Fe2 O3), second term is from magnetite [(Fe^2+) (Fe^3+)2 O4].
 
@@ -1433,7 +1323,6 @@ if (((Gal[p].MetalsColdGas[0]+Gal[p].MetalsColdGas[1]+Gal[p].MetalsColdGas[2])>0
 #ifndef MAINELEMENTS
 #ifdef H2_AND_RINGS
         float f_Cb_max =  1.0 - num_CO*A_Cb/Gal[p].ColdGasCloudsRings_elements[j][Cb_NUM]; //Mass fraction of all carbon in clouds not in CO (i.e. max available for dust formation)
-        //ROB: Why isn't Gal[p].DustColdGasCloudsRings_elements[j][Cb_NUM] also considered here? (07-03-22)
 #else
         float f_Cb_max =  1.0 - num_CO*A_Cb/Gal[p].ColdGasClouds_elements[Cb_NUM]; //Mass fraction of all carbon in clouds not in CO
 #endif //H2_AND_RINGS
@@ -1443,21 +1332,6 @@ if (((Gal[p].MetalsColdGas[0]+Gal[p].MetalsColdGas[1]+Gal[p].MetalsColdGas[2])>0
 
 		//*********************************************
 		//Calculate the new masses of each element that are in dust in the diffuse gas and clouds:
-
-        //Here we use an approximation for calculating the fraction of dust produced in
-        //clouds and the diffused ISM which is valid for a constant accretion timescale
-        //across the timestep. Since that is not the case as it depends on the amount of 
-        //dust in the clouds, we divide the calculation in constant bins of the time step
-        //in between snaps. The dust mass in clouds is calculated again to update t_acc.
-        
-        //Note: Dust molecules injected into the ISM has elements bonded with itself and 
-        //only certain other elements. 
-        // * Cb: Cb, Si
-        // * O: Mg, Si, Fe
-        // * Mg: Si, O
-        // * Si: with all
-        // * Fe: Si, Fe 
-        // * Maybe bring this into play like implemented by Zhukovska
         
         //*****
 		//Check that f_Cb_max and f_O_max are between 0. and 1., and assign their values to Gal[p].f_cmax (for use in update_fractions()):
@@ -1508,7 +1382,7 @@ if (((Gal[p].MetalsColdGas[0]+Gal[p].MetalsColdGas[1]+Gal[p].MetalsColdGas[2])>0
 		}
 
 		if (DustClouds_init == 0) {
-            tacc = 1e15; //ROB: This should be it's default value anyway... (07-02-22)
+            tacc = 1e15; //ROB: This should be it's default value anyway. (07-02-22)
         }
         else {
             tacc = Dust_tAcc0*(Clouds_tot/DustClouds_init);
@@ -1529,7 +1403,6 @@ if (((Gal[p].MetalsColdGas[0]+Gal[p].MetalsColdGas[1]+Gal[p].MetalsColdGas[2])>0
 			drop_fnan(j, ee, p);
 			//Updating the amount of dust in clouds after this grain growth:
 			Gal[p].DustColdGasCloudsRings_elements[j][ee] = Gal[p].f_c[j][ee]*Gal[p].ColdGasCloudsRings_elements[j][ee];
-			//Gal[p].DustColdGasClouds_elements[ee] += Gal[p].f_c[j][ee]*Gal[p].ColdGasCloudsRings_elements[j][ee];
 		}
 #else //H2_AND_RINGS
         for(ee=0;ee<NUM_ELEMENTS;ee++) {
@@ -1624,10 +1497,7 @@ if (((Gal[p].MetalsColdGas[0]+Gal[p].MetalsColdGas[1]+Gal[p].MetalsColdGas[2])>0
 #ifdef H2_AND_RINGS
 		for(ee=0;ee<NUM_ELEMENTS;ee++) {
 			Gal[p].DustColdGasDiffRings_elements[j][ee] = Gal[p].f_i[j][ee] * Gal[p].ColdGasDiffRings_elements[j][ee];
-			Gal[p].DustColdGasCloudsRings_elements[j][ee] = Gal[p].f_c[j][ee] * Gal[p].ColdGasCloudsRings_elements[j][ee]; //ROB: Not sure this line is needed, as f_c and ColdGasCloudsRings_elements haven't change since the last update above. (07-03-22)
-			//Gal[p].DustColdGasDiff_elements[ee] += Gal[p].f_i[j][ee] * Gal[p].ColdGasDiffRings_elements[j][ee];
-			//Gal[p].DustColdGasClouds_elements[ee] += Gal[p].f_c[j][ee] * Gal[p].ColdGasCloudsRings_elements[j][ee];
-			//DustDiff_new[j] += Gal[p].ColdGasCloudsRings_elements[j][ee];
+			Gal[p].DustColdGasCloudsRings_elements[j][ee] = Gal[p].f_c[j][ee] * Gal[p].ColdGasCloudsRings_elements[j][ee];
 			DustDiff_new[j] += Gal[p].DustColdGasDiffRings_elements[j][ee];
 			DustClouds_new[j] += Gal[p].DustColdGasCloudsRings_elements[j][ee];
 		}
@@ -1637,7 +1507,6 @@ if (((Gal[p].MetalsColdGas[0]+Gal[p].MetalsColdGas[1]+Gal[p].MetalsColdGas[2])>0
         for(ee=0;ee<NUM_ELEMENTS;ee++) {
 			Gal[p].DustColdGasDiff_elements[ee] = Gal[p].f_i[ee] * Gal[p].ColdGasDiff_elements[ee];
 			Gal[p].DustColdGasClouds_elements[ee] = Gal[p].f_c[ee] * Gal[p].ColdGasClouds_elements[ee];
-			//DustDiff_new += Gal[p].ColdGasClouds_elements[ee];
 			DustDiff_new += Gal[p].DustColdGasDiff_elements[ee];
 			DustClouds_new += Gal[p].DustColdGasClouds_elements[ee];
 		}
@@ -1647,7 +1516,6 @@ if (((Gal[p].MetalsColdGas[0]+Gal[p].MetalsColdGas[1]+Gal[p].MetalsColdGas[2])>0
 
 #ifdef FULL_DUST_RATES
 		Gal[p].DustColdGasRates[3] += (DustDiff_Growth + DustClouds_Growth)/(deltaT * UnitTime_in_years);
-		//if (Gal[p].SnapNum > 50) printf("SnapNum = %i | DustDiff_Growth = %e | DustClouds_Growth = %e | SnapshotWidth = %e [Myr] | increment = %e | DustColdGasRates[3] = %e\n", Gal[p].SnapNum, DustDiff_Growth, DustClouds_Growth, (deltaT * UnitTime_in_years)/1.e6, (DustDiff_Growth + DustClouds_Growth)/(deltaT * UnitTime_in_years), Gal[p].DustColdGasRates[3]);
 #endif
         
 		mass_checks(p,"End of dust from growth: model_dust_yields.c",__LINE__);
@@ -1666,20 +1534,6 @@ for(ee=0;ee<NUM_ELEMENTS;ee++) {
 	Gal[p].DustColdGasDiff_elements[ee] = DustColdGasDiff_elements_allRings;
 	Gal[p].DustColdGasClouds_elements[ee] = DustColdGasClouds_elements_allRings;
 }
-
-/*
-//Calculate final global t_des from all rings:
-double tot_SNRate=0., tot_ColdGasRings=0.;
-double frac_Cb_final, m_cleared_final;
-for (int jjj=0;jjj<RNUM;jjj++) {
-	tot_SNRate += DiskSNIIRate_current_ts[jjj] + DiskSNIaRate_current_ts[jjj];
-	tot_ColdGasRings += Gal[p].ColdGasRings[jjj];
-}
-//Gal[p].t_des = (tot_ColdGasRings*(1.0e10/Hubble_h))/(M_CLEARED * F_SN * (tot_SNRate/(UnitTime_in_s / SEC_PER_YEAR))); //Note, this will be outputted as the (global) destruction timescale of the last timestep of each snapshot, rather than the average across the whole snapshot. (09-02-22)
-frac_Cb_final = (Gal[p].DustColdGasCloudsRings_elements[j][Cb_NUM]+Gal[p].DustColdGasDiffRings_elements[j][Cb_NUM])/(Gal[p].DustColdGasCloudsRings_elements[j][Cb_NUM]+Gal[p].DustColdGasCloudsRings_elements[j][Si_NUM]+Gal[p].DustColdGasDiffRings_elements[j][Cb_NUM]+Gal[p].DustColdGasDiffRings_elements[j][Si_NUM]); //Note, this will be outputted as the (global) destruction timescale of the last timestep of each snapshot, rather than the average across the whole snapshot. (09-02-22)
-m_cleared_final = calc_cleared_mass(frac_Cb_final);
-Gal[p].t_des = (tot_ColdGasRings*(1.0e10/Hubble_h))/(m_cleared_final * F_SN * (tot_SNRate/(UnitTime_in_s / SEC_PER_YEAR))); //Note, this will be outputted as the (global) destruction timescale of the last timestep of each snapshot, rather than the average across the whole snapshot. (09-02-22)
-*/
 
 //Calculate final global t_acc from all rings (if TAU_RINGS is off):
 #ifndef TAU_RINGS

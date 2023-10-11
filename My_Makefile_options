@@ -182,8 +182,6 @@ OPT += -DDUST_SNII
 OPT += -DDUST_SNIA
 OPT += -DDUST_GROWTH
 OPT += -DDUST_DESTRUCTION
-#OPT += -DCR_Dest
-#OPT += -DDestHIIregion
 # Remember instantaneous production/growth/destruction rates
 OPT += -DFULL_DUST_RATES
 #Allow dust to survive in the HotGas and/or Ejecta reservoirs, and be gradual destroyed via thermal sputting:
