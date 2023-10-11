@@ -3,7 +3,7 @@
 
 # Options that control output
 OPT += -DOVERWRITE_OUTPUT    # overwrite output files if they exist (otherwise will quit without overwriting)
-OPT += -DNOUT=1    #1        # This sets the number of galaxy output times. IGNORED IN GALAXYTREE MODE. VALUE CORRESPONDS TO NO. OF ROWS READ FROM THE /input/desired_output_redshifts.txt FILE
+OPT += -DNOUT=1              # This sets the number of galaxy output times. IGNORED IN GALAXYTREE MODE. VALUE CORRESPONDS TO NO. OF ROWS READ FROM THE /input/desired_output_redshifts.txt FILE
 
 #OPT += -DPARALLEL
 #OPT += -DGALAXYTREE         # This will enable output of full galaxy merger trees, implicitly sets NOUT to maximum value
@@ -15,7 +15,7 @@ OPT += -DHALOPROPERTIES      # Output halo spin and other properties
 
 OPT += -DREORDER_ON_DISK    # Default: on. This will read/write to disk to re-order IDs in a better format for uploading to database. (Takes a long time on Millennium-II in GALAXYTREE mode). (ROB: 21-01-20)
 
-OPT += -DLITE_OUTPUT       # ROB: If on, only a minimal number of parameters are outputted (suitable for basic dust+binaries studies) (NOTE: This is different to the more extreme LIGHT_OUTPUT option) (15-09-22)
+#OPT += -DLITE_OUTPUT       # ROB: If on, only a minimal number of parameters are outputted (suitable for basic dust+binaries studies) (NOTE: This is different to the more extreme LIGHT_OUTPUT option) (15-09-22)
 
 # To run with different dark matter simulation
 #OPT += -DMRII      
@@ -130,9 +130,10 @@ endif #FULL_SPECTRA
 endif ### COMPUTE_SPECPHOT_PROPERTIES
 endif # ifneq (LITE_OUTPUT,$(findstring LITE_OUTPUT,$(OPT)))
 
-###########################
-# Chemical enrichment of individual element yields
-###########################
+
+#############################
+# CHEMICAL ENRICHMENT OPTIONS
+#############################
 OPT += -DDETAILED_METALS_AND_MASS_RETURN
 ifeq (DETAILED_METALS_AND_MASS_RETURN,$(findstring DETAILED_METALS_AND_MASS_RETURN,$(OPT)))
 
@@ -140,7 +141,7 @@ OPT += -DFEEDBACK_COUPLED_WITH_MASS_RETURN
 OPT += -DINDIVIDUAL_ELEMENTS
 ifeq (INDIVIDUAL_ELEMENTS,$(findstring INDIVIDUAL_ELEMENTS,$(OPT)))
 OPT += -DOUTPUT_ELEMENTS
-#OPT += -DMAINELEMENTS  #(17-05-23): WARNING: THIS SWITCH IS CURRENTLY BROKEN. If you are running with BINARYC yields, re-run the yield table generator script with fewer elements selected.
+#OPT += -DMAINELEMENTS  #(17-05-23): WARNING: THIS SWITCH IS DEFUNCT. If you are running with BINARYC yields, re-run the yield table generator script with fewer elements selected instead.
 endif
 #OPT   += -DBULGE_TO_COLD 
 OPT   += -DMETALRICHWIND #This switch allows SNII, SNIa, and AGB ejecta to be directly dumped in to the HotGas, via fwindSNII, fwindSNIa, fwindAGB.
@@ -152,18 +153,11 @@ OBJS += ./code/yields_read_tables.o #ORIGINAL FILE
 #OBJS += ./code/yields_integrals.o #ORIGINAL FILE
 OBJS += ./code/yields_integrals_withBinaryC.o
 #OBJS += ./code/yields_integrals_old.o
-#OBJS += ./code/yields_integrals_Aswin_17-01-19.o
-#OBJS += ./code/yields_calc_SNe_rates.o
-#OPT += -DSNIATOHOT #REDUNDANT as of 19-09-18. Replaced with a FracSNIatoHot parameter in the input file for when METALRICHWIND is on.
 #OPT  += -DNORMALIZE #(ONLY WORKS WITH MAINELEMENTS OFF) If on, elements and total metals are normlaised to total component masses.
 #OPT += -DINSTANTANEOUS_RECYCLE #Recycle all metals in one time step to resemble instantaneous recycling approximation 
 
 # Yield table options:
 OPT += -DBINARYC #Use the binary_c yields for all enrichment channels. If on, the other yield table options below are ignored. (02-05-22)
-ifeq (BINARYC,$(findstring BINARYC,$(OPT)))
-#OPT += -DAL26 #Use the binary_c yields with Al26 included in place of Calcium in the element arrays (the 10th element in the arrays, i.e. array element 9) (Only works if LITE_OUTPUT is off)
-endif #ifeq (BINARYC,$(findstring BINARYC,$(OPT)))
-
 ifneq (BINARYC,$(findstring BINARYC,$(OPT)))
 OPT += -DPORTINARI #Use Portinari et al. (1998) SN-II yield tables.
 #OPT += -DCHIEFFI #Use Chieffi & Limongi (2007) SN-II yield tables.
@@ -178,6 +172,7 @@ endif #ifneq (BINARYC,$(findstring BINARYC,$(OPT)))
 
 OPT += -DWRITE_YIELD_DATA #If on, text files containing sets of different yield data will be written.
 endif #ifeq (DETAILED_METALS_AND_MASS_RETURN,$(findstring DETAILED_METALS_AND_MASS_RETURN,$(OPT)))
+
 
 ###########################
 #DUST OPTIONS:
@@ -210,7 +205,6 @@ endif #ifeq (H2_AND_RINGS,$(findstring H2_AND_RINGS,$(OPT)))
 # The following is nothing to do with dust but does help to reduce the output file size.
 #OPT += -DREDUCED_OUTPUT
 OBJS += ./code/model_dust_yields.o
-##OBJS += ./code/model_dust_yields_simp.o #ROB: simplified versions assuming H2_AND_RINGS is on and MAIN_ELEMENTS is off. (07-03-22)
 OBJS += ./code/dust_integrals.o
 OBJS += ./code/dust_read_tables.o
 endif #ifeq (DETAILED_DUST,$(findstring DETAILED_DUST,$(OPT)))
