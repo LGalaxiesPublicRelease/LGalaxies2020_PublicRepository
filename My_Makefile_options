@@ -1,0 +1,217 @@
+# List of Makefile options
+# see also routine "check_options" in main.c...
+
+# Options that control output
+OPT += -DOVERWRITE_OUTPUT    # overwrite output files if they exist (otherwise will quit without overwriting)
+OPT += -DNOUT=1    #1        # This sets the number of galaxy output times. IGNORED IN GALAXYTREE MODE. VALUE CORRESPONDS TO NO. OF ROWS READ FROM THE /input/desired_output_redshifts.txt FILE
+
+#OPT += -DPARALLEL
+#OPT += -DGALAXYTREE         # This will enable output of full galaxy merger trees, implicitly sets NOUT to maximum value
+OPT += -DLOADIDS            # Load dbids files
+OPT += -DUPDATETYPETWO       # This updates the positions of type 2 galaxies when the galaxies are written to file (requires aux files to be read)
+OPT += -DTRACK_MASSGROWTH_CHANNELS
+#OPT += -DTRACK_SFH_MASSGROWTH_CHANNELS
+OPT += -DHALOPROPERTIES      # Output halo spin and other properties
+
+OPT += -DREORDER_ON_DISK    # Default: on. This will read/write to disk to re-order IDs in a better format for uploading to database. (Takes a long time on Millennium-II in GALAXYTREE mode). (ROB: 21-01-20)
+
+OPT += -DLITE_OUTPUT       # ROB: If on, only a minimal number of parameters are outputted (suitable for basic dust+binaries studies) (NOTE: This is different to the more extreme LIGHT_OUTPUT option) (15-09-22)
+
+# To run with different dark matter simulation
+#OPT += -DMRII      
+#OPT += -DCATERPILLAR
+
+
+#OPT += -DFAST_TESTING_MODE
+#OPT += -DCHECK_SFH_AND_RINGS
+#OPT += -DCHECK_NO_NEGATIVE_VALUES
+#OPT += -DTRACK_SPLASHBACKS
+#OPT += -DTRACK_NMERGERS
+
+#OPT += -DEXCESS_MASS        # Stores negative infall in an ExcessMass component
+
+# predefined some models (to be run with the corresponding input_***.par file)
+#OPT += -DGUO10
+#OPT += -DGUO13 
+#OPT += -DHENRIQUES13
+#OPT += -DHENRIQUES15
+
+# Debugging options
+#OPT+= -DDEBUG
+#OPT+= -DDEBUG_PRINT
+#OPT+= -DDEBUG_PRINT_TO_CONSOLE
+#OPT+= -DDEBUG_READ_AND_CHECK
+#OPT += -DMASS_CHECKS         # Check for mass conservation at every stage of galaxy building
+
+# Options that control the SA model
+#OPT += -DFAST_TESTING_MODE  #Reduces the number of timesteps per snapshot from 20 to 10 (see params.h)
+OPT += -DDISRUPTION          # Instantaneously and completely disrupt type 2s
+#OPT += -DHT09_DISRUPTION     # Henriques & Thomas 2009 tidal disruption of stars in satellite galaxies 
+ifeq (HT09_DISRUPTION,$(findstring HT09_DISRUPTION,$(OPT)))
+OBJS  += ./code/model_HT09_disrupt.o
+endif
+OPT += -DMERGE01             # allows type 1s to merge with type 0s
+OPT += -DINFALL_UPDATE   #search also outside rvir to compute infall mass
+
+#Options for Rings:
+OPT += -DH2_AND_RINGS
+ifeq (H2_AND_RINGS,$(findstring H2_AND_RINGS,$(OPT)))
+OBJS  += ./code/model_radial_flow.o
+OPT += -DOUTPUT_RINGS
+#OPT += -DOUTPUT_RINGS_EXTRA # ROB: Output extra rings arrays (e.g. SFHs for elements in rings) (Only works if LITE_OUTPUT is off)
+OPT += -DRINGS_IN_BULGES
+endif
+
+# record star formation histories - used for post-process mags and detailed chemical enrichment
+OPT += -DSTAR_FORMATION_HISTORY
+ifeq (STAR_FORMATION_HISTORY,$(findstring STAR_FORMATION_HISTORY,$(OPT)))
+OBJS  += ./code/star_formation_history.o
+OPT += -DOUTPUT_SFH
+endif
+
+
+###########################
+### SPECPHOT_PROPERTIES ###
+###########################
+ifneq (LITE_OUTPUT,$(findstring LITE_OUTPUT,$(OPT)))
+OPT += -DCOMPUTE_SPECPHOT_PROPERTIES
+ifeq (COMPUTE_SPECPHOT_PROPERTIES,$(findstring COMPUTE_SPECPHOT_PROPERTIES,$(OPT)))
+OBJS  += ./code/model_spectro_photometric.o
+
+OPT += -DOUTPUT_REST_MAGS    # output rest-frame magnitudes
+#OPT += -DCOMPUTE_OBS_MAGS    # compute observer-frame magnitudes
+#OPT += -DOUTPUT_OBS_MAGS     # adds observer-frame magnitudes to the standard outptus (either tree or snapshot formats)
+#OPT += -DOUTPUT_MOMAF_INPUTS # writes out extra files which are std. input files for MoMaF (works both with and without galaxytree option)
+#OPT += -DKITZBICHLER				# does MOMAF outputs with forward and backwards k-corrections
+#OPT += -DICL                 # output magnitudes for ICL
+
+
+### Options that control the Spectral synthesis
+
+#OPT += -DM05 #use Maraston 2005 stellar populations need to change input.par
+OPT += -DBC03 #use Bruzual & Charlot 2003 stellar populations need to change input.par
+#OPT += -DCB07 #use Charlot & Bruzual 2007 stellar populations need to change input.par
+
+OPT += -DPHOTTABLES_PRECOMPUTED    
+   
+#OPT += -DSPEC_PHOTABLES_ON_THE_FLY
+ifeq (SPEC_PHOTABLES_ON_THE_FLY,$(findstring SPEC_PHOTABLES_ON_THE_FLY,$(OPT)))
+#OPT += -DFULL_SPECTRA
+OPT += -DAB    #AB MAGNITUDES
+#OPT += -DVEGA #VEGA MAGNITUDES
+OBJS  += ./code/model_spectro_photometric_onthefly_initialize.o
+OBJS  += ./code/model_spectro_photometric_onthefly_misc.o
+endif
+
+
+### POST PROCESS MAGS 
+ifeq (STAR_FORMATION_HISTORY,$(findstring STAR_FORMATION_HISTORY,$(OPT)))
+OPT += -DPOST_PROCESS_MAGS
+ifeq (POST_PROCESS_MAGS,$(findstring POST_PROCESS_MAGS,$(OPT)))
+OBJS  += ./code/post_process_spec_mags.o
+endif
+endif # STAR_FORMATION_HISTORY
+
+#Define NMAG
+ifeq (FULL_SPECTRA,$(findstring FULL_SPECTRA,$(OPT)))
+ifeq (M05,$(findstring M05,$(OPT)))
+OPT += -DNMAG=1221
+endif
+ifeq (BC03,$(findstring BC03,$(OPT)))
+OPT += -DNMAG=1238
+endif
+ifeq (CB07,$(findstring CB07,$(OPT)))
+OPT += -DNMAG=1221
+endif
+else #IF NOT DEFINED FULL_SPECTRA
+OPT += -DNMAG=5 #40
+endif #FULL_SPECTRA
+
+endif ### COMPUTE_SPECPHOT_PROPERTIES
+endif # ifneq (LITE_OUTPUT,$(findstring LITE_OUTPUT,$(OPT)))
+
+###########################
+# Chemical enrichment of individual element yields
+###########################
+OPT += -DDETAILED_METALS_AND_MASS_RETURN
+ifeq (DETAILED_METALS_AND_MASS_RETURN,$(findstring DETAILED_METALS_AND_MASS_RETURN,$(OPT)))
+
+OPT += -DFEEDBACK_COUPLED_WITH_MASS_RETURN
+OPT += -DINDIVIDUAL_ELEMENTS
+ifeq (INDIVIDUAL_ELEMENTS,$(findstring INDIVIDUAL_ELEMENTS,$(OPT)))
+OPT += -DOUTPUT_ELEMENTS
+#OPT += -DMAINELEMENTS  #(17-05-23): WARNING: THIS SWITCH IS CURRENTLY BROKEN. If you are running with BINARYC yields, re-run the yield table generator script with fewer elements selected.
+endif
+#OPT   += -DBULGE_TO_COLD 
+OPT   += -DMETALRICHWIND #This switch allows SNII, SNIa, and AGB ejecta to be directly dumped in to the HotGas, via fwindSNII, fwindSNIa, fwindAGB.
+#OPT   += -DGASDENSITYFWIND #This sets the amount of direct ejection into the HotGas to depend on the ISM density. MUST HAVE METALRICHWIND SWITCHED ON TOO.
+#OPT   += -DMVIRDEPFWIND #Amount of direct ejection into the HotGas depends on Mvir and the FRACZ values set in the input file (see model_yields.c). (16-06-20)
+#OBJS += ./code/model_yields.o #ORIGINAL FILE
+OBJS += ./code/model_yields_withBinaryC.o
+OBJS += ./code/yields_read_tables.o #ORIGINAL FILE
+#OBJS += ./code/yields_integrals.o #ORIGINAL FILE
+OBJS += ./code/yields_integrals_withBinaryC.o
+#OBJS += ./code/yields_integrals_old.o
+#OBJS += ./code/yields_integrals_Aswin_17-01-19.o
+#OBJS += ./code/yields_calc_SNe_rates.o
+#OPT += -DSNIATOHOT #REDUNDANT as of 19-09-18. Replaced with a FracSNIatoHot parameter in the input file for when METALRICHWIND is on.
+#OPT  += -DNORMALIZE #(ONLY WORKS WITH MAINELEMENTS OFF) If on, elements and total metals are normlaised to total component masses.
+#OPT += -DINSTANTANEOUS_RECYCLE #Recycle all metals in one time step to resemble instantaneous recycling approximation 
+
+# Yield table options:
+OPT += -DBINARYC #Use the binary_c yields for all enrichment channels. If on, the other yield table options below are ignored. (02-05-22)
+ifeq (BINARYC,$(findstring BINARYC,$(OPT)))
+#OPT += -DAL26 #Use the binary_c yields with Al26 included in place of Calcium in the element arrays (the 10th element in the arrays, i.e. array element 9) (Only works if LITE_OUTPUT is off)
+endif #ifeq (BINARYC,$(findstring BINARYC,$(OPT)))
+
+ifneq (BINARYC,$(findstring BINARYC,$(OPT)))
+OPT += -DPORTINARI #Use Portinari et al. (1998) SN-II yield tables.
+#OPT += -DCHIEFFI #Use Chieffi & Limongi (2007) SN-II yield tables.
+OPT += -DDTD #If on, a delay time distribution (DTD) is used for SNIa enrichment. If off, the Matteucci & Greggio (1986) formalism is used.
+ifeq (DTD,$(findstring DTD,$(OPT)))
+#OPT += -DBIMODALDTD #Use the Mannucci et al. (2006) delay time distribution. ~Half SNe-Ia die within ~100 Myrs. Rest distributed out to ~11 Gyrs.
+#OPT += -DGAUSSIANDTD #Use a Gaussian delay time distribution, centered on 2 Gyrs.
+OPT += -DPOWERLAWDTD #Use a declining power-law delay time distribution of slope -1.12.
+#OPT += -DRUITERDTD
+endif #ifeq (DTD,$(findstring DTD,$(OPT)))
+endif #ifneq (BINARYC,$(findstring BINARYC,$(OPT)))
+
+OPT += -DWRITE_YIELD_DATA #If on, text files containing sets of different yield data will be written.
+endif #ifeq (DETAILED_METALS_AND_MASS_RETURN,$(findstring DETAILED_METALS_AND_MASS_RETURN,$(OPT)))
+
+###########################
+#DUST OPTIONS:
+###########################
+OPT += -DDETAILED_DUST #NOTE: DETAILED_DUST will only work if the following elements are in the yield tables: C, O, Mg, Si, Fe. This is checked in yields_read_tables.c. (17-05-23)
+ifeq (DETAILED_DUST,$(findstring DETAILED_DUST,$(OPT)))
+# Options to switch on various dust production/growth/destruction processes
+OPT += -DDUST_AGB
+OPT += -DDUST_SNII
+OPT += -DDUST_SNIA
+OPT += -DDUST_GROWTH
+OPT += -DDUST_DESTRUCTION
+#OPT += -DCR_Dest
+#OPT += -DDestHIIregion
+# Remember instantaneous production/growth/destruction rates
+OPT += -DFULL_DUST_RATES
+#Allow dust to survive in the HotGas and/or Ejecta reservoirs, and be gradual destroyed via thermal sputting:
+OPT += -DDUST_HOTGAS
+ifeq (DUST_HOTGAS,$(findstring DUST_HOTGAS,$(OPT)))
+OPT += -DDUSTRICHWIND #This switch allows SNII, SNIa, and AGB dust to be directly dumped in to the HotGas, via fwindSNII, fwindSNIa, fwindAGB.
+#OPT += -DSEPARATE_DUST_EJEC_FRACTIONS #If on, this will use the FracDustToHot fractions defined in the input file when calculating direct dust ejection
+endif #ifeq (DUST_HOTGAS,$(findstring DUST_HOTGAS,$(OPT)))
+OPT += -DDUST_EJECTEDMASS
+OPT += -DUSE_BETA_MODEL #If off: isothermal density is used for all sputtering. If on: average density from beta model profile is used for HotGas sputtering (and isothermal for EjectedMass).
+# Output diff/cloud gas/dust rings arrays (only works if H2_AND_RINGS is on too):
+ifeq (H2_AND_RINGS,$(findstring H2_AND_RINGS,$(OPT)))
+OPT += -DOUTPUT_DUST_RINGS
+OPT += -DTAU_RINGS #If on, graing growth and SN shock timescales are outputted for each ring. If off, the average for the whole galaxy is outputted.
+endif #ifeq (H2_AND_RINGS,$(findstring H2_AND_RINGS,$(OPT)))
+# The following is nothing to do with dust but does help to reduce the output file size.
+#OPT += -DREDUCED_OUTPUT
+OBJS += ./code/model_dust_yields.o
+##OBJS += ./code/model_dust_yields_simp.o #ROB: simplified versions assuming H2_AND_RINGS is on and MAIN_ELEMENTS is off. (07-03-22)
+OBJS += ./code/dust_integrals.o
+OBJS += ./code/dust_read_tables.o
+endif #ifeq (DETAILED_DUST,$(findstring DETAILED_DUST,$(OPT)))
+
