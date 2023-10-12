@@ -1,1 +1,0 @@
-Ensemble output files from binary_c in .json format are stored here. Stellar populations containing a mix of single and binary stars are stored in /binaryStars, and stellar populations containing only single stars are stored in /singleStars.
