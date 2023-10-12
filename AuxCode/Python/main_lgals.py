@@ -59,13 +59,13 @@ MULTI_REDSHIFT_PLOTS = 0 #If on, in combination with either GENERAL_PLOTS or PAP
 COSMOLOGY = 'Planck' #Choose from: 'WMAP1', 'Planck'
 SIMULATION  = 'Mil-I' #Choose from: 'Mil-I', 'Mil-II' 
 FILE_TYPE = 'snapshots' #Choose from: 'snapshots', 'galtree'
-STRUCT_TYPE = 'snapshots' #Choose from: 'snapshots', 'galtree'
+STRUCT_TYPE = 'liteOutput' #Choose from: 'normal', 'liteOutput', 'ringSFHs'
 MODEL = 'modified' #Choose from: 'default', 'modified'
 VERSION = 'test1' #Pick a memorable name
 LABEL = MODEL+' model '+VERSION #NEEDS TO BE IN SIMPLE ASCII (so it can be used in a filename ok in Linux, and read by latex). White space is ok [removed later]). A label that wll be added to plots to denote this model if MULTIPLE_MODELS is on.
 
 SOLAR_ABUNDANCE_SET = 'A09' #'GAS07' #'AG89_phot' #'AG89_mete' #Sets which solar abundances are assumed when normalising abundances and enhancements inplots
-SAMPLE_TYPE = 'All' #Select from: 'All', 'Discs', 'Dwarfs', 'MWAs', 'ETGs'    
+SAMPLE_TYPE = 'All' #Select from: 'All', 'Discs', 'ETGs', 'Dwarfs'
 
 #################       
 #Files to load:
@@ -237,7 +237,10 @@ if CALC_RINGS_AND_SFH_INFO == 1 :
     RReRings = np.empty((NumGals,RNUM))    
     RReSFHRings  = np.empty((NumGals,RNUM,RBINS))
     #Calculate standard ring areas and central radii:
-    print("NOTE: Using StellarHalfMassRadius as effective radius (Re)\n")
+    if ("liteOutput" in (STRUCT_TYPE)) :
+        print("NOTE: Using StellarHalfMassRadius as effective radius (Re)\n")
+    else :
+        print("NOTE: Using StellarHalfLightRadius as effective radius (Re)\n")
     for ii in range(RNUM) :
         if ii == 0 :
             RingArea[ii] = np.pi * RingRadii[ii]**2
@@ -245,10 +248,15 @@ if CALC_RINGS_AND_SFH_INFO == 1 :
         else :
             RingArea[ii] = np.pi * (RingRadii[ii]**2 - RingRadii[ii-1]**2)
             RingCenRadii[ii] = RingRadii[ii-1] + ((RingRadii[ii] - RingRadii[ii-1])/2.)      
-        #Calculate R/Re for every ring of every galaxy:
-        RReRings[:,ii] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfMassRadius'][:])
-        for jj in range(RBINS) :
-            RReSFHRings[:,ii,jj] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfMassRadius'][:])
+    #Calculate R/Re for every ring of every galaxy:
+        if ("liteOutput" in (STRUCT_TYPE)) :
+            RReRings[:,ii] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfMassRadius'][:])
+            for jj in range(RBINS) :
+                RReSFHRings[:,ii,jj] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfMassRadius'][:])      
+        else :           
+            RReRings[:,ii] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfLightRadius'][:])
+            for jj in range(RBINS) :
+                RReSFHRings[:,ii,jj] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfLightRadius'][:])
         
     #Calculate SFH properties:
     #N.B. If making new samples, SFH_bins IS ALREADY STORED IN THE DICTIONARY BELOW
@@ -305,8 +313,9 @@ if GENERAL_PLOTS == 1 :
         plot_mssfr(Volume, Hubble_h, Samp1, char_z_low, pdf=pdf)
         plot_mzgr(Samp1, struct1, char_z_low, pdf=pdf)
         plot_mzsr(Samp1, char_z_low, pdf=pdf)
-        plot_sfhs(Samp1, SFH_bins, snap_z0, char_z_low, pdf=pdf)
-        plot_sfrd_prof(Samp1, struct1, char_z_low, MassBins, pdf=pdf)        
+        if CALC_RINGS_AND_SFH_INFO == 1 :
+            plot_sfhs(Samp1, SFH_bins, snap_z0, char_z_low, pdf=pdf)
+            plot_sfrd_prof(Samp1, struct1, char_z_low, MassBins, pdf=pdf)        
     pdf.close()
         
 if PAPER_PLOTS == 1 :

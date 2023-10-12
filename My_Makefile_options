@@ -15,7 +15,7 @@ OPT += -DHALOPROPERTIES      # Output halo spin and other properties
 
 OPT += -DREORDER_ON_DISK    # Default: on. This will read/write to disk to re-order IDs in a better format for uploading to database. (Takes a long time on Millennium-II in GALAXYTREE mode). (ROB: 21-01-20)
 
-#OPT += -DLITE_OUTPUT       # ROB: If on, only a minimal number of parameters are outputted (suitable for basic dust+binaries studies) (NOTE: This is different to the more extreme LIGHT_OUTPUT option) (15-09-22)
+OPT += -DLITE_OUTPUT       # ROB: If on, only a minimal number of parameters are outputted (suitable for basic dust+binaries studies) (NOTE: This is different to the more extreme LIGHT_OUTPUT option) (15-09-22)
 
 # To run with different dark matter simulation
 #OPT += -DMRII      
