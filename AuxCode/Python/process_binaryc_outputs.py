@@ -2,7 +2,7 @@
 """
 Created on Thu Oct 12 09:28:57 2023
 
-@author: ry22aas
+@author: R. Yates & D. Hendricks
 """
 
 """
@@ -14,7 +14,6 @@ import json
 import pandas as pd
 import numpy as np
 from collections import OrderedDict, Counter
-#from plot_functions import plot_yield_per_channel
 from ensemble_functions.ensemble_functions import inflate_ensemble_with_lists, find_columnames_recursively
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
