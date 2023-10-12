@@ -45,7 +45,7 @@ PlotDir = BaseDir+'figures/' #where plots created by this script are sent
 #################
 #################
 #Switches:
-LOAD_SAMPLE = 0 #If on, a pre-made sample of galaxies is loaded from the pickeled save file (quicker). If off, L-Galaxies outputs are read in and a sample is made (slower).
+LOAD_SAMPLE = 1 #If on, a pre-made sample of galaxies is loaded from the pickeled save file (quicker). If off, L-Galaxies outputs are read in and a sample is made (slower).
 MASS_CHECKS = 0 #If on (and LOAD_SAMPLE is off), key mass properties will be checked for Nans, negatives, and whether sub-components add up to component masses properly.
 COMBINE_MODELS = 0 #If on, MR-I and MR-II versions of the same model are combined (if the other version has a .npy sample already saved).
 STELLAR_MASS_CUT = 1 #If on, only galaxies above the mass resolution thresholds of log(M*/Msun) >= 8.0 for Millennium-I and log(M*/Msun) >= 7.0 for Millennium-II will be selected.
@@ -96,6 +96,8 @@ mark = 'mk1'
 #################
 char_z_low="%0.2f" % FullRedshiftList[0]
 char_z_high="%0.2f" % FullRedshiftList[-1]
+FullSnapnumList_MRI = robs_snapnum_from_redshift('Mil-I', COSMOLOGY, FullRedshiftList)
+FullSnapnumList_MRII = robs_snapnum_from_redshift('Mil-II', COSMOLOGY, FullRedshiftList)
 if (MULTI_REDSHIFT_PLOTS == 1) :    
     FullSnapnumList = robs_snapnum_from_redshift(SIMULATION, COSMOLOGY, FullRedshiftList)
 
@@ -123,15 +125,18 @@ elif COSMOLOGY == 'Planck' :
     Omega_Lambda  = 0.683  
 else : print("***** ERROR: Cosmology unknown. Please choose from: WMAP1, PLANCK *****") 
 
+MRI_cutoff = 1.e9 #Msun
+MRI_BoxSideLength = 500.*0.960558 #Mpc/h
+MRII_BoxSideLength = 100.*0.960558 #Mpc/h
 if SIMULATION == 'Mil-I' :
-    BoxSideLength = 500.*0.960558 #Mpc/h
+    BoxSideLength = MRI_BoxSideLength #Mpc/h
     DMParticleMass = 0.0961104*1e10 #Msun/h 
     if STELLAR_MASS_CUT == 1 :
         StellarMassRes = 1.e8 #Rough recommended minimum stellar mass for well-resolved galaxies for Mil-I
     else :
         StellarMassRes = 0.0
 elif SIMULATION == 'Mil-II' :
-    BoxSideLength = 100.*0.960558 #Mpc/h
+    BoxSideLength = MRII_BoxSideLength #Mpc/h
     DMParticleMass = 0.000768884*1e10 #Msun/h
     if STELLAR_MASS_CUT == 1 :
         StellarMassRes = 1.e7 #Rough recommended minimum stellar mass for well-resolved galaxies for Mil-II
@@ -165,6 +170,8 @@ if LOAD_SAMPLE == 0 :
                            FullRedshiftList, RedshiftsToRead)
     np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE, G_samp1, allow_pickle=True)
     NumGals = len(G_samp1) #Number of galaxies in the sample selected in make_lgals_sample (not the total number of objects in the treefiles used).
+    #Save treefile info:
+    np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+"_"+"treefiles", [FirstFile,LastFile], allow_pickle=True)
     print('Sample data pickled\n')
 
 elif LOAD_SAMPLE == 1 :
@@ -284,8 +291,8 @@ if CALC_RINGS_AND_SFH_INFO == 1 :
 if CALC_RINGS_AND_SFH_INFO == 1 :
     Samp1 = make_lgals_dictionary(LABEL, G_samp1, PlotDir, COSMOLOGY, SIMULATION, FILE_TYPE, MODEL, \
                                   VERSION, MRI_cutoff, NumGals, MRI_gals, MRII_gals, SAMPLE_TYPE, char_z_low, char_z_high, \
-                                  Volume_MRI, Volume_MRII, FullSnapnumList_MRI, FullSnapnumList_MRII, RNUM, RingRadii, RingCenRadii, \
-                                  RReRings, RReSFHRings, RingArea, SFH_bins_num, SFH_bins_lbt_allGals) #Volume, 
+                                  Volume_MRI, Volume_MRII, FullSnapnumList_MRI, FullSnapnumList_MRII, CALC_RINGS_AND_SFH_INFO, \
+                                  RNUM, RingRadii, RingCenRadii, RReRings, RReSFHRings, RingArea, SFH_bins_num, SFH_bins_lbt_allGals)
 else :
     Samp1 = make_lgals_dictionary(LABEL, G_samp1, PlotDir, COSMOLOGY, SIMULATION, FILE_TYPE, MODEL, \
                               VERSION, MRI_cutoff, NumGals, MRI_gals, MRII_gals, SAMPLE_TYPE, char_z_low, char_z_high, \
@@ -298,12 +305,11 @@ struct1 = STRUCT_TYPE
 #MAKE PLOTS:
 #################
 #################
-MassBins = np.array([[9.0,9.75],[9.75,10.5],[10.5,11.25]])
-AgeBins = np.array([[0.0,5.0],[5.0,9.0],[9.0,14.0]])
-
 if GENERAL_PLOTS == 1 :
     pdf = PdfPages(PlotDir+Samp1['Cosmology']+"_"+Samp1['Simulation']+"_"+Samp1['File_type']+"_" \
-                   +Samp1['Model']+"_"+Samp1['Version']+"_"+'z'+char_z_low+"-"+char_z_high+"_"+Samp1['Sample_type']+"_"+mark+".pdf")        
+                   +Samp1['Model']+"_"+Samp1['Version']+"_"+'z'+char_z_low+"-"+char_z_high+"_"+Samp1['Sample_type']+"_"+mark+".pdf") 
+    MassBins = np.array([[9.0,10.2],[10.2,11.4]])
+    AgeBins = np.array([[0.0,5.0],[5.0,9.0],[9.0,14.0]])
     if MULTI_REDSHIFT_PLOTS == 1:
         plot_cosmic_SFRD(Volume, Hubble_h, FullRedshiftList, FullSnapnumList, RedshiftsToRead, Samp1, struct1, char_z_low, pdf=pdf)
     else :
@@ -314,11 +320,14 @@ if GENERAL_PLOTS == 1 :
         plot_mzgr(Samp1, struct1, char_z_low, pdf=pdf)
         plot_mzsr(Samp1, char_z_low, pdf=pdf)
         if CALC_RINGS_AND_SFH_INFO == 1 :
-            plot_sfhs(Samp1, SFH_bins, snap_z0, char_z_low, pdf=pdf)
+            if not ("liteOutput" in (STRUCT_TYPE)) :
+                plot_sfhs(Samp1, SFH_bins, snap_z0, char_z_low, pdf=pdf)
             plot_sfrd_prof(Samp1, struct1, char_z_low, MassBins, pdf=pdf)        
     pdf.close()
         
 if PAPER_PLOTS == 1 :
+    MassBins = np.array([[9.0,9.75],[9.75,10.5],[10.5,11.25]])
+    AgeBins = np.array([[0.0,5.0],[5.0,9.0],[9.0,14.0]])
     if MULTI_REDSHIFT_PLOTS == 1 :
         plot_dust_scaling_relations_evo(Hubble_h, FullRedshiftList, FullSnapnumList_MRI, FullSnapnumList_MRII, RedshiftsToRead, Samp1, struct1, \
                                         props=['DTM','DTG'], SolarNorm=SOLAR_ABUNDANCE_SET, obs=1, V19=None, aveOnly=1, incHotDust=None, \

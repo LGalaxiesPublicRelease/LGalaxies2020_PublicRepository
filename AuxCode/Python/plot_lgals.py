@@ -173,10 +173,19 @@ def plot_smf(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :
     plt.tick_params(direction="in", top=True, bottom=True, left=True, right=True)
     
     #Plot stellar mass function:
-    binwidth = 0.1
-    bin_arr=np.arange(xlimits[0],xlimits[1]+binwidth,binwidth)
-    hist=np.histogram(np.log10(Samp1['G_samp']['StellarMass']), bins=bin_arr, range=(xlimits[0],xlimits[1]))     
-    plt.plot(hist[1][0:len(hist[1][:])-1]+binwidth/2., np.log10((hist[0][:]/(Volume*binwidth))*Hubble_h**3), label=Samp1['Label'])    
+    if ((Samp1["MRI_gals"] > 0) & (Samp1["MRII_gals"] > 0)) :
+        prop_MRI = np.log10(Samp1['G_samp']['StellarMass'][0:Samp1['MRI_gals']])
+        prop_MRII = np.log10(Samp1['G_samp']['StellarMass'][Samp1['MRI_gals']:])
+        bin_arr_MRI = np.arange(np.log10(Samp1["MRI_cutoff"]),xlimits[1]+binwidth,binwidth)
+        bin_arr_MRII = np.arange(xlimits[0],np.log10(Samp1["MRI_cutoff"])+(2.*binwidth),binwidth)
+        hist_MRI = np.histogram(prop_MRI, bins=bin_arr_MRI, range=(np.log10(Samp1["MRI_cutoff"]),xlimits[1])) 
+        hist_MRII = np.histogram(prop_MRII, bins=bin_arr_MRII, range=(xlimits[0],np.log10(Samp1["MRI_cutoff"]))) 
+        plt.plot(hist_MRI[1][0:len(hist_MRI[1][:])-1]+binwidth/2., np.log10((hist_MRI[0][:]/(Samp1["Volumes"][0]*binwidth))*Hubble_h**3), label=Samp1['Label'])
+        plt.plot(hist_MRII[1][0:len(hist_MRII[1][:])-1]+binwidth/2., np.log10((hist_MRII[0][:]/(Samp1["Volumes"][Samp1['MRI_gals']]*binwidth))*Hubble_h**3), linestyle='dotted')
+    else :
+        prop = np.log10(Samp1['G_samp']['StellarMass'])
+        hist = np.histogram(prop, bins=bin_arr, range=(xlimits[0],xlimits[1])) 
+        plt.plot(hist[1][0:len(hist[1][:])-1]+binwidth/2., np.log10((hist[0][:]/(Samp1['Volumes'][0]*binwidth))*Hubble_h**3), label=Samp1['Label'])
 
     ##########
     #title:
@@ -190,7 +199,7 @@ def plot_smf(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :
 
 
 #################
-def plot_himf(Volume, Hubble_h, Samp1, char_z_low, Samp2=None, pdf=None) :  
+def plot_himf(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :  
     #Set axis limits:
     xlimits = np.array([7.0,11.0])
     ylimits = np.array([-5.9,-0.5])
@@ -206,8 +215,20 @@ def plot_himf(Volume, Hubble_h, Samp1, char_z_low, Samp2=None, pdf=None) :
     #Plot HI mass function:
     binwidth = 0.1
     bin_arr=np.arange(xlimits[0],xlimits[1]+binwidth,binwidth)
-    hist=np.histogram(np.log10(Samp1['G_samp']['ColdGas']*(1.-Samp1['G_samp']['H2fraction'])), bins=bin_arr, range=(xlimits[0],xlimits[1]))     
-    plt.plot(hist[1][0:len(hist[1][:])-1]+binwidth/2., np.log10((hist[0][:]/(Volume*binwidth))*Hubble_h**3), label=Samp1['Label'])    
+    if ((Samp1["MRI_gals"] > 0) & (Samp1["MRII_gals"] > 0)) :
+        MRI_HI_cutoff = 10**(9.5) #Samp1["MRI_cutoff"]
+        prop_MRI = np.log10(Samp1['G_samp']['ColdGas'][0:Samp1['MRI_gals']]*(1.-Samp1['G_samp']['H2fraction'][0:Samp1['MRI_gals']]))
+        prop_MRII = np.log10(Samp1['G_samp']['ColdGas'][Samp1['MRI_gals']:]*(1.-Samp1['G_samp']['H2fraction'][Samp1['MRI_gals']:]))
+        bin_arr_MRI = np.arange(np.log10(MRI_HI_cutoff),xlimits[1]+binwidth,binwidth)
+        bin_arr_MRII = np.arange(xlimits[0],np.log10(MRI_HI_cutoff)+(2.*binwidth),binwidth)
+        hist_MRI = np.histogram(prop_MRI, bins=bin_arr_MRI, range=(np.log10(MRI_HI_cutoff),xlimits[1])) 
+        hist_MRII = np.histogram(prop_MRII, bins=bin_arr_MRII, range=(xlimits[0],np.log10(MRI_HI_cutoff))) 
+        plt.plot(hist_MRI[1][0:len(hist_MRI[1][:])-1]+binwidth/2., np.log10((hist_MRI[0][:]/(Samp1["Volumes"][0]*binwidth))*Hubble_h**3), label=Samp1['Label']) 
+        plt.plot(hist_MRII[1][0:len(hist_MRII[1][:])-1]+binwidth/2., np.log10((hist_MRII[0][:]/(Samp1["Volumes"][Samp1['MRI_gals']]*binwidth))*Hubble_h**3), linestyle='dotted') 
+    else :
+        prop = np.log10(Samp1['G_samp']['ColdGas']*(1.-Samp1['G_samp']['H2fraction']))
+        hist = np.histogram(prop, bins=bin_arr, range=(xlimits[0],xlimits[1])) 
+        plt.plot(hist[1][0:len(hist[1][:])-1]+binwidth/2., np.log10((hist[0][:]/(Samp1['Volumes'][0]*binwidth))*Hubble_h**3), label=Samp1['Label']) 
 
     ##########
     #title:
@@ -238,8 +259,10 @@ def plot_mssfr(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :
     binno = 50
     theX = np.log10(Samp1['G_samp']['StellarMass'][Samp1['G_samp']['Sfr']>0.0])
     theY = np.log10(Samp1['G_samp']['Sfr'][Samp1['G_samp']['Sfr']>0.0]/Samp1['G_samp']['StellarMass'][Samp1['G_samp']['Sfr']>0.0])
-    robs_contour_plot(theX, theY, binno, '2sig', noOutliers=1)
-    robs_plot_average(theX, theY, binno=10, aveType='Median', minInBin=50, linewidth=4., inputCentres=1)
+    #robs_contour_plot(theX, theY, binno, '2sig', noOutliers=1)
+    robs_contour_plot(theX, theY, binno, '2sig', noOutliers=1, theRange=[xlimits,ylimits], \
+                      weights=1./Samp1['Volumes'][Samp1['G_samp']['Sfr']>0.0])
+    #robs_plot_average(theX, theY, binno=10, aveType='Median', minInBin=50, linewidth=4., inputCentres=1)
 
     ##########
     #title:
@@ -283,37 +306,6 @@ def plot_mzgr(Samp1, struct1, char_z_low, pdf=None) :
     
     #print figure to pdf:
     pdf.savefig()  
-    
-    ##########    
-    # Plot ColdGas metallicity as mass-weighted M_Z/M_tot, using elements arrays, normalised to Sun:
-    ##########     
-    #Set axis limits:
-    xlimits = np.array([9.0,12.0])
-    ylimits = np.array([-1.5,0.5])
-    
-    #Set-up plot:
-    fig = plt.figure(figsize=(6,5))
-    plt.xlabel(r'log$(M_{*} / \textnormal{M}_{\odot})$')
-    plt.ylabel(r'$Z_{\rm gas} / \textnormal{Z}_{\odot}$')
-    plt.xlim(xlimits)
-    plt.ylim(ylimits)
-    plt.tick_params(direction="in", top=True, bottom=True, left=True, right=True)
-    
-    #Plot:
-    binno = 50
-    M_cold = np.nansum(Samp1['G_samp']['ColdGas_elements'][:,:], axis=1)
-    MZ_cold = np.nansum(Samp1['G_samp']['ColdGas_elements'][:,2:], axis=1)
-    Zs = np.log10(MZ_cold / M_cold) - np.log10(Z_mf_bulk_A09)
-    theX = np.log10(Samp1['G_samp']['StellarMass'][(M_cold > 0.0) & (MZ_cold > 0.0)])
-    theY = Zs[(M_cold > 0.0) & (MZ_cold > 0.0)]
-    robs_contour_plot(theX, theY, binno, '2sig', noOutliers=1)  
-    robs_plot_average(theX, theY, binno=10, aveType='Median', minInBin=50, linewidth=4., inputCentres=1)
-
-    #title:
-    plt.text(.5, 0.92, ['M*-Zg (global, mw, elements arrays)', 'z='+char_z_low, str(Samp1['NumGals'])+' gals', Samp1['Cosmology'], Samp1['Simulation'], Samp1['File_type'], Samp1['Model'], Samp1['Version'], Samp1['Sample_type']], transform=fig.transFigure, horizontalalignment='center', color='blue')  
-    
-    #print figure to pdf:
-    pdf.savefig()     
     
     ##########    
     # Plot ColdGas metallicity as number-weighted 12+log(O/H):
@@ -384,37 +376,6 @@ def plot_mzsr(Samp1, char_z_low, pdf=None) :
 
     #print figure to pdf:
     pdf.savefig()    
-    
-    ##########    
-    # Plot Stellar metallicity as mass-weighted M_Z/M_tot, using elements arrays, normalised to Sun:
-    ##########            
-    #Set axis limits:
-    xlimits = np.array([9.0,12.0])
-    ylimits = np.array([-1.5,0.5])
-    
-    #Set-up plot:
-    fig = plt.figure(figsize=(6,5))
-    plt.xlabel(r'log$(M_{*} / \textnormal{M}_{\odot})$')
-    plt.ylabel(r'$Z_{*} / \textnormal{Z}_{\odot}$')
-    plt.xlim(xlimits)
-    plt.ylim(ylimits)
-    plt.tick_params(direction="in", top=True, bottom=True, left=True, right=True)
-    
-    #Plot:
-    binno = 50
-    M_stars = np.nansum(Samp1['G_samp']['DiskMass_elements'][:,:], axis=1) +  np.nansum(Samp1['G_samp']['BulgeMass_elements'][:,:], axis=1)
-    MZ_stars = np.nansum(Samp1['G_samp']['DiskMass_elements'][:,2:], axis=1) + np.nansum(Samp1['G_samp']['BulgeMass_elements'][:,2:], axis=1)
-    Zs = np.log10(MZ_stars / M_stars) - np.log10(Z_mf_bulk_A09)
-    theX = np.log10(Samp1['G_samp']['StellarMass'][(M_stars > 0.0) & (MZ_stars > 0.0)])
-    theY = Zs[(M_stars > 0.0) & (MZ_stars > 0.0)]
-    robs_contour_plot(theX, theY, binno, '2sig', noOutliers=1)  
-    robs_plot_average(theX, theY, binno=10, aveType='Median', minInBin=50, linewidth=4., inputCentres=1)
-
-    #title:
-    plt.text(.5, 0.92, ['M*-Zs (global, mw, elements arrays)', 'z='+char_z_low, str(Samp1['NumGals'])+' gals', Samp1['Cosmology'], Samp1['Simulation'], Samp1['File_type'], Samp1['Model'], Samp1['Version'], Samp1['Sample_type']], transform=fig.transFigure, horizontalalignment='center', color='blue')  
-    
-    #print figure to pdf:
-    pdf.savefig()  
     
     
     ##########
