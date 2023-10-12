@@ -30,41 +30,11 @@ from ensemble_functions import inflate_ensemble_with_lists, find_columnames_recu
 USE_NEW_ENSEMBLES = 0 #If on, new binary_c ensembles stored in /YieldTables/binary_c_yields/new/ensembles/ will be used. If off, the default ensembles in /YieldTables/binary_c_yields/default/ensembles/ will be used.
 SINGLE_STARS = 0 #If on, the single star stellar populations from binary_c will be loaded, rather than the binary star ones. (30-05-23)
 WRITE_HEADER_FILE = 1 #If on, this script will generate a new h_metals.h file for L-Galaxies, which includes (a) the correct number of chemical elements to consider, and (b) their order.
-ROBS_PLOT_LAYOUT = 1 #If on, my style of plots (times new roman font, etc) is used. If off, David's is used.
-PLOT_BINARYC_YIELDS = 1
-PLOT_ONE_ELEMENT = 1 #If on, the normalised mass ejection rate for just one chemical element (given by ele_to_plot) will be plotted from the binary_c yields. If off, the sum of all the metal elements is plotted. (25-08-23)
-PLOT_METAL_ELEMENTS = 0 #If on (and PLOT_ONE_ELEMENTS is off), only the elements heavier than He are summed when plotting the metal ejection rate from binary_c.
-CONVERT_PLOTS_TO_LINEAR_TIME_BINS = 1 #When on, this will convert the binary_c yields from dM/dlogt * 1/Msun to dM/dt * 1/Msun for plots only.
-CONVERT_PLOTS_TO_PER_SOLARMASS = 0 #TURN OFF ALWAYS. IT'S NOT NEEDED! Apparently, this is already done before the raw binary_c yields are tabulated.
-PLOT_LGALAXIES_YIELDS = 0
-PLOT_YIELD_COMPARISONS = 0
-PLOT_SN_RATES = 1 #If on, the SN rates will be plotted in a panel underneath the total mass and metal mass ejection rates.
-PLOT_SINGLE_AND_BINARY_STARS = 1 #If on, both the singleStar and binaryStar ensembles from binary_c will be plotted together in the PLOT_YIELD_COMPARISONS plots.
-PLOT_ONE_COLUMN = 1 #If on, the individual element evolutions will be plotted all in one colum (for Supp. Material). If off, they will be split into 2 columns (for main paper).
-PLOT_PIECHARTS = 1 #If on, pie charts showing the relatvie masses of each element ejected by the binary_c and Yates+13 yields is plotted next to the burst yield evolutions.
-MAXSNIIMASS25_YIELDS = 0 # If on, data from L-Galaxies when assuming the max mass for SN-II progenitors is 25Msun (rather than the defulat 120Msun) is used.
-READ_SQL_FILE = 0
-PLOT_UNPROCESSED_COMP = 0 #If on, plots of the assumed unprocessed component of an SPs elected metals are made. (This is the metal mass subtracted from the stars in L-GALAXIES).
 
 switches_dict = {
     'USE_NEW_ENSEMBLES' : USE_NEW_ENSEMBLES,
     'SINGLE_STARS' : SINGLE_STARS,
-    'WRITE_HEADER_FILE' : WRITE_HEADER_FILE,
-    'ROBS_PLOT_LAYOUT'  : ROBS_PLOT_LAYOUT,
-    'PLOT_BINARYC_YIELDS' : PLOT_BINARYC_YIELDS,
-    'PLOT_ONE_ELEMENT' : PLOT_ONE_ELEMENT,
-    'PLOT_METAL_ELEMENTS' : PLOT_METAL_ELEMENTS,
-    'CONVERT_PLOTS_TO_LINEAR_TIME_BINS'  : CONVERT_PLOTS_TO_LINEAR_TIME_BINS,
-    'CONVERT_PLOTS_TO_PER_SOLARMASS' : CONVERT_PLOTS_TO_PER_SOLARMASS,
-    'PLOT_LGALAXIES_YIELDS' : PLOT_LGALAXIES_YIELDS,
-    'PLOT_YIELD_COMPARISONS' : PLOT_YIELD_COMPARISONS,
-    'PLOT_SN_RATES': PLOT_SN_RATES,
-    'PLOT_SINGLE_AND_BINARY_STARS' : PLOT_SINGLE_AND_BINARY_STARS,
-    'PLOT_ONE_COLUMN' : PLOT_ONE_COLUMN,
-    'PLOT_PIECHARTS' : PLOT_PIECHARTS,
-    'MAXSNIIMASS25_YIELDS' : MAXSNIIMASS25_YIELDS,
-    'READ_SQL_FILE' : READ_SQL_FILE,
-    'PLOT_UNPROCESSED_COMP' : PLOT_UNPROCESSED_COMP
+    'WRITE_HEADER_FILE' : WRITE_HEADER_FILE
 }
 
 
@@ -249,10 +219,10 @@ for zz in range(0,len(ensemble_file_metallicities)) :
 ###################
 if WRITE_HEADER_FILE :
     #Rename old header file:
-    os.rename(basedir+'code/'+'h_metals.h', basedir+'code/'+'h_metals_old.h')
+    os.replace(basedir+'code/'+'h_metals.h', basedir+'code/'+'h_metals_old.h')
     #Write new header file:
     with open(basedir+'code/'+'h_metals.h', 'w') as f:
-        f.write("//NOTE: This header file was written by process_binaryc_outputs.py on "+now.strftime("%d/%m/%Y")+':\n')
+        f.write("//NOTE: This header file was written by process_binaryc_outputs.py on "+now.strftime("%m/%d/%Y at %H:%M:%S")+'.\n')
         f.write( \
                 "\n#ifdef DETAILED_METALS_AND_MASS_RETURN\
                 \n    #define NUM_METAL_CHANNELS 3 //[SN-II group][SN-Ia group][Wind group]\
@@ -296,7 +266,49 @@ if WRITE_HEADER_FILE :
     #Make a copy of the new header file in the yields folder:
     shutil.copy2(basedir+'code/'+'h_metals.h', outputdir+'h_metals.h')
     
-    print("Header file written.")
+    print("\nHeader file written.")
+
+
+##########
+# WRITE METADATA:
+##########
+with open(outputdir+'ensemble_output_'+'info.txt', 'w') as f:
+    f.write('INFO FOR BINARY_C YIELD FILES:'+'\n')
+    f.write('------------------------------\n\n')
+    f.write('Date/time produced:\n')
+    f.write(now.strftime("%d/%m/%Y at %H:%M:%S")+'\n')   
+    f.write('\nbinary_c files location:\n')
+    f.write(ensembledir+'\n\n')
+    f.write('binary_c files:\n')
+    for zz in range(0,len(ensemble_file_metallicities)) :
+        f.write('ensemble_output-'+ensemble_file_codes[zz]+'.json'+'\n')         
+    f.write('\nWritten files location:\n')
+    f.write(outputdir+'\n\n') 
+    f.write('Written files:\n')
+    f.write('ensemble_output_'+'logt_timesteps.txt\n')
+    f.write('ensemble_output_'+'metallicities.txt\n')
+    if WRITE_HEADER_FILE :
+        f.write('h_metals.h\n')
+    for mets in the_metallicities :
+        for group in selec_channels :
+            f.write('ensemble_output_'+group+'_'+'Z'+mets+'_'+'Yields.txt\n')
+            f.write('ensemble_output_'+group+'_'+'Z'+mets+'_'+'EjectedMasses.txt\n')
+            f.write('ensemble_output_'+group+'_'+'Z'+mets+'_'+'TotalMetals.txt\n')
+            f.write('ensemble_output_'+group+'_'+'Z'+mets+'_'+'Rates.txt\n')   
+    f.write('\nSwitches:\n')
+    f.write(json.dumps(switches_dict)+'\n\n')
+    f.write('elements:\n')
+    f.write(json.dumps(elements)+'\n\n')
+    f.write('selec_channels:\n')
+    f.write(json.dumps(selec_channels)+'\n\n')
+    f.write('sn_channels:\n')
+    f.write(json.dumps(sn_channels)+'\n\n')
+    f.write('Outputted yield units:\n')
+    f.write('d(M/Msun)/dlog(t/Myr) * 1/Msun'+'\n\n')
+    f.write("END")
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-//NOTE: This header file was written by process_binaryc_outputs.py on 12/10/2023:
+//NOTE: This header file was written by process_binaryc_outputs.py on 10/12/2023 at 13:03:30.
 
 #ifdef DETAILED_METALS_AND_MASS_RETURN                
     #define NUM_METAL_CHANNELS 3 //[SN-II group][SN-Ia group][Wind group]                
