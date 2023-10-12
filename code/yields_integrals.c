@@ -662,13 +662,6 @@ void integrate_yields()
 #ifdef WRITE_YIELD_DATA //Store total yields
 			  //Calculate total mass ejecta rates in each timestep from all of its SFH bins (assuming 1Msun of SF in every SFH bin):
 			  for (Zi=0;Zi<ARRAY_Z_NUM;Zi++) {
-				  /*//The divide by active bins (i.e. by (float)SFH_ibin[snap][step]+1.0) accounts for the assumption of 1Msun SF in each SFH bin, so that TotNormSNIIEjMass is in units of Msun/Msun (rather than Msun/(SFH_ibin*Msun)):
-				  TotNormSNIIEjMass[(STEPS*snap)+step][Zi] += NormSNIIMassEjecRate[(STEPS*snap)+step][i][Zi] / ((float)SFH_ibin[snap][step]+1.0);
-				  TotNormSNIaEjMass[(STEPS*snap)+step][Zi] += NormSNIaMassEjecRate[(STEPS*snap)+step][i][Zi] / ((float)SFH_ibin[snap][step]+1.0);
-				  TotNormAGBEjMass[(STEPS*snap)+step][Zi] += NormAGBMassEjecRate[(STEPS*snap)+step][i][Zi] / ((float)SFH_ibin[snap][step]+1.0);
-				  TotNormSNIINum[(STEPS*snap)+step][Zi] += NormSNIINum[(STEPS*snap)+step][i][Zi] / ((float)SFH_ibin[snap][step]+1.0);
-				  TotNormSNIaNum[(STEPS*snap)+step][Zi] += NormSNIaNum[(STEPS*snap)+step][i][Zi] / ((float)SFH_ibin[snap][step]+1.0);
-				  TotNormAGBNum[(STEPS*snap)+step][Zi] += NormAGBNum[(STEPS*snap)+step][i][Zi] / ((float)SFH_ibin[snap][step]+1.0);*/
 				  //Smoother lines are plotted when not normalising out SFH_ibin here, although note that the magnitude of TotNormSNIIEjMass, etc, will be higher as the units will correspond to Msun/(SFH_ibin*Msun) (rather than Msun/Msun):
 				  TotNormSNIIEjMass[(STEPS*snap)+step][Zi] += NormSNIIMassEjecRate[(STEPS*snap)+step][i][Zi];
 				  TotNormSNIaEjMass[(STEPS*snap)+step][Zi] += NormSNIaMassEjecRate[(STEPS*snap)+step][i][Zi];

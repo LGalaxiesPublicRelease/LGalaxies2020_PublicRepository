@@ -167,7 +167,7 @@ OPT += -DPOWERLAWDTD #Use a declining power-law delay time distribution of slope
 endif #ifeq (DTD,$(findstring DTD,$(OPT)))
 endif #ifneq (BINARYC,$(findstring BINARYC,$(OPT)))
 
-OPT += -DWRITE_YIELD_DATA #If on, text files containing sets of different yield data will be written.
+#OPT += -DWRITE_YIELD_DATA #If on, text files containing sets of different yield data will be written.
 endif #ifeq (DETAILED_METALS_AND_MASS_RETURN,$(findstring DETAILED_METALS_AND_MASS_RETURN,$(OPT)))
 
 
