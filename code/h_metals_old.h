@@ -1,7 +1,7 @@
-//NOTE: This header file was written by process_binaryc_outputs.py on 12/10/2023:
+//NOTE: This header file was written by the binary_c yields generator on 30/05/2023:
 
 #ifdef DETAILED_METALS_AND_MASS_RETURN                
-    #define NUM_METAL_CHANNELS 3 //[SN-II group][SN-Ia group][Wind group]                
+    #define NUM_METAL_CHANNELS 3 //[SNe-II][SNe-Ia][AGBs]                
 #ifdef INDIVIDUAL_ELEMENTS                
 #ifndef MAINELEMENTS                
 #ifdef BINARYC                
