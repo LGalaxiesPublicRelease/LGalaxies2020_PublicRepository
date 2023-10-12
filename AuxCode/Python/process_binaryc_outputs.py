@@ -103,7 +103,7 @@ switches_dict = {
 ##############
 basedir = '../../'
 #basedir = r'C:\Users\ry22aas\robyates\Astro\L-Galaxies\LGalaxies2020_code_git\\'
-ensembledir = basedir+'YieldTables/binary_c_yields/ensembles/'
+ensembledir = basedir+'YieldTables/binary_c_yields/default/ensembles/'
 
 
 ##########
