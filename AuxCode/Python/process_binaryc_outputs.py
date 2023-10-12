@@ -14,7 +14,6 @@ import json
 import pandas as pd
 import numpy as np
 # from collections import OrderedDict, Counter
-from ensemble_functions.ensemble_functions import inflate_ensemble_with_lists, find_columnames_recursively
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from datetime import datetime
@@ -25,25 +24,18 @@ import filecmp
 #Local packages:
 import sys
 sys.path.append('./Robs_python_routines/')
-#sys.path.append(r'C:\Users\ry22aas\robyates\Astro\L-Galaxies\LGalaxies2020_code_git\AuxCode\Python\Robs_python_routines\\')
+from ensemble_functions import inflate_ensemble_with_lists, find_columnames_recursively
 
 
 ##########
 # Switches:
 ##########
-CONVERT_DATA_TO_LINEAR_TIME_BINS = 0 #Turn off when generating yields for input into L-Galaxies (the log-to-linear conversion is done there).
-CONVERT_DATA_TO_PER_SOLARMASS = 0 #TURN OFF ALWAYS. IT'S NOT NEEDED! Apparently, this is already done before the raw binary_c yields are tabulated.
 CORRECT_SN_RATE_UNITS = 1 #If on, SN "rates" from the binary_c ensemble files will be corrected from a SN number to a SN rate per logt, using the log timestep width from the file (i.e. bc_logdt, calculated below).
 SINGLE_STARS = 0 #If on, the single star stellar populations from binary_c will be loaded, rather than the binary star ones. (30-05-23)
 RESCALED_SINGLE_STAR_POP = 0 #If on, the "single star" ensembles providing only the single star component of a mixed ensemble are loaded (good to assess impact of binaries in a given population). If off, the 100% single-star ensembles are loaded (good for comp to e.g. oldYields). ****Only valid if SINGLE_STARS is onD****
 READ_SIM_INFO = 0 #Only works if ORIGINAL_ENSEMBLES is off. If on, the sim_info_file will be read and some key meta data printed. (N.B> This info file is not available for the older binary_c ensembles).
-IMF = 'kroupa2001' #Only works if ORIGINAL_ENSEMBLES is off. Choose from: 'kroupa2001', 'chabrier2003' #Only relevant for single-star SPs, as binary-star SPs only come for one IMF option (old SPs: 'kroupa2001', new SPs: 'chabrier2003')
-SN_IA_CHAND_COAL_FACTOR = 1. #10000. #This is the fudge factor used to arbitrarily increase the number of (and yield from) DD-scenario SNe-Ia (i.e. SN_IA_CHAND_coal) in order to match that predicted by Claeys+14 using an older version of binary_c. (07-07-23)
 WRITE_BINARYC_YIELDS = 0
-WRITE_SN_RATES = 0
 WRITE_HEADER_FILE = 0 #If on, this script will generate a new h_metals.h file for L-Galaxies, which includes (a) the correct number of chemical elements to consider, and (b) their order.
-AL26 = 0 #If on, calcium will be replaced by Al26 when extracting yields/metals/amsses from the binary_c ensemble files.
-NEW_LINE_PER_ELEMENT = 0 #Turn off when generating yields for input into L-Galaxies (they may not be read-in correctly otherwise).
 ROBS_PLOT_LAYOUT = 1 #If on, my style of plots (times new roman font, etc) is used. If off, David's is used.
 PLOT_BINARYC_YIELDS = 1
 PLOT_ONE_ELEMENT = 1 #If on, the normalised mass ejection rate for just one chemical element (given by ele_to_plot) will be plotted from the binary_c yields. If off, the sum of all the metal elements is plotted. (25-08-23)
@@ -61,19 +53,12 @@ READ_SQL_FILE = 0
 PLOT_UNPROCESSED_COMP = 0 #If on, plots of the assumed unprocessed component of an SPs elected metals are made. (This is the metal mass subtracted from the stars in L-GALAXIES).
 
 switches_dict = {
-    'CONVERT_DATA_TO_LINEAR_TIME_BINS'  : CONVERT_DATA_TO_LINEAR_TIME_BINS,
-    'CONVERT_DATA_TO_PER_SOLARMASS' : CONVERT_DATA_TO_PER_SOLARMASS,
     'CORRECT_SN_RATE_UNITS' : CORRECT_SN_RATE_UNITS,
     'SINGLE_STARS' : SINGLE_STARS,
     'RESCALED_SINGLE_STAR_POP' : RESCALED_SINGLE_STAR_POP,
     'READ_SIM_INFO' : READ_SIM_INFO,
-    'IMF' : IMF,
-    'SN_IA_CHAND_COAL_FACTOR' : SN_IA_CHAND_COAL_FACTOR,
     'WRITE_BINARYC_YIELDS' : WRITE_BINARYC_YIELDS,
-    'WRITE_SN_RATES' : WRITE_SN_RATES,
     'WRITE_HEADER_FILE' : WRITE_HEADER_FILE,
-    'AL26' : AL26,
-    'NEW_LINE_PER_ELEMENT'  : NEW_LINE_PER_ELEMENT,
     'ROBS_PLOT_LAYOUT'  : ROBS_PLOT_LAYOUT,
     'PLOT_BINARYC_YIELDS' : PLOT_BINARYC_YIELDS,
     'PLOT_ONE_ELEMENT' : PLOT_ONE_ELEMENT,
@@ -96,8 +81,8 @@ switches_dict = {
 # DIRECTORIES:
 ##############
 basedir = '../../'
-#basedir = r'C:\Users\ry22aas\robyates\Astro\L-Galaxies\LGalaxies2020_code_git\\'
-ensembledir = basedir+'YieldTables/binary_c_yields/default/ensembles/'
+ensembledir = basedir+'YieldTables/binary_c_yields/default/ensembles/' #Where the binary_c ensembles to be processed will be read from
+outputdir = basedir+'YieldTables/binary_c_yields/new/' #Where the yield tables for L-Galaxies will be written to
 
 
 ##########
@@ -106,11 +91,13 @@ ensembledir = basedir+'YieldTables/binary_c_yields/default/ensembles/'
 ensemble_file_metallicities = np.array([0.0001,0.001,0.004,0.008,0.01,0.03])
 if SINGLE_STARS == 1 :
     ensembledir = ensembledir+'singleStars/'
+    outputdir = outputdir+'singleStars/'
     ensemble_file_codes = ['319d1c05','bcc22d43','da1bfc0c','4fb2a217','b3e037d4','1e923d7c']
     bcYields_tag = 'binaryc_origEnsembles_singleStars_kroupa2001' #can lose these tags, and be cleverer about how we call files below.
     bcYields_tag2 = 'binaryc_origEnsembles_binaryStars_kroupa2001'
 else : #binary stars      
     ensembledir = ensembledir+'binaryStars/'
+    outputdir = outputdir+'singleStars/'
     ensemble_file_codes = ['6d984eac','dab8bea4','3083cc1f','47cd834d','d723bdf4','a28ea3be']
     bcYields_tag = 'binaryc_origEnsembles_binaryStars_kroupa2001'
     bcYields_tag2 = 'binaryc_origEnsembles_singleStars_kroupa2001'
@@ -170,30 +157,57 @@ for zz in range(0,len(ensemble_file_metallicities)) :
     print("Mmax (Msun) = "+str(meta_data['settings']['population_settings']['custom_options']['mmax']))
     print("\n")
 
+    # Inflate yield data to lists, fetch column names, and load into a pandas dataframe:
     yield_data = ensemble_data['Xyield']
+    data_list = inflate_ensemble_with_lists(yield_data)
+    data_array = np.array(data_list).T
+    columnames = find_columnames_recursively(yield_data)
+    columnames = columnames + ['yield_per_solarmass'] 
+    df = pd.DataFrame(data_array, columns=columnames)
+    df = df.astype({"time": float, "yield_per_solarmass": float}) #Make sure we set the correct type in the columns
+    
     sn_data = ensemble_data['scalars']
     sn_rates = {}
 
-    # First I inflate it to a list of lists
-    data_list = inflate_ensemble_with_lists(yield_data)
-    
-    # Load it as an array and rotate
-    data_array = np.array(data_list).T
-    
-    # I fetch the names of the columns like so:
-    columnames = find_columnames_recursively(yield_data)
-    
-    # Which I update with a final column name
-    columnames = columnames + ['yield_per_solarmass'] 
-    
-    # Then I load it into a dataframe
-    df = pd.DataFrame(data_array, columns=columnames)
-    
-    # Make sure we set the correct type in the columns
-    # (because we turn the list into an array and transpose it, the whole array is filled with strings rather than a mix of both)
-    df = df.astype({"time": float, "yield_per_solarmass": float})
-    
-    
+
+##############
+#WRITE YIELDS:
+##############
+    df_blank = df.groupby(by='time')['yield_per_solarmass'].sum()*0.0   
+    for group in selec_channel_types :
+        source_df = df[df['source'].isin(selec_channels[group])]
+        sn_avail = []
+        for sn_channel in sn_channels[group] :
+            try :
+                sn_avail.append([i for i in sn_data.keys() if sn_channel == i][0])
+            except :
+                print("SN channel not found")
+
+        #(a) element yields for each channel (AGB, SNe-II, SNe_Ia):
+        for element in elements : 
+            ele = (source_df["isotope"].str.contains(element)) \
+                & (((source_df["isotope"].str.replace(element,'')).str.isnumeric()) | (source_df["isotope"].str.replace(element,'') == '')) #Selects entries where the isotope name contains only the given element name (e.g. H, He, etc) plus numbers, or contains only the given isotope name (e.g. Al26, H34, etc).
+            element_df = source_df[ele]
+            grouped_by_time = element_df.groupby(by='time')['yield_per_solarmass'].sum()           
+            the_yield_array = np.nan_to_num(np.array(df_blank+grouped_by_time))
+            the_yield_list = list(np.array(the_yield_array, dtype=str))
+            if (element == elements[0]) : 
+                writemode = 'w'
+                tot_ej_masses_array = the_yield_array
+            else : 
+                writemode = 'a'
+                tot_ej_masses_array += the_yield_array
+                if (element == elements[2]) :
+                    tot_metal_masses_array = the_yield_array              
+                elif (element != elements[1]) :
+                    tot_metal_masses_array += the_yield_array                        
+            with open(bc_yieldsdir+bc_yieldsfile+'_'+group+'_'+'Z'+bc_metallicity+'_'+'Yields'+mark+'.txt', writemode) as f:
+                f.write(' '.join(the_yield_list)+' ')
+                
+                
+                
+                
+                
 
 
 
@@ -247,35 +261,6 @@ if LOAD_DATA == 1 :
     print("\n#################")
     print("BINARY_C")
     print("#################\n")
-
-    
-        
-        # print(ensemble_data.keys())
-        yield_data = ensemble_data['Xyield']
-        if (WRITE_SN_RATES) | (PLOT_BINARYC_YIELDS) :
-            sn_data = ensemble_data['scalars']
-            sn_rates = {}
-            # print([i for i in sn_data.keys() if i == 'SN_IIa']) #Check if a certain SN type is in the ensemble.
-            # print([i for i in sn_data.keys() if 'IIa' in i]) #Check if a certain SN type is in the ensemble.
-    
-        # First I inflate it to a list of lists
-        data_list = inflate_ensemble_with_lists(yield_data)
-        
-        # Load it as an array and rotate
-        data_array = np.array(data_list).T
-        
-        # I fetch the names of the columns like so:
-        columnames = find_columnames_recursively(yield_data)
-        
-        # Which I update with a final column name
-        columnames = columnames + ['yield_per_solarmass'] 
-        
-        # Then I load it into a dataframe
-        df = pd.DataFrame(data_array, columns=columnames)
-        
-        # Make sure we set the correct type in the columns
-        # (because we turn the list into an array and transpose it, the whole array is filled with strings rather than a mix of both)
-        df = df.astype({"time": float, "yield_per_solarmass": float})
 
     
     #########################################################
