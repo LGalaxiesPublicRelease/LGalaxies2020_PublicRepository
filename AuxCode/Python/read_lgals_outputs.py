@@ -14,6 +14,8 @@ read_lgals_outputs.py
   ;Rob Yates 04-11-2021
   ;
   ;08-11-22: This version was adapted for use at the L-Galaxies workshop 2022
+  ;17-10-23: This script has been modified to read the L-Galaxy output structures 
+  ;          stored in the same directory as this script (i.e. ./AuxCode/Python/)
   ;
 """
 
@@ -27,8 +29,8 @@ from astropy.io import fits
 import procedures
 reload (procedures)
 from procedures import read_snap, read_tree
-import sys
-sys.path.append('../awk/output/python/')
+# import sys
+# sys.path.append('../awk/output/python/')
 
 
 
