@@ -702,7 +702,7 @@ def plot_timescales(Samp1, struct1, redshift, xprop='OH', \
     
 #################
 def plot_smf(Hubble_h, Samp1, redshift, Add_Edd_bias=None) :  
-    pdf = PdfPages(PaperPlotDir+"smf"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
+    pdf = PdfPages(PlotDir+"smf"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
     
     xlimits = np.array([8.0,12.0])
     ylimits = np.array([-5.9,-0.5])
@@ -739,8 +739,6 @@ def plot_smf(Hubble_h, Samp1, redshift, Add_Edd_bias=None) :
                  linewidth=defaultLinewidth, color=model1avecol, label=Samp1['Label'])   
    
     #Labels:
-    robs_plot_text(ax, [r'MM+\textsc{binary\_c}', r'MM+singleStars', r'Observations'], hpos='left', vpos='bottom', \
-                   colour=[model1avecol, model2col, obscol])
     robs_plot_text(ax, r'a)', hpos='right', vpos='top')
     
     pdf.savefig(bbox_inches='tight')     
@@ -750,7 +748,7 @@ def plot_smf(Hubble_h, Samp1, redshift, Add_Edd_bias=None) :
 #################
 #Plot HI mass function (HIMF):
 def plot_himf(Hubble_h, Samp1, struct1, redshift, prop="ColdGas") :  
-    pdf = PdfPages(PaperPlotDir+"himf"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
+    pdf = PdfPages(PlotDir+"himf"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
     if prop == "H" :
         El1 = robs_element_list_finder(struct1)
     xlimits = np.array([7.0,11.0])
@@ -801,7 +799,7 @@ def plot_himf(Hubble_h, Samp1, struct1, redshift, prop="ColdGas") :
 #################
 #Plot M* - sSFR relation:
 def plot_mssfr(Hubble_h, Samp1, redshift, contourLines=None) :  
-    pdf = PdfPages(PaperPlotDir+"mstar-ssfr"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
+    pdf = PdfPages(PlotDir+"mstar-ssfr"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
     
     if Samp1["MRII_gals"] > 0 :
         xlimits = np.array([8.5,12.0])
@@ -836,7 +834,7 @@ def plot_mssfr(Hubble_h, Samp1, redshift, contourLines=None) :
 
 #################
 def plot_snrates(Samp1, redshift) :     
-    pdf = PdfPages(PaperPlotDir+"sSFR-SNRates"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
+    pdf = PdfPages(PlotDir+"sSFR-SNRates"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
     xlimits = np.array([-13.0,-9.0])
     xticks = [-13.0,-12.0,-11.0,-10.0,-9.0]
     ylimits = np.array([[-4.5,3.0],[-5.5,1.5]])
@@ -889,7 +887,7 @@ def plot_snrates(Samp1, redshift) :
 #Plot M* - Zg relation: 12+log(O/H), rings-based, SFR weighted:
 def plot_mzgr(Hubble_h, Samp1, struct1, redshift, dustCorrec=None, \
               contourLines=None, plotAve=None, plotRedshift=None) :     
-    pdf = PdfPages(PaperPlotDir+"mzgr"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")   
+    pdf = PdfPages(PlotDir+"mzgr"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")   
     El1 = robs_element_list_finder(struct1)
     
     if Samp1["MRII_gals"] > 0 :
@@ -954,7 +952,7 @@ def plot_mzgr(Hubble_h, Samp1, struct1, redshift, dustCorrec=None, \
 #Plot M* - Zs relation: Z*/Zsun, rings-based, mass weighted, within 3 arcsec (i.e. first 7 rings, for z=0.037):
 def plot_mzsr(Hubble_h, Omega_M, Omega_Lambda, Samp1, redshift, \
               SolarNorm="A09_bulk", ApertureCorrec=None, contourLines=None) :  
-    pdf = PdfPages(PaperPlotDir+"mzsr"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
+    pdf = PdfPages(PlotDir+"mzsr"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
     SolarAbunds = robs_solarnorm_finder(SolarNorm)
     #N.B. SolarNorm default is "A09_bulk" to match the observations that are plotted for comparison in Yates+23.
 
@@ -1035,3 +1033,303 @@ def plot_mzsr(Hubble_h, Omega_M, Omega_Lambda, Samp1, redshift, \
     
     pdf.savefig(bbox_inches='tight')     
     pdf.close() 
+    
+
+#################
+#Plot DTM, DTG, and Mdust versus 12+log(O/H) or [M/H] or M*:
+def plot_dust_scaling_relations(Hubble_h, Samp1, struct1, redshift, props='All', xprop='OH', \
+                                SolarNorm='A09', levels='3sig', contourOnly=None, contourLines=None, \
+                                SFRWeighted=None, incHotDust=None, outlierFrac=defaultOutlierFrac, SFing_only=None) :  
+    pdf = PdfPages(PlotDir+xprop+'_vs_'+"dust"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
+    if props == 'All' :
+        props=['DTM','DTG','Mdust']
+    SolarAbunds = robs_solarnorm_finder(SolarNorm)
+    El1 = robs_element_list_finder(struct1)
+  
+    if contourLines is None :
+        ls1 = 'solid'
+    else :
+        ls1 = contourLines
+    
+    #Set-up panels:
+    figsizescale = 5.
+    plt.figure(figsize=(5,len(props)*figsizescale))
+    if xprop == 'OH' :
+        xlimits = np.array([6.0,9.6])
+        xlabel = r'12+log(O/H)'
+        xticks = [6.0,7.0,8.0,9.0]
+    elif xprop == 'stellarMass' :
+        xlimits = np.array([8.0,12.0]) 
+        xlabel = r'log$(M_{*} / \textnormal{M}_{\odot})$'
+        xticks = [8.0,9.0,10.0,11.0]
+    elif xprop == 'MH' :
+        xlimits = np.array([-3.0,1.0])
+        xlabel = r'[M/H]$_{\rm tot}$'
+        xticks = [-3.,-2.,-1.,0.,1.]
+    binno = 40
+    minInBin = 50
+    rowno = len(props)
+    colno = 1
+    numPanels = rowno*colno
+    xlabs = np.full(colno,xlabel)
+    xlims = np.full((colno,len(xlimits)),xlimits)
+    ylims = np.full((rowno,len(xlimits)),-99.)
+    yticks = [None]*rowno
+    ylabs = ['y']*rowno
+    
+    #Calc x-axis values:
+    if xprop == 'OH' :
+        if SFRWeighted :
+            SFRmax = np.max(Samp1['G_samp']['SfrRings'], axis=1) #Max SFR from all rings, for every galaxy
+            SFRfrac = Samp1['G_samp']['SfrRings']/SFRmax[:,None] #Fraction of max SFR in each ring, for every galaxy
+            SFRtot = np.nansum(SFRfrac, axis=1) #Sum of the SFR fractions from all rings, for evey galaxy. (Minimum must be 1.0)   
+            H_rings = Samp1['G_samp']['ColdGasCloudsRings_elements'][:,:,El1["H_NUM"]] + Samp1['G_samp']['ColdGasDiffRings_elements'][:,:,El1["H_NUM"]] \
+                    - Samp1['G_samp']['DustColdGasCloudsRings_elements'][:,:,El1["H_NUM"]] - Samp1['G_samp']['DustColdGasDiffRings_elements'][:,:,El1["H_NUM"]]
+            O_rings = Samp1['G_samp']['ColdGasCloudsRings_elements'][:,:,El1["O_NUM"]] + Samp1['G_samp']['ColdGasDiffRings_elements'][:,:,El1["O_NUM"]] \
+                    - Samp1['G_samp']['DustColdGasCloudsRings_elements'][:,:,El1["O_NUM"]] - Samp1['G_samp']['DustColdGasDiffRings_elements'][:,:,El1["O_NUM"]]
+            Zg_rings = (O_rings / H_rings) * (H_aw/O_aw) * SFRfrac
+            Zg_tot = np.nansum(Zg_rings, axis=1)
+            Zg = 12. + np.log10(Zg_tot / SFRtot)
+            theX1 = Zg
+        else :
+            MH_gas = Samp1['G_samp']['ColdGasClouds_elements'][:,El1["H_NUM"]] + Samp1['G_samp']['ColdGasDiff_elements'][:,El1["H_NUM"]] \
+                    - Samp1['G_samp']['DustColdGasClouds_elements'][:,El1["H_NUM"]] - Samp1['G_samp']['DustColdGasDiff_elements'][:,El1["H_NUM"]]
+            MO_gas = Samp1['G_samp']['ColdGasClouds_elements'][:,El1["O_NUM"]] + Samp1['G_samp']['ColdGasDiff_elements'][:,El1["O_NUM"]] \
+                   - Samp1['G_samp']['DustColdGasClouds_elements'][:,El1["O_NUM"]] - Samp1['G_samp']['DustColdGasDiff_elements'][:,El1["O_NUM"]]
+            theX1 = 12. + np.log10((MO_gas/MH_gas) * (H_aw/O_aw))
+    elif xprop == 'stellarMass' :
+        theX1 = np.log10(Samp1['G_samp']['StellarMass'])
+    elif xprop == 'MH' :
+        H_mass = Samp1['G_samp']['ColdGas_elements'][:,El1["H_NUM"]]
+        Met_mass = np.nansum(Samp1['G_samp']['MetalsColdGas'], axis=1)
+        theX1 = np.log10(Met_mass/H_mass) - np.log10(SolarAbunds['ZH_mf_sun'])
+    theY1 = np.full((rowno,Samp1["NumGals"]),-99.)
+    theWeights1 = 1./Samp1['Volumes']
+    
+    #Calc y-axis values:
+    if incHotDust :
+        TotMdust1 = np.nansum(Samp1['G_samp']['DustColdGasClouds_elements'], axis=1) + np.nansum(Samp1['G_samp']['DustColdGasDiff_elements'], axis=1) \
+                  + np.nansum(Samp1['G_samp']['DustHotGas_elements'], axis=1) + np.nansum(Samp1['G_samp']['DustEjectedMass_elements'], axis=1)
+    else :
+        TotMdust1 = np.nansum(Samp1['G_samp']['DustColdGasClouds_elements'], axis=1) + np.nansum(Samp1['G_samp']['DustColdGasDiff_elements'], axis=1)
+    for ii in range(len(props)) :
+        if props[ii] == 'DTM' :
+            ylims[ii] = np.array([-3.4,0.8])
+            yticks[ii] = [-3.0,-2.0,-1.0,0.0]
+            ylabs[ii] = r'log$(M_{\rm dust} / M_{\rm metal,tot})$'
+            TotMmetal1 = np.nansum(Samp1['G_samp']['MetalsColdGas'], axis=1)
+            theY1[ii] = np.log10(TotMdust1/TotMmetal1)
+            if Samp2 :
+                TotMmetal2 = np.nansum(Samp2['G_samp']['MetalsColdGas'], axis=1)
+                theY2[ii] = np.log10(TotMdust2/TotMmetal2)
+        elif props[ii] == 'DTG' :
+            ylims[ii] = np.array([-5.9,-0.5])
+            yticks[ii] = [-5.0,-4.0,-3.0,-2.0,-1.0]
+            ylabs[ii] = r'log$(M_{\rm dust} /M_{\rm HI+H2})$'
+            H_mass1 = Samp1['G_samp']['ColdGas_elements'][:,El1["H_NUM"]]
+            theY1[ii] = np.log10(TotMdust1/H_mass1)
+            if Samp2 :
+                H_mass2 = Samp2['G_samp']['ColdGas_elements'][:,El2["H_NUM"]]
+                theY2[ii] = np.log10(TotMdust2/H_mass2)
+        elif props[ii] == 'Mdust' :
+            ylims[ii] = np.array([1.5,9.5])
+            yticks[ii] = [2,3,4,5,6,7,8,9]
+            ylabs[ii] = r'log$(M_{\rm dust} / \textnormal{M}_{\odot})$'
+            theY1[ii] = np.log10(TotMdust1)
+            if Samp2 :
+                theY2[ii] = np.log10(TotMdust2)
+        
+    for kk in range(numPanels) :
+        panel = robs_plot_panels(kk, rows=rowno, columns=colno, xlimits=xlims, ylimits=ylims, \
+                                 xlab=xlabs, ylab=ylabs, xticks=xticks, yticks=yticks, SecondXAxis=None)
+        # Clean model samples:
+        if SFing_only :
+            tH_z0 = ((1./(100.*Hubble_h))*3.086e+19)*3.17098e-8 #Hubble time at z=0 [in years]
+            w_clean1 = np.where((np.isfinite(theX1)) & (~np.isnan(theX1)) & \
+                              (np.isfinite(theY1[kk])) & (~np.isnan(theY1[kk])) & \
+                              (np.isfinite(theWeights1)) & (~np.isnan(theWeights1)) & \
+                              (Samp1['G_samp']['Sfr']/Samp1['G_samp']['StellarMass'] >= ((2.*(1.+robs_redshift_from_snapnum(Samp1['Simulation'], Samp1['Cosmology'], Samp1['G_samp']['SnapNum']))**2)/tH_z0)/10.))
+            theX1_clean = theX1[w_clean1[0]]
+            theY1_clean = theY1[kk][w_clean1[0]]
+            theWeights1_clean = theWeights1[w_clean1[0]]
+        else :
+            w_clean1 = np.where((np.isfinite(theX1)) & (~np.isnan(theX1)) & \
+                              (np.isfinite(theY1[kk])) & (~np.isnan(theY1[kk])) & \
+                              (np.isfinite(theWeights1)) & (~np.isnan(theWeights1)))
+            theX1_clean = theX1[w_clean1[0]]
+            theY1_clean = theY1[kk][w_clean1[0]]
+            theWeights1_clean = theWeights1[w_clean1[0]]  
+        
+        # Plot models:
+        robs_contour_plot(theX1_clean, theY1_clean, binno, levels=levels, noOutliers=0, fill=1, alpha=1.0, theRange=[xlimits,ylims[kk]], \
+                          linestyle=ls1, colour=model1col, outlierFrac=outlierFrac, weights=theWeights1_clean)
+        if not contourOnly :
+            robs_plot_average(theX1_clean, theY1_clean, binno=binno, aveType='Median', minInBin=minInBin, linewidth=defaultLinewidth*scaleFactor, \
+                              noShade=0, colour=model1col, inputCentres=1, weights=theWeights1_clean, zorder=10)      
+    
+        #Labels:
+        if kk == 0 :
+            robs_plot_text(panel, r'z = '+char_z_low, vpos='top', hpos='left')
+    
+    pdf.savefig(bbox_inches='tight')     
+    pdf.close()  
+    
+
+#################
+#Plot various dust scaling relations back to high redshift:
+def plot_dust_scaling_relations_evo(Hubble_h, FullRedshiftList, FullSnapnumList_MRI, FullSnapnumList_MRII, RedshiftsToRead, Samp1, struct1, \
+                                    props='All', xprop='OH', SolarNorm='A09', aveOnly=None, contourOnly=None, incHotDust=None, SFRWeighted=None) :  
+    pdf = PdfPages(PaperPlotDir+xprop+'_vs_'+"dust_evo"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+Samp1['z_lower']+"-"+Samp1['z_upper']+".pdf")    
+    El1 = robs_element_list_finder(struct1)
+
+    #Set-up panels:
+    if props == 'All' :
+        props = ['DTM','DTG','Mdust','ColdGas','OH','sSFR']
+    rowno = len(props)
+    colno = len(RedshiftsToRead)
+    figsizescale = 3.
+    plt.figure(figsize=(4*figsizescale,len(props)*figsizescale)) #plt.figure(figsize=(12,len(props)*figsizescale)) #plt.figure(figsize=(12,12))
+    binno = 50
+    thelinewidth = defaultLinewidth
+    minInBin = 20
+    numPanels = rowno*colno
+    if xprop == 'OH' :
+        xlimits = np.array([6.0,9.6])
+        xlabel = r'12+log(O/H)'
+        xticks = [6.0,7.0,8.0,9.0]
+    elif xprop == 'stellarMass' :
+        xlimits = np.array([8.0,12.0]) 
+        xlabel = r'log$(M_{*} / \textnormal{M}_{\odot})$'
+        xticks = [8.0,9.0,10.0,11.0]
+    xlabs = np.full(colno,xlabel)
+    xlims = np.full((colno,len(xlimits)),xlimits)
+    
+    #Set-up arrays:
+    ylabs = ['y']*rowno
+    ylims = np.full((rowno,len(xlimits)),-99.)
+    yticks = [None]*rowno
+    if xprop == 'OH' :
+        if SFRWeighted :
+            SFRmax = np.max(Samp1['G_samp']['SfrRings'], axis=1) #Max SFR from all rings, for every galaxy
+            SFRfrac = Samp1['G_samp']['SfrRings']/SFRmax[:,None] #Fraction of max SFR in each ring, for every galaxy
+            SFRtot = np.nansum(SFRfrac, axis=1) #Sum of the SFR fractions from all rings, for evey galaxy. (Minimum must be 1.0)   
+            H_rings = Samp1['G_samp']['ColdGasCloudsRings_elements'][:,:,El1["H_NUM"]] + Samp1['G_samp']['ColdGasDiffRings_elements'][:,:,El1["H_NUM"]] \
+                    - Samp1['G_samp']['DustColdGasCloudsRings_elements'][:,:,El1["H_NUM"]] - Samp1['G_samp']['DustColdGasDiffRings_elements'][:,:,El1["H_NUM"]]
+            O_rings = Samp1['G_samp']['ColdGasCloudsRings_elements'][:,:,El1["O_NUM"]] + Samp1['G_samp']['ColdGasDiffRings_elements'][:,:,El1["O_NUM"]] \
+                    - Samp1['G_samp']['DustColdGasCloudsRings_elements'][:,:,El1["O_NUM"]] - Samp1['G_samp']['DustColdGasDiffRings_elements'][:,:,El1["O_NUM"]]
+            Zg_rings = (O_rings / H_rings) * (H_aw/O_aw) * SFRfrac
+            Zg_tot = np.nansum(Zg_rings, axis=1)
+            Zg = 12. + np.log10(Zg_tot / SFRtot)
+            theX1 = Zg
+        else :
+            MH_gas = Samp1['G_samp']['ColdGasClouds_elements'][:,El1["H_NUM"]] + Samp1['G_samp']['ColdGasDiff_elements'][:,El1["H_NUM"]] \
+                    - Samp1['G_samp']['DustColdGasClouds_elements'][:,El1["H_NUM"]] - Samp1['G_samp']['DustColdGasDiff_elements'][:,El1["H_NUM"]]
+            MO_gas = Samp1['G_samp']['ColdGasClouds_elements'][:,El1["O_NUM"]] + Samp1['G_samp']['ColdGasDiff_elements'][:,El1["O_NUM"]] \
+                   - Samp1['G_samp']['DustColdGasClouds_elements'][:,El1["O_NUM"]] - Samp1['G_samp']['DustColdGasDiff_elements'][:,El1["O_NUM"]]
+            theX1 = 12. + np.log10((MO_gas/MH_gas) * (H_aw/O_aw))
+    elif xprop == 'stellarMass' :
+        theX1 = np.log10(Samp1['G_samp']['StellarMass'])
+    theY1 = np.full((rowno,Samp1["NumGals"]),-99.)
+    theWeights1 = 1./Samp1['Volumes']
+    
+    #Get y-axis values:
+    if incHotDust :
+        TotMdust1 = np.nansum(Samp1['G_samp']['DustColdGasClouds_elements'], axis=1) + np.nansum(Samp1['G_samp']['DustColdGasDiff_elements'], axis=1) \
+                  + np.nansum(Samp1['G_samp']['DustHotGas_elements'], axis=1) + np.nansum(Samp1['G_samp']['DustEjectedMass_elements'], axis=1)
+    else :
+        TotMdust1 = np.nansum(Samp1['G_samp']['DustColdGasClouds_elements'], axis=1) + np.nansum(Samp1['G_samp']['DustColdGasDiff_elements'], axis=1)
+    for ii in range(len(props)) :
+        if props[ii] == 'DTM' :
+            ylims[ii] = np.array([-3.4,0.8])
+            yticks[ii] = [-3.0,-2.0,-1.0,0.0]
+            ylabs[ii] = r'log$(M_{\rm dust} / M_{\rm metal,tot})$'
+            TotMmetal1 = np.nansum(Samp1['G_samp']['MetalsColdGas'], axis=1)
+            theY1[ii] = np.log10(TotMdust1/TotMmetal1)
+        elif props[ii] == 'DTG' : 
+            ylims[ii] = np.array([-6.4,0.4])
+            yticks[ii] = [-6.0,-5.0,-4.0,-3.0,-2.0,-1.0,0.0]
+            ylabs[ii] = r'log$(M_{\rm dust} /M_{\rm HI+H2})$'
+            H_mass1 = Samp1['G_samp']['ColdGas_elements'][:,El1["H_NUM"]]
+            theY1[ii] = np.log10(TotMdust1/H_mass1)
+        elif props[ii] == 'Mdust' :
+            ylims[ii] = np.array([1.5,9.9])
+            yticks[ii] = [2,3,4,5,6,7,8,9]
+            ylabs[ii] = r'log$(M_{\rm dust} / \textnormal{M}_{\odot})$'
+            theY1[ii] = np.log10(TotMdust1)
+        elif props[ii] == 'ColdGas' :
+            ylims[ii] = np.array([1.8,12.4])
+            yticks[ii] = [2,3,4,5,6,7,8,9,10,11,12]
+            ylabs[ii] = r'log$(M_{\rm cold} / \textnormal{M}_{\odot})$'
+            theY1[ii] = np.log10(Samp1['G_samp']['ColdGas'])
+        elif props[ii] == 'OH' :
+            ylims[ii] = np.array([6.0,9.6])
+            yticks[ii] = [6.0,7.0,8.0,9.0]
+            ylabs[ii] = r'12+log(O/H)'
+            if SFRWeighted :
+                SFRmax = np.max(Samp1['G_samp']['SfrRings'], axis=1) #Max SFR from all rings, for every galaxy
+                SFRfrac = Samp1['G_samp']['SfrRings']/SFRmax[:,None] #Fraction of max SFR in each ring, for every galaxy
+                SFRtot = np.nansum(SFRfrac, axis=1) #Sum of the SFR fractions from all rings, for evey galaxy. (Minimum must be 1.0)   
+                H_rings = Samp1['G_samp']['ColdGasCloudsRings_elements'][:,:,El1["H_NUM"]] + Samp1['G_samp']['ColdGasDiffRings_elements'][:,:,El1["H_NUM"]] \
+                        - Samp1['G_samp']['DustColdGasCloudsRings_elements'][:,:,El1["H_NUM"]] - Samp1['G_samp']['DustColdGasDiffRings_elements'][:,:,El1["H_NUM"]]
+                O_rings = Samp1['G_samp']['ColdGasCloudsRings_elements'][:,:,El1["O_NUM"]] + Samp1['G_samp']['ColdGasDiffRings_elements'][:,:,El1["O_NUM"]] \
+                        - Samp1['G_samp']['DustColdGasCloudsRings_elements'][:,:,El1["O_NUM"]] - Samp1['G_samp']['DustColdGasDiffRings_elements'][:,:,El1["O_NUM"]]
+                Zg_rings = (O_rings / H_rings) * (H_aw/O_aw) * SFRfrac
+                Zg_tot = np.nansum(Zg_rings, axis=1)
+                theY1[ii] = 12. + np.log10(Zg_tot / SFRtot)
+            else :
+                MH_gas = Samp1['G_samp']['ColdGasClouds_elements'][:,El1["H_NUM"]] + Samp1['G_samp']['ColdGasDiff_elements'][:,El1["H_NUM"]] \
+                        - Samp1['G_samp']['DustColdGasClouds_elements'][:,El1["H_NUM"]] - Samp1['G_samp']['DustColdGasDiff_elements'][:,El1["H_NUM"]]
+                MO_gas = Samp1['G_samp']['ColdGasClouds_elements'][:,El1["O_NUM"]] + Samp1['G_samp']['ColdGasDiff_elements'][:,El1["O_NUM"]] \
+                       - Samp1['G_samp']['DustColdGasClouds_elements'][:,El1["O_NUM"]] - Samp1['G_samp']['DustColdGasDiff_elements'][:,El1["O_NUM"]]
+                theY1[ii] = 12. + np.log10((MO_gas/MH_gas) * (H_aw/O_aw))
+        elif props[ii] == 'sSFR' :
+            ylims[ii] = np.array([-15.0,-6.5])
+            yticks[ii] = [-15.,-14.,-13.,-12.,-11.,-10.,-9.,-8.,-7.]
+            ylabs[ii] = r'log$(\textnormal{sSFR} / \textnormal{yr}^{-1})$'
+            theY1[ii] = np.log10(Samp1['G_samp']['Sfr'] / Samp1['G_samp']['StellarMass'])
+                
+    #Plot panels:
+    for kk in range(numPanels) :
+        panel = robs_plot_panels(kk, rows=rowno, columns=colno, xlimits=xlims, ylimits=ylims, \
+                                 xlab=xlabs, ylab=ylabs, xticks=xticks, yticks=yticks, SecondXAxis=None)
+        theRowNum = int(kk/colno)
+        theColNum = kk%colno
+        if (Samp1['MRI_gals'] > 0) & (Samp1['MRII_gals'] > 0) :
+            wz1 = np.where(((Samp1['Volumes'] == Samp1['Volumes'][0]) & (Samp1['G_samp']['SnapNum'] == FullSnapnumList_MRI[theColNum]) & (np.isfinite(theY1[theRowNum])) & (~np.isnan(theY1[theRowNum]))) | \
+                           ((Samp1['Volumes'] == Samp1['Volumes'][Samp1['MRI_gals']]) & (Samp1['G_samp']['SnapNum'] == FullSnapnumList_MRII[theColNum]) & (np.isfinite(theY1[theRowNum])) & (~np.isnan(theY1[theRowNum]))))
+        elif Samp1['Simulation'] == 'Mil-I' :
+            wz1 = np.where((Samp1['G_samp']['SnapNum'] == FullSnapnumList_MRI[theColNum]) & (np.isfinite(theY1[theRowNum])) & (~np.isnan(theY1[theRowNum])))
+        elif Samp1['Simulation'] == 'Mil-II' :
+            wz1 = np.where((Samp1['G_samp']['SnapNum'] == FullSnapnumList_MRII[theColNum]) & (np.isfinite(theY1[theRowNum])) & (~np.isnan(theY1[theRowNum])))
+
+        if aveOnly :
+            robs_plot_average(theX1[wz1], theY1[theRowNum][wz1], binno=binno, aveType='Median', minInBin=minInBin, linewidth=defaultLinewidth*scaleFactor, \
+                              noShade=0, colour=model1col, inputCentres=1, levels='2sig', weights=theWeights1[wz1])#, plotlims=[xlimits,ylims[theRowNum]])
+            
+        else :
+            robs_contour_plot(theX1[wz1], theY1[theRowNum][wz1], binno, levels='4sig', noOutliers=0, fill=1, alpha=0.3, theRange=[xlimits,ylims[theRowNum]], \
+                              colour=model1col, outlierFrac=defaultOutlierFrac, weights=theWeights1[wz1])
+            if not contourOnly :
+                robs_plot_average(theX1[wz1], theY1[theRowNum][wz1], binno=binno, aveType='Median', minInBin=minInBin, linewidth=defaultLinewidth*scaleFactor, \
+                                  noShade=0, colour=model1col, inputCentres=1, levels='2sig', weights=theWeights1[wz1])
+          
+        #Plot SFing cut-off line: N.B. This cut-off seems to work nicely for Mil-I and Mil-II right back to z~10 (19-06-23):
+        if props[theRowNum] == 'sSFR' :
+            tH_z0 = ((1./(100.*Hubble_h))*3.086e+19)*3.17098e-8 #Hubble time at z=0 [in years]
+            logsSFR_cutoff = np.log10((2. * (1. + FullRedshiftList[theColNum])**2/tH_z0)/10.)
+            plt.plot(xlimits, [logsSFR_cutoff,logsSFR_cutoff], '--', linewidth=thelinewidth, color='red') #, label=phase[ii])            
+   
+        #Labels:
+        textPadder = 15. #20.
+        xpadder = (xlimits[1]-xlimits[0])/textPadder
+        ypadder = (ylims[theRowNum][1]-ylims[theRowNum][0])/textPadder
+        if theRowNum == 0 :
+            if xprop == 'OH' :
+                plt.text(xlimits[0]+xpadder, ylims[theRowNum][1]-ypadder, r'z = '+str(FullRedshiftList[theColNum]), horizontalalignment='left', \
+                         verticalalignment='top', color='black') #r'z = '+Samp1['z_lower']
+            elif xprop == 'stellarMass' :
+                plt.text(xlimits[1]-(1.25*xpadder), ylims[theRowNum][0]+ypadder, r'z = '+str(FullRedshiftList[theColNum]), horizontalalignment='right', \
+                         verticalalignment='bottom', color='black')
+        
+    pdf.savefig(bbox_inches='tight')     
+    pdf.close()  

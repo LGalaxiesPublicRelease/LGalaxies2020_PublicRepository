@@ -49,7 +49,7 @@ LOAD_SAMPLE = 1 #If on, a pre-made sample of galaxies is loaded from the pickele
 MASS_CHECKS = 0 #If on (and LOAD_SAMPLE is off), key mass properties will be checked for Nans, negatives, and whether sub-components add up to component masses properly.
 COMBINE_MODELS = 0 #If on, MR-I and MR-II versions of the same model are combined (if the other version has a .npy sample already saved).
 STELLAR_MASS_CUT = 1 #If on, only galaxies above the mass resolution thresholds of log(M*/Msun) >= 8.0 for Millennium-I and log(M*/Msun) >= 7.0 for Millennium-II will be selected.
-CALC_RINGS_AND_SFH_INFO = 0 #If on, ring centre radii, Re, etc & SFH info will be calculated and added to the sample dictionaries
+CALC_SFH_INFO = 0 #If on, SFH info will be calculated and added to the sample dictionaries
 GENERAL_PLOTS = 1 #If on, general plots are produced, such as the SMF, MZR, etc.
 PAPER_PLOTS = 0 #If on, the plots presented in Yates+23 are produced.
 MULTI_REDSHIFT_PLOTS = 0 #If on, in combination with either GENERAL_PLOTS or PAPER_PLOTS, plots requiring multiple redshift outputs will be calculated and made.
@@ -233,38 +233,38 @@ print("MRII_gals = ", MRII_gals, "\n")
 #CALCULATE RING AND SFH INFO:
 #################
 #################
-if CALC_RINGS_AND_SFH_INFO == 1 :
-    #Calculate ring info:
-    RNUM = 12
-    RBINS = 20 #Max number of SFH bins allowed in L-Galaxies.
-    RingArray = np.arange(1,RNUM+1)
-    RingRadii = 0.01*np.power(2.,RingArray)/Hubble_h #in kpc
-    RingArea = np.empty(RNUM) #in kpc^2
-    RingCenRadii = np.empty(RNUM)
-    RReRings = np.empty((NumGals,RNUM))    
-    RReSFHRings  = np.empty((NumGals,RNUM,RBINS))
-    #Calculate standard ring areas and central radii:
-    if ("liteOutput" in (STRUCT_TYPE)) :
-        print("NOTE: Using StellarHalfMassRadius as effective radius (Re)\n")
+#Calculate ring info:
+RNUM = 12
+RBINS = 20 #Max number of SFH bins allowed in L-Galaxies.
+RingArray = np.arange(1,RNUM+1)
+RingRadii = 0.01*np.power(2.,RingArray)/Hubble_h #in kpc
+RingArea = np.empty(RNUM) #in kpc^2
+RingCenRadii = np.empty(RNUM)
+RReRings = np.empty((NumGals,RNUM))    
+RReSFHRings  = np.empty((NumGals,RNUM,RBINS))
+#Calculate standard ring areas and central radii:
+if ("liteOutput" in (STRUCT_TYPE)) :
+    print("NOTE: Using StellarHalfMassRadius as effective radius (Re)\n")
+else :
+    print("NOTE: Using StellarHalfLightRadius as effective radius (Re)\n")
+for ii in range(RNUM) :
+    if ii == 0 :
+        RingArea[ii] = np.pi * RingRadii[ii]**2
+        RingCenRadii[ii] = 0.75*RingRadii[ii]
     else :
-        print("NOTE: Using StellarHalfLightRadius as effective radius (Re)\n")
-    for ii in range(RNUM) :
-        if ii == 0 :
-            RingArea[ii] = np.pi * RingRadii[ii]**2
-            RingCenRadii[ii] = 0.75*RingRadii[ii]
-        else :
-            RingArea[ii] = np.pi * (RingRadii[ii]**2 - RingRadii[ii-1]**2)
-            RingCenRadii[ii] = RingRadii[ii-1] + ((RingRadii[ii] - RingRadii[ii-1])/2.)      
-    #Calculate R/Re for every ring of every galaxy:
-        if ("liteOutput" in (STRUCT_TYPE)) :
-            RReRings[:,ii] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfMassRadius'][:])
-            for jj in range(RBINS) :
-                RReSFHRings[:,ii,jj] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfMassRadius'][:])      
-        else :           
-            RReRings[:,ii] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfLightRadius'][:])
-            for jj in range(RBINS) :
-                RReSFHRings[:,ii,jj] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfLightRadius'][:])
-        
+        RingArea[ii] = np.pi * (RingRadii[ii]**2 - RingRadii[ii-1]**2)
+        RingCenRadii[ii] = RingRadii[ii-1] + ((RingRadii[ii] - RingRadii[ii-1])/2.)      
+#Calculate R/Re for every ring of every galaxy:
+    if ("liteOutput" in (STRUCT_TYPE)) :
+        RReRings[:,ii] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfMassRadius'][:])
+        for jj in range(RBINS) :
+            RReSFHRings[:,ii,jj] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfMassRadius'][:])      
+    else :           
+        RReRings[:,ii] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfLightRadius'][:])
+        for jj in range(RBINS) :
+            RReSFHRings[:,ii,jj] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfLightRadius'][:])
+                
+if CALC_SFH_INFO == 1 :        
     #Calculate SFH properties:
     #N.B. If making new samples, SFH_bins IS ALREADY STORED IN THE DICTIONARY BELOW
     SFH_bins = astropy.io.fits.open(BaseDir+'AuxCode/Python/'+'Database_SFH_table.fits')
@@ -288,15 +288,16 @@ if CALC_RINGS_AND_SFH_INFO == 1 :
 #MAKE SAMPLE DICTIONARY:
 #################
 #################
-if CALC_RINGS_AND_SFH_INFO == 1 :
+if CALC_SFH_INFO == 1 :
     Samp1 = make_lgals_dictionary(LABEL, G_samp1, PlotDir, COSMOLOGY, SIMULATION, FILE_TYPE, MODEL, \
                                   VERSION, MRI_cutoff, NumGals, MRI_gals, MRII_gals, SAMPLE_TYPE, char_z_low, char_z_high, \
-                                  Volume_MRI, Volume_MRII, FullSnapnumList_MRI, FullSnapnumList_MRII, CALC_RINGS_AND_SFH_INFO, \
+                                  Volume_MRI, Volume_MRII, FullSnapnumList_MRI, FullSnapnumList_MRII, CALC_SFH_INFO, \
                                   RNUM, RingRadii, RingCenRadii, RReRings, RReSFHRings, RingArea, SFH_bins_num, SFH_bins_lbt_allGals)
 else :
     Samp1 = make_lgals_dictionary(LABEL, G_samp1, PlotDir, COSMOLOGY, SIMULATION, FILE_TYPE, MODEL, \
-                              VERSION, MRI_cutoff, NumGals, MRI_gals, MRII_gals, SAMPLE_TYPE, char_z_low, char_z_high, \
-                              Volume_MRI, Volume_MRII, FullSnapnumList_MRI, FullSnapnumList_MRII, CALC_RINGS_AND_SFH_INFO)
+                                  VERSION, MRI_cutoff, NumGals, MRI_gals, MRII_gals, SAMPLE_TYPE, char_z_low, char_z_high, \
+                                  Volume_MRI, Volume_MRII, FullSnapnumList_MRI, FullSnapnumList_MRII, CALC_SFH_INFO, \
+                                  RNUM, RingRadii, RingCenRadii, RReRings, RReSFHRings, RingArea)
 struct1 = STRUCT_TYPE
 
         
@@ -330,22 +331,23 @@ if PAPER_PLOTS == 1 :
     AgeBins = np.array([[0.0,5.0],[5.0,9.0],[9.0,14.0]])
     if MULTI_REDSHIFT_PLOTS == 1 :
         plot_dust_scaling_relations_evo(Hubble_h, FullRedshiftList, FullSnapnumList_MRI, FullSnapnumList_MRII, RedshiftsToRead, Samp1, struct1, \
-                                        props=['DTM','DTG'], SolarNorm=SOLAR_ABUNDANCE_SET, obs=1, V19=None, aveOnly=1, incHotDust=None, \
-                                        SFRWeighted=None, xprop='OH', legend=1)
+                                        props=['DTM','DTG'], xprop='OH', SolarNorm=SOLAR_ABUNDANCE_SET, aveOnly=1, incHotDust=None, SFRWeighted=None)
         plot_dust_scaling_relations_evo(Hubble_h, FullRedshiftList, FullSnapnumList_MRI, FullSnapnumList_MRII, RedshiftsToRead, Samp1, struct1, \
-                                        props=['Mdust'], SolarNorm=SOLAR_ABUNDANCE_SET, obs=1, V19=None, aveOnly=1, incHotDust=None, \
-                                        SFRWeighted=None, xprop='stellarMass', legend=None)
+                                        props=['Mdust'], xprop='stellarMass', SolarNorm=SOLAR_ABUNDANCE_SET, aveOnly=1, incHotDust=None, SFRWeighted=None)
         if COMBINE_MODELS != 1 :
             plot_cosmic_dust_evos(Volume, Hubble_h, Omega_M, Omega_b, FullRedshiftList, FullSnapnumList, RedshiftsToRead, \
                                   char_z_low, char_z_high, Samp1, obs=1, plotTotal=None)
     else :
         plot_timescales(Samp1, struct1, REDSHIFT, xprop='OH', yprops='All', contourLines='graded', \
-                        outlierFrac=0.0, SolarNorm=SOLAR_ABUNDANCE_SET)
+                        outlierFrac=0.0, SolarNorm=SOLAR_ABUNDANCE_SET) #xprop: Choose from: ['OH','logZ','H2D']
         plot_smf(Hubble_h, Samp1, REDSHIFT, Add_Edd_bias=None)
         plot_himf(Hubble_h, Samp1, struct1, REDSHIFT, prop="H")
         plot_mssfr(Hubble_h, Samp1, REDSHIFT, contourLines='graded')
         plot_snrates(Samp1, REDSHIFT)
         plot_mzgr(Hubble_h, Samp1, struct1, REDSHIFT, dustCorrec=1, contourLines='graded')
         plot_mzsr(Hubble_h, Omega_M, Omega_Lambda, Samp1, REDSHIFT, ApertureCorrec=1, contourLines='graded')
+        plot_dust_scaling_relations(Hubble_h, Samp1, struct1, REDSHIFT, props='All', xprop='OH', \
+                                    SolarNorm=SOLAR_ABUNDANCE_SET, levels='3sig', contourOnly=1, \
+                                    contourLines="graded", SFRWeighted=1, incHotDust=None) #xprop: Choose from: ['OH','MH','stellarMass']
 print("DONE!")
 
