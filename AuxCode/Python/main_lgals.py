@@ -59,6 +59,7 @@ MULTI_REDSHIFT_PLOTS = 0 #If on, in combination with either GENERAL_PLOTS or PAP
 COSMOLOGY = 'Planck' #Choose from: 'WMAP1', 'Planck'
 SIMULATION  = 'Mil-I' #Choose from: 'Mil-I', 'Mil-II' 
 FILE_TYPE = 'snapshots' #Choose from: 'snapshots', 'galtree'
+REDSHIFT = 0.00 #Only used if MULTI_REDSHIFT_PLOTS is off
 STRUCT_TYPE = 'liteOutput' #Choose from: 'normal', 'liteOutput', 'ringSFHs'
 MODEL = 'modified' #Choose from: 'default', 'modified'
 VERSION = 'test1' #Pick a memorable name
@@ -80,9 +81,13 @@ TreeFilesUsed = LastFile-FirstFile+1
 TotTreeFiles = 512
 
 ################# 
-#Redshifts to load: (in snapshot mode, only works for single redshifts currently 21-04-21)
-FullRedshiftList = [0.00] #[0.00,1.04,2.07,3.11,3.95,5.03,5.92,6.97,8.22,8.93]
-RedshiftsToRead = [True] #[True,True,True,True,True,True,True,True,True,True]
+#Redshifts to load:
+if MULTI_REDSHIFT_PLOTS :
+    FullRedshiftList = [0.00,1.04,2.07,3.11,3.95,5.03,5.92,6.97,8.22,8.93]
+    RedshiftsToRead = np.full(len(FullRedshiftList),True)
+else :
+    FullRedshiftList = [REDSHIFT]
+    RedshiftsToRead = [True]
 
 #################  
 #Plot suffix:
@@ -320,23 +325,22 @@ if GENERAL_PLOTS == 1 :
         plot_mssfr(Volume, Hubble_h, Samp1, char_z_low, pdf=pdf)
         plot_mzgr(Samp1, struct1, char_z_low, pdf=pdf)
         plot_mzsr(Samp1, char_z_low, pdf=pdf)
-        if CALC_RINGS_AND_SFH_INFO == 1 :
-            plot_sfrd_prof(Samp1, struct1, char_z_low, MassBins, pdf=pdf)
+        plot_sfrd_prof(Samp1, struct1, char_z_low, MassBins, pdf=pdf)
+        if CALC_SFH_INFO == 1 :
             if not ("liteOutput" in (STRUCT_TYPE)) :
                 plot_sfhs(Samp1, SFH_bins, snap_z0, char_z_low, pdf=pdf)
     pdf.close()
         
 if PAPER_PLOTS == 1 :
     MassBins = np.array([[9.0,9.75],[9.75,10.5],[10.5,11.25]])
-    AgeBins = np.array([[0.0,5.0],[5.0,9.0],[9.0,14.0]])
     if MULTI_REDSHIFT_PLOTS == 1 :
         plot_dust_scaling_relations_evo(Hubble_h, FullRedshiftList, FullSnapnumList_MRI, FullSnapnumList_MRII, RedshiftsToRead, Samp1, struct1, \
                                         props=['DTM','DTG'], xprop='OH', SolarNorm=SOLAR_ABUNDANCE_SET, aveOnly=1, incHotDust=None, SFRWeighted=None)
         plot_dust_scaling_relations_evo(Hubble_h, FullRedshiftList, FullSnapnumList_MRI, FullSnapnumList_MRII, RedshiftsToRead, Samp1, struct1, \
                                         props=['Mdust'], xprop='stellarMass', SolarNorm=SOLAR_ABUNDANCE_SET, aveOnly=1, incHotDust=None, SFRWeighted=None)
         if COMBINE_MODELS != 1 :
-            plot_cosmic_dust_evos(Volume, Hubble_h, Omega_M, Omega_b, FullRedshiftList, FullSnapnumList, RedshiftsToRead, \
-                                  char_z_low, char_z_high, Samp1, obs=1, plotTotal=None)
+            plot_cosmic_dust_evos(Volume, Hubble_h, Omega_M, Omega_b, FullRedshiftList, FullSnapnumList, \
+                                      RedshiftsToRead, Samp1, plotTotal=None)
     else :
         plot_timescales(Samp1, struct1, REDSHIFT, xprop='OH', yprops='All', contourLines='graded', \
                         outlierFrac=0.0, SolarNorm=SOLAR_ABUNDANCE_SET) #xprop: Choose from: ['OH','logZ','H2D']
@@ -349,5 +353,10 @@ if PAPER_PLOTS == 1 :
         plot_dust_scaling_relations(Hubble_h, Samp1, struct1, REDSHIFT, props='All', xprop='OH', \
                                     SolarNorm=SOLAR_ABUNDANCE_SET, levels='3sig', contourOnly=1, \
                                     contourLines="graded", SFRWeighted=1, incHotDust=None) #xprop: Choose from: ['OH','MH','stellarMass']
+        plot_profs_multiplot(Samp1, struct1, Hubble_h, Omega_M, Omega_Lambda, MassBins=MassBins, \
+                             props=['OH_cold','OFE_stars','CvsD_DTM','DTG','DMD'], SolarNorm=SOLAR_ABUNDANCE_SET, \
+                             stellarComp='Disc+Bulge') #props: Choose from: ['OH_cold','Z_stars','FeH_stars','OFE_cold','OFE_stars','DTM','CvsD_DTM','DTG','DMD','DCloudsD','DDiffD','CloudsD','DiffD','MmetD','MHD','MHID','MH2D','SFRD','MstarD']
+        plot_profs_together(Hubble_h, Omega_M, Omega_Lambda, Samp1, struct1, MassBins=MassBins, props=[['MstarD','SFRD','McoldD'],['HID','H2D','MdustD']])
+            
 print("DONE!")
 

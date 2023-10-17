@@ -1179,7 +1179,7 @@ def plot_dust_scaling_relations(Hubble_h, Samp1, struct1, redshift, props='All',
 #Plot various dust scaling relations back to high redshift:
 def plot_dust_scaling_relations_evo(Hubble_h, FullRedshiftList, FullSnapnumList_MRI, FullSnapnumList_MRII, RedshiftsToRead, Samp1, struct1, \
                                     props='All', xprop='OH', SolarNorm='A09', aveOnly=None, contourOnly=None, incHotDust=None, SFRWeighted=None) :  
-    pdf = PdfPages(PaperPlotDir+xprop+'_vs_'+"dust_evo"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+Samp1['z_lower']+"-"+Samp1['z_upper']+".pdf")    
+    pdf = PdfPages(PlotDir+xprop+'_vs_'+"dust_evo"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+Samp1['z_lower']+"-"+Samp1['z_upper']+".pdf")    
     El1 = robs_element_list_finder(struct1)
 
     #Set-up panels:
@@ -1333,3 +1333,557 @@ def plot_dust_scaling_relations_evo(Hubble_h, FullRedshiftList, FullSnapnumList_
         
     pdf.savefig(bbox_inches='tight')     
     pdf.close()  
+    
+    
+#################
+#Plot evolution of dust production/destruction rate densities and dust mass densities:
+def plot_cosmic_dust_evos(Volume, Hubble_h, Omega_M, Omega_b, FullRedshiftList, FullSnapnumList, \
+                          RedshiftsToRead, Samp1, plotTotal=None) :
+    pdf = PdfPages(PlotDir+"cosmic_dust_evos"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+Samp1['z_lower']+"-"+Samp1['z_upper']+".pdf")
+    NumSamps = 1
+    
+    # Set-up axes:
+    xlimits = [Samp1['z_lower']-0.2, Samp1['z_upper']+0.2] #[0.0,8.0]
+    ylimits = [[-9.4,-2.2],[0.4,6.2]]
+    rowno=2
+    colno=1
+    xlabs = [r'Redshift']
+    ylabs = [r'log$(\dot{\rho}_{\rm dust}\ /\ \textnormal{M}_{\odot}\ \textnormal{yr}^{-1}\ \textnormal{cMpc}^{-3})$', \
+             r'log$(\rho_{\rm dust}\ /\ \textnormal{M}_{\odot}\ \textnormal{cMpc}^{-3})$']
+    xlims = xlimits
+    ylims = ylimits
+    xticks = [0,1,2,3,4,5,6,7,8]
+    yticks = [[-9,-8,-7,-6,-5,-4,-3],[1.,2.,3.,4.,5.,6.]]
+    fig = plt.figure(figsize=(5,10))
+    
+    # Set cols and processes:
+    thecols1 = ['blue','orange','green','red','cyan','purple','pink']
+    theLabs1 = ['AGB (total)              ','SN-II (total)','SN-Ia (total)','Grain growth','SN shocks + astration (ISM)','Sputtering (CGM)','Sputtering (Ejecta)']
+    thecols2 = ['darkblue','cornflowerblue','green','pink']
+    theLabs2 = ['ISM (mol. clouds)         ', 'ISM (diffuse gas)', 'CGM', 'Ejecta']  
+    zorders2 = [10,-1,-1,-1]
+    allLabs = theLabs1 + theLabs2
+    
+    # X-axis values:
+    FRL = np.array(FullRedshiftList)
+    RTR = np.array(RedshiftsToRead)
+    
+    # Calc cosmic densities:
+    logDRate = np.empty((NumSamps,len(FullRedshiftList),len(theLabs1))) #Each dust prod/dest rate at each redshift
+    logTotProdDRate = np.empty((NumSamps,len(FullRedshiftList)))
+    logTotDestDRate = np.empty((NumSamps,len(FullRedshiftList)))
+    tot_prod_rates = np.zeros((NumSamps,len(FullRedshiftList)))
+    tot_dest_rates = np.zeros((NumSamps,len(FullRedshiftList)))
+    logDMass = np.empty((NumSamps,len(FullRedshiftList),len(theLabs2)))
+    logTotDMass = np.empty((NumSamps,len(FullRedshiftList)))
+    tot_dust_mass = np.zeros((NumSamps,len(FullRedshiftList)))
+    for iz in range(len(FullRedshiftList)) : #loop over redshifts
+        if RedshiftsToRead[iz] : 
+            wz1 = np.where(Samp1['G_samp']['SnapNum'] == FullSnapnumList[iz])
+            # Dust rates:
+            for ii in range(len(theLabs1)) : #loop over rates
+                if (ii <= 2) : #AGB, SN-II, SN-Ia
+                    Rate = np.nansum(Samp1['G_samp']['DustColdGasRates'][wz1,ii] + Samp1['G_samp']['DustHotGasRates'][wz1,ii])
+                    tot_prod_rates[0,iz] += Rate
+                elif (ii == 3) : #Grain growth      
+                    Rate = np.nansum(Samp1['G_samp']['DustColdGasRates'][wz1,ii])
+                    tot_prod_rates[0,iz] += Rate
+                elif (ii == 4) : #SN dest      
+                    Rate = np.nansum(Samp1['G_samp']['DustColdGasRates'][wz1,ii])
+                    tot_dest_rates[0,iz] += Rate
+                elif (ii == 5) :  #Sputtering dest (HotGas)
+                    Rate = np.nansum(Samp1['G_samp']['DustHotGasRates'][wz1,ii-2])
+                    tot_dest_rates[0,iz] += Rate
+                elif (ii == 6) : #Sputtering dest (EjectedMass)
+                    Rate = np.nansum(Samp1['G_samp']['DustEjectedMassRates'][wz1])
+                    tot_dest_rates[0,iz] += Rate
+                logDRate[0,iz,ii] = np.log10(Rate / (Volume/Hubble_h**3))
+            # Dust masses:
+            for ii in range(len(theLabs2)) : #loop over rates
+                if (ii == 0) : #Clouds (ISM)
+                    Masses = Samp1['G_samp']['DustColdGasClouds_elements'][wz1,:]
+                elif (ii == 1) : #Diffuse (ISM)
+                    Masses = Samp1['G_samp']['DustColdGasDiff_elements'][wz1,:]
+                elif (ii == 2) : #CGM     
+                    Masses = Samp1['G_samp']['DustHotGas_elements'][wz1,:]
+                elif (ii == 3) : #Ejecta     
+                    Masses = Samp1['G_samp']['DustEjectedMass_elements'][wz1,:]
+                Masses[np.where(Masses < 0.0)] = 0.0
+                Mass = np.nansum(Masses)
+                tot_dust_mass[0,iz] += Mass
+                logDMass[0,iz,ii] = np.log10(Mass / (Volume/Hubble_h**3)) 
+    logTotProdDRate = np.log10(tot_prod_rates / (Volume/Hubble_h**3))
+    logTotDestDRate = np.log10(tot_dest_rates / (Volume/Hubble_h**3))
+    logTotDMass = np.log10(tot_dust_mass / (Volume/Hubble_h**3))
+    
+    # Plot panels:
+    for ii in range(rowno*colno) :
+        panel = robs_plot_panels(ii, rows=rowno, columns=colno, xlimits=xlims, ylimits=ylims, \
+                                 xlab=xlabs, ylab=ylabs, xticks=xticks, yticks=yticks, SecondXAxis=None)
+        #Add second x axis:
+        thezs = np.array([0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0])
+        thelbts = np.array([0.0,4.0,8.0,10.0,11.0,12.0,13.0])
+        thelbts_zs = robs_get_lookbacktimes(Hubble_h, Omega_M, Omega_b, thezs=thezs, thelbts=thelbts)
+        p1b = panel.twiny()
+        p1b.set_xlim(xlimits[0],xlimits[1])
+        p1b.set_xticks(thelbts_zs, minor=False) 
+        p1b.tick_params(direction="in") 
+        p1b.set_xticks([0], minor=True)
+        
+        #####################
+        # Cosmic dust rates:
+        if ii == 0 :
+            # Finish-off second x axis:
+            p1b.set_xticklabels(['{:g}'.format(lbt) for lbt in thelbts])
+            p1b.set_xlabel(r'Lookback time / Gyr')
+            plt.setp(panel.get_xticklabels(), visible=False)
+                  
+            #Plot cosmic rate densities:
+            for ii in range(len(theLabs1)) : #loop over rates
+                coeffs = np.polyfit(FRL[RTR], logDRate[0,:,ii], 5)
+                poly = np.poly1d(coeffs)
+                Samp1_x = np.linspace(FRL[RTR][0], FRL[RTR][-1])
+                Samp1_y = poly(Samp1_x)
+                plt.plot(Samp1_x, Samp1_y, linewidth=defaultLinewidth, linestyle='solid', color=thecols1[ii], zorder=-1)
+                  
+            # Plot tot prod and dest rates:
+            if plotTotal :
+                linstyle = ['solid','dashed']
+                for samp in range(NumSamps) :
+                    coeffs = np.polyfit(FRL[RTR], logTotProdDRate[samp,:], 5)
+                    poly = np.poly1d(coeffs)
+                    Samp1_x = np.linspace(FRL[RTR][0], FRL[RTR][-1])
+                    Samp1_y = poly(Samp1_x)
+                    plt.plot(Samp1_x, Samp1_y, linewidth=2.*defaultLinewidth, linestyle=linstyle[samp], color='black', zorder=-2)
+                    coeffs = np.polyfit(FRL[RTR], logTotDestDRate[samp,:], 5)
+                    poly = np.poly1d(coeffs)
+                    Samp1_x = np.linspace(FRL[RTR][0], FRL[RTR][-1])
+                    Samp1_y = poly(Samp1_x)
+                    plt.plot(Samp1_x, Samp1_y, linewidth=2.*defaultLinewidth, linestyle=linstyle[samp], color='grey', zorder=-2)
+   
+            # Labels:
+            numLeft = 4
+            padder=0.05
+            # Production labs:
+            theProdLabs = theLabs1[0:numLeft]
+            theProdCols = thecols1[0:numLeft]
+            theProdLabs = [r'\textbf{Dust production/growth:}'] + theProdLabs
+            theProdCols =  ['black'] + theProdCols
+            if plotTotal :
+                theProdLabs += ['Total']
+                theProdCols += ['black']
+            robs_plot_text(panel, theProdLabs, vpos='top', hpos='right', padder=padder, colour=theProdCols)
+            # Destruction labs:
+            theDestLabs = list(reversed(theLabs1[numLeft:]))
+            theDestCols = list(reversed(thecols1[numLeft:]))
+            theDestLabs = [r'\textbf{Dust destruction:}'] + theDestLabs
+            theDestCols =  ['black'] + theDestCols
+            if plotTotal :
+                theDestLabs += ['Total']
+                theDestCols += ['grey']
+            robs_plot_text(panel, theDestLabs, vpos='bottom', hpos='left', padder=padder, colour=theDestCols)
+                
+        #####################
+        # Cosmic dust masses:
+        elif ii == 1 :
+            # Finish-off second x axis:
+            p1b.set_xticklabels([])
+            
+            #Plot cosmic mass densities:
+            for ii in range(len(theLabs2)) : #loop over rates
+                coeffs = np.polyfit(FRL[RTR], logDMass[0,:,ii], 5)
+                poly = np.poly1d(coeffs)
+                Samp1_x = np.linspace(FRL[RTR][0], FRL[RTR][-1])
+                Samp1_y = poly(Samp1_x)
+                plt.plot(Samp1_x, Samp1_y, linewidth=defaultLinewidth, linestyle='solid', color=thecols2[ii], zorder=zorders2[ii])
+            
+            # Plot MCs + diffuse:
+            coeffs = np.polyfit(FRL[RTR], np.log10(10**(logDMass[0,:,0]) + 10**(logDMass[0,:,1])), 5)
+            poly = np.poly1d(coeffs)
+            Samp1_x = np.linspace(FRL[RTR][0], FRL[RTR][-1])
+            Samp1_y = poly(Samp1_x)
+            plt.plot(Samp1_x, Samp1_y, linewidth=defaultLinewidth, linestyle='solid', color='red', zorder=10)
+   
+            # Plot tot prod and dest masses:
+            if plotTotal :
+                linstyle = ['solid','dashed']
+                for samp in range(NumSamps) :
+                    coeffs = np.polyfit(FRL[RTR], logTotDMass[samp,:], 5)
+                    poly = np.poly1d(coeffs)
+                    Samp1_x = np.linspace(FRL[RTR][0], FRL[RTR][-1])
+                    Samp1_y = poly(Samp1_x)
+                    plt.plot(Samp1_x, Samp1_y, linewidth=2.*defaultLinewidth, linestyle=linstyle[samp], color='black', zorder=-2)
+            
+            # Labels:
+            theLabs2 = list(reversed(['ISM (total)'] + theLabs2))
+            thecols2 = list(reversed(['red'] + thecols2))
+            theLabs2 = [r'\textbf{Dust mass:}'] + theLabs2
+            thecols2 =  ['black'] + thecols2
+            if plotTotal :
+                theLabs2 += ['Total']
+                thecols2 += ['black']
+            padder=0.05
+            robs_plot_text(panel, theLabs2, vpos='bottom', hpos='left', padder=padder, colour=thecols2)    
+            robs_plot_text(panel, r'$H_{0} =$ '+str(round(Hubble_h*100.,1)), vpos='top', hpos='right', padder=3.3*padder)
+            
+            #Add second y-axis:
+            PH20_h = 0.7
+            PH20_rho_crit = 1.36e11 * ((100.*Hubble_h)**2/(100.*PH20_h)**2) #Msun/cMpc^3 Critical mass density of the Universe (PH20, section 2.1.1), corrected for Hubble parameter. N.B. rho_crit,0 = 3*H0^2 / 8*pi*G
+            p2b = panel.twinx()
+            p2b.set_ylim(panel.get_ylim() - np.log10(PH20_rho_crit))
+            p2b.set_ylabel(r'log($\Omega_{\rm dust}$)')
+            p2b.tick_params(direction="in")
+
+    pdf.savefig(bbox_inches='tight')     
+    pdf.close()
+    
+    
+#################
+def plot_profs_multiplot(Samp1, struct1, Hubble_h, Omega_M, Omega_Lambda, \
+                         MassBins, props='All', SolarNorm=None, stellarComp='Disc+Bulge') :
+    pdf = PdfPages(PlotDir+"Profs_multiplot"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+Samp1['z_lower']+".pdf")
+    SolarAbunds = robs_solarnorm_finder(SolarNorm)
+    El1 = robs_element_list_finder(struct1)
+    if props == 'All' :
+        props = ['OH_cold','Z_stars','FeH_stars','OFE_cold','OFE_stars','DTM','CvsD_DTM','DTG','DMD', \
+                 'DCloudsD','DDiffD','CloudsD','DiffD','MmetD','MHD','MHID','MH2D','SFRD','MstarD']
+
+    #Set-up panels:
+    figsizescale = 3.
+    figsizescale_x = 4.
+    plt.figure(figsize=(len(MassBins)*figsizescale_x,len(props)*figsizescale))
+    xlimits = np.array([0.0,5.0])
+    xlabel = r'$R/\textnormal{R}_{\textnormal{e}}$'
+    binwidth = 0.2
+    binno = 50
+    thelinewidth = defaultLinewidth
+    rowno = len(props)
+    colno = len(MassBins)
+    numPanels = rowno*colno
+    xlabs = np.full(colno,xlabel)
+    xlims = np.full((colno,len(xlimits)),xlimits)
+    theX = Samp1['RReRings'][:,:] 
+    ylims = np.full((rowno,len(xlimits)),-99.)
+    yticks = [None]*rowno
+    ylabs = ['y']*rowno
+    theY = np.full((rowno,Samp1["NumGals"],Samp1["RNUM"]),-99.)
+    theY1a = np.full((rowno,Samp1["NumGals"],Samp1["RNUM"]),-99.)
+    theY1b = np.full((rowno,Samp1["NumGals"],Samp1["RNUM"]),-99.)
+    
+    #Get y-axis values:
+    for ii in range(len(props)) :
+        if props[ii] == 'OH_cold' :
+            ylims[ii] = np.array([7.51,9.6])
+            yticks[ii] = [8.0,8.5,9.0,9.5]
+            ylabs[ii] = r'12+log(O/H)$_{\rm gas}$'
+            MH_gas = Samp1['G_samp']['ColdGasCloudsRings_elements'][:,:,El1["H_NUM"]] + Samp1['G_samp']['ColdGasDiffRings_elements'][:,:,El1["H_NUM"]] \
+                   - Samp1['G_samp']['DustColdGasCloudsRings_elements'][:,:,El1["H_NUM"]] - Samp1['G_samp']['DustColdGasDiffRings_elements'][:,:,El1["H_NUM"]]
+            MO_gas = Samp1['G_samp']['ColdGasCloudsRings_elements'][:,:,El1["O_NUM"]] + Samp1['G_samp']['ColdGasDiffRings_elements'][:,:,El1["O_NUM"]] \
+                   - Samp1['G_samp']['DustColdGasCloudsRings_elements'][:,:,El1["O_NUM"]] - Samp1['G_samp']['DustColdGasDiffRings_elements'][:,:,El1["O_NUM"]]
+            theY[ii] = 12. + np.log10((MO_gas / MH_gas) * (H_aw/O_aw))
+        elif props[ii] == 'Z_stars' :
+            ylims[ii] = np.array([-1.7,0.7])
+            yticks[ii] = [-1.5,-1.0,-0.5,0.0,0.5]
+            if stellarComp == 'Disc' :
+                ylabs[ii] = r'log($Z_{*\rm ,disc}/\textnormal{Z}_{\odot}$)'
+                TotMetRings = np.nansum(Samp1['G_samp']['MetalsDiskMassRings'][:,:,:], axis=2)
+                theY[ii] = np.log10(TotMetRings / Samp1['G_samp']['DiskMassRings'][:,:]) - np.log10(SolarAbunds['Z_mf_sun'])
+            elif (stellarComp == 'Disc+Bulge') | (stellarComp == 'Bulge+Disc') :
+                ylabs[ii] = r'log($Z_{*}/\textnormal{Z}_{\odot}$)'
+                TotMetRings = np.nansum(Samp1['G_samp']['MetalsDiskMassRings'][:,:,:], axis=2) + np.nansum(Samp1['G_samp']['MetalsBulgeMassRings'][:,:,:], axis=2)
+                theY[ii] = np.log10(TotMetRings / (Samp1['G_samp']['DiskMassRings'][:,:] + Samp1['G_samp']['BulgeMassRings'][:,:])) - np.log10(SolarAbunds['Z_mf_sun'])
+            elif stellarComp == 'Bulge' :
+                ylabs[ii] = r'log($Z_{*\rm ,bulge}/\textnormal{Z}_{\odot}$)'
+                TotMetRings = np.nansum(Samp1['G_samp']['MetalsBulgeMassRings'][:,:,:], axis=2)
+                theY[ii] = np.log10(TotMetRings / Samp1['G_samp']['BulgeMassRings'][:,:]) - np.log10(SolarAbunds['Z_mf_sun'])
+        elif props[ii] == 'FeH_stars' :
+            ylims[ii] = np.array([-1.8,0.4])
+            yticks[ii] = [-1.5,-1.0,-0.5,0.0]
+            if stellarComp == 'Disc' :
+                ylabs[ii] = r'[Fe/H]$_{*\rm ,disc}$'
+                HRings = Samp1['G_samp']['DiskMassRings_elements'][:,:,El1["H_NUM"]]
+                FeRings = Samp1['G_samp']['DiskMassRings_elements'][:,:,El1["Fe_NUM"]]
+            elif (stellarComp == 'Disc+Bulge') | (stellarComp == 'Bulge+Disc') :
+                ylabs[ii] = r'[Fe/H]$_{*}$'
+                HRings = Samp1['G_samp']['DiskMassRings_elements'][:,:,El1["H_NUM"]] + Samp1['G_samp']['BulgeMassRings_elements'][:,:,El1["H_NUM"]]
+                FeRings = Samp1['G_samp']['DiskMassRings_elements'][:,:,El1["Fe_NUM"]] + Samp1['G_samp']['BulgeMassRings_elements'][:,:,El1["Fe_NUM"]]
+            elif stellarComp == 'Bulge' :
+                ylabs[ii] = r'[Fe/H]$_{*\rm ,bulge}$'
+                HRings = Samp1['G_samp']['BulgeMassRings_elements'][:,:,El1["H_NUM"]]
+                FeRings = Samp1['G_samp']['BulgeMassRings_elements'][:,:,El1["Fe_NUM"]]
+            theY[ii] = np.log10(FeRings/HRings) - np.log10(SolarAbunds['FeH_mf_sun'])
+        elif props[ii] == 'OFE_cold' :
+            ylims[ii] = np.array([0.08,0.46])
+            yticks[ii] = [0.1,0.2,0.3,0.4]
+            ylabs[ii] = r'[O/Fe]$_{\rm ISM,gas+dust}$'
+            ORings = Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["O_NUM"]]
+            FeRings = Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["Fe_NUM"]]
+            theY[ii] = np.log10(ORings/FeRings) - np.log10(SolarAbunds['OH_mf_sun']/SolarAbunds['FeH_mf_sun'])
+        elif props[ii] == 'OFE_stars' :
+            ylims[ii] = np.array([0.15,0.51])
+            yticks[ii] = [0.2,0.3,0.4,0.5]
+            if (stellarComp == 'Disc+Bulge') | (stellarComp == 'Bulge+Disc') :
+                ylabs[ii] = r'[O/Fe]$_{*\rm ,disc+bulge}$'
+                ORings = Samp1['G_samp']['DiskMassRings_elements'][:,:,El1["O_NUM"]] + Samp1['G_samp']['BulgeMassRings_elements'][:,:,El1["O_NUM"]]
+                FeRings = Samp1['G_samp']['DiskMassRings_elements'][:,:,El1["Fe_NUM"]] + Samp1['G_samp']['BulgeMassRings_elements'][:,:,El1["Fe_NUM"]]
+            elif stellarComp == 'Disc' :
+                ylabs[ii] = r'[O/Fe]$_{*\rm ,disc}$'
+                ORings = Samp1['G_samp']['DiskMassRings_elements'][:,:,El1["O_NUM"]]
+                FeRings = Samp1['G_samp']['DiskMassRings_elements'][:,:,El1["Fe_NUM"]]
+            elif stellarComp == 'Bulge' :
+                ylabs[ii] = r'[O/Fe]$_{*\rm ,bulge}$'
+                ORings = Samp1['G_samp']['BulgeMassRings_elements'][:,:,El1["O_NUM"]]
+                FeRings = Samp1['G_samp']['BulgeMassRings_elements'][:,:,El1["Fe_NUM"]]
+            theY[ii] = np.log10(ORings/FeRings) - np.log10(SolarAbunds['OH_mf_sun']/SolarAbunds['FeH_mf_sun'])  
+        elif props[ii] == 'DTM' :
+            ylims[ii] = np.array([-2.7,0.0])
+            yticks[ii] = [-2.5,-2.0,-1.5,-1.0,-0.5]
+            ylabs[ii] = r'log$(M_{\rm dust} /M_{\rm metal,tot})$'
+            TotMdustRings = np.nansum(Samp1['G_samp']['DustColdGasCloudsRings_elements'], axis=2) + np.nansum(Samp1['G_samp']['DustColdGasDiffRings_elements'], axis=2)
+            TotMmetalRings = np.nansum(Samp1['G_samp']['MetalsColdGasRings'], axis=2)
+            theY[ii] = np.log10(TotMdustRings/TotMmetalRings)
+        elif props[ii] == 'DTG' :
+            ylims[ii] = np.array([-5.2,-0.8])
+            yticks[ii] = [-5.,-4.,-3.,-2.,-1.]
+            ylabs[ii] = r'log$(M_{\rm dust} /M_{\rm HI+H2})$'
+            TotMdustRings = np.nansum(Samp1['G_samp']['DustColdGasCloudsRings_elements'], axis=2) + np.nansum(Samp1['G_samp']['DustColdGasDiffRings_elements'], axis=2)
+            TotHMassRings = Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["H_NUM"]]
+            theY[ii] = np.log10(TotMdustRings/TotHMassRings)             
+        elif props[ii] == 'DMD' :
+            ylims[ii] = np.array([-5.5,2.5])
+            yticks[ii] = [-5.,-4.,-3.,-2.,-1.,0.,1.,2.]
+            ylabs[ii] = r'log($\Sigma_{\rm dust} / \textnormal{M}_{\odot}\textnormal{ pc}^{-2}$)'
+            TotMdustRings = np.nansum(Samp1['G_samp']['DustColdGasCloudsRings_elements'], axis=2) + np.nansum(Samp1['G_samp']['DustColdGasDiffRings_elements'], axis=2)
+            theY[ii] = np.log10(TotMdustRings/Samp1['RingArea']/(1000.**2)) #to get Msun/pc^2  
+        elif props[ii] == 'DCloudsD' :
+            ylims[ii] = np.array([-5.5,2.5])
+            yticks[ii] = [-5.,-4.,-3.,-2.,-1.,0.,1.,2.]
+            ylabs[ii] = r'log($\Sigma_{\rm dust,clouds} / \textnormal{M}_{\odot}\textnormal{ pc}^{-2}$)'
+            theY[ii] = np.log10(np.nansum(Samp1['G_samp']['DustColdGasCloudsRings_elements'], axis=2)/Samp1['RingArea']/(1000.**2)) #to get Msun/pc^2  
+        elif props[ii] == 'DDiffD' :
+            ylims[ii] = np.array([-5.5,2.5])
+            yticks[ii] = [-5.,-4.,-3.,-2.,-1.,0.,1.,2.]
+            ylabs[ii] = r'log($\Sigma_{\rm dust,diffuse} / \textnormal{M}_{\odot}\textnormal{ pc}^{-2}$)'
+            theY[ii] = np.log10(np.nansum(Samp1['G_samp']['DustColdGasDiffRings_elements'], axis=2)/Samp1['RingArea']/(1000.**2)) #to get Msun/pc^2   
+        elif props[ii] == 'CloudsD' :
+            ylims[ii] = np.array([-3.5,2.5])
+            yticks[ii] = [-5.,-4.,-3.,-2.,-1.,0.,1.,2.]
+            ylabs[ii] = r'log($\Sigma_{\rm clouds} / \textnormal{M}_{\odot}\textnormal{ pc}^{-2}$)'
+            theY[ii] = np.log10(np.nansum(Samp1['G_samp']['ColdGasCloudsRings_elements'], axis=2)/Samp1['RingArea']/(1000.**2)) #to get Msun/pc^2  
+        elif props[ii] == 'DiffD' :
+            ylims[ii] = np.array([-1.5,2.5])
+            yticks[ii] = [-5.,-4.,-3.,-2.,-1.,0.,1.,2.]
+            ylabs[ii] = r'log($\Sigma_{\rm diffuse} / \textnormal{M}_{\odot}\textnormal{ pc}^{-2}$)'
+            theY[ii] = np.log10(np.nansum(Samp1['G_samp']['ColdGasDiffRings_elements'], axis=2)/Samp1['RingArea']/(1000.**2)) #to get Msun/pc^2  
+        elif props[ii] == 'CvsD_DTM' :
+            ylims[ii] = np.array([-2.7,0.0])
+            yticks[ii] = [-2.5,-2.0,-1.5,-1.0,-0.5]
+            ylabs[ii] = r'log$(M_{\rm dust} /M_{\rm metal,tot})$'
+            DustMassClouds = np.nansum(Samp1['G_samp']['DustColdGasCloudsRings_elements'], axis=2)
+            MetalMassClouds = np.nansum(Samp1['G_samp']['ColdGasCloudsRings_elements'][:,:,El1["He_NUM"]+1:], axis=2) #2:11
+            theY1a[ii] = np.log10(DustMassClouds/MetalMassClouds)
+            DustMassDiff = np.nansum(Samp1['G_samp']['DustColdGasDiffRings_elements'], axis=2)
+            MetalMassDiff = np.nansum(Samp1['G_samp']['ColdGasDiffRings_elements'][:,:,El1["He_NUM"]+1:], axis=2)
+            theY1b[ii] = np.log10(DustMassDiff/MetalMassDiff)
+        elif props[ii] == 'MmetD' :
+            ylims[ii] = np.array([-3.5,1.5])
+            yticks[ii] = [-3.,-2.,-1.,0.,1.]
+            ylabs[ii] = r'log($\Sigma_{\rm met,tot} / \textnormal{M}_{\odot}\textnormal{ pc}^{-2}$)'
+            theY[ii] = np.log10(np.nansum(Samp1['G_samp']['MetalsColdGasRings'], axis=2)/Samp1['RingArea']/(1000.**2)) #to get Msun/pc^2  
+        elif props[ii] == 'MHD' :
+            ylims[ii] = np.array([-1.5,3.5])
+            yticks[ii] = [-1.,0.,1.,2.,3.]
+            ylabs[ii] = r'log($\Sigma_{\rm H,tot} / \textnormal{M}_{\odot}\textnormal{ pc}^{-2}$)'
+            theY[ii] = np.log10(Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["H_NUM"]]/Samp1['RingArea']/(1000.**2)) #to get Msun/pc^2  
+        elif props[ii] == 'MHID' :
+            ylims[ii] = np.array([-0.9,1.7])
+            yticks[ii] = [-0.5,0.,0.5,1.,1.5]
+            ylabs[ii] = r'log($\Sigma_{\rm HI} / \textnormal{M}_{\odot}\textnormal{ pc}^{-2}$)'
+            theY[ii] = np.log10((Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["H_NUM"]]*(1. - Samp1['G_samp']['H2fractionRings']))/Samp1['RingArea']/(1000.**2)) #to get Msun/pc^2  
+        elif props[ii] == 'MH2D' :
+            ylims[ii] = np.array([-2.4,3.5])
+            yticks[ii] = [-2.,-1.,0.,1.,2.,3.]
+            ylabs[ii] = r'log($\Sigma_{\rm H2} / \textnormal{M}_{\odot}\textnormal{ pc}^{-2}$)'
+            theY[ii] = np.log10((Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["H_NUM"]]*Samp1['G_samp']['H2fractionRings'])/Samp1['RingArea']/(1000.**2)) #to get Msun/pc^2  
+        elif props[ii] == 'SFRD' :
+            ylims[ii] = np.array([-6.5,0.5])
+            yticks[ii] = [-6.,-5.,-4.,-3.,-2.,-1.,0.]
+            ylabs[ii] = r'log($\Sigma_{\rm SFR} / \textnormal{ M}_{\odot}\textnormal{ yr}^{-1}\textnormal{ kpc}^{-2}$)'
+            theY[ii] = np.log10(Samp1['G_samp']['SfrRings']/Samp1['RingArea']) #in Msun/kpc^2    /(1000.**2)) #to get Msun/pc^2                       
+        elif props[ii] == 'MstarD' :
+            ylims[ii] = np.array([-2.4,3.9])
+            yticks[ii] = [-2.,-1.,0.,1.,2.,3.]
+            ylabs[ii] = r'log($\Sigma_{*} / \textnormal{M}_{\odot}\textnormal{ pc}^{-2}$)'
+            theY[ii] = np.log10((Samp1['G_samp']['DiskMassRings'] + Samp1['G_samp']['BulgeMassRings'])/Samp1['RingArea']/(1000.**2)) #to get Msun/pc^2   
+        
+    for kk in range(numPanels) :
+        panel = robs_plot_panels(kk, rows=rowno, columns=colno, xlimits=xlims, ylimits=ylims, \
+                                 xlab=xlabs, ylab=ylabs, xticks=[0,1,2,3,4], yticks=yticks, SecondXAxis=None)
+        if kk >= numPanels-colno :
+            thePanelLabel = r'log$(M_{*}/\textnormal{M}_{\odot}) =$ '
+        else :
+            thePanelLabel = None
+        theRowNum = int(kk/colno)
+        theColNum = kk%colno
+        panelProp = np.log10(Samp1['G_samp']['StellarMass'])
+        xrange = [theX[np.isfinite(theX)].min(), theX[np.isfinite(theX)].max()]
+        if props[theRowNum] == 'CvsD_DTM' :
+            robs_plot_profile(theX, theY1a[theRowNum], panelProp, xlims[theColNum], ylims[theRowNum], binno=(xrange[1]-xrange[0])/binwidth, \
+                                                panelBins=[MassBins[theColNum]], rowno=rowno, colno=colno, aveType='Median', \
+                                                linewidth=defaultLinewidth*scaleFactor, textPadder=12., colour=model1col, minInBin=1, \
+                                                newSubplot=None, plot1sig=1, plot2sig=1, inputCentres=1, panelLabel=thePanelLabel, panelLabelDecs=2, zorder=-1)
+            robs_plot_profile(theX, theY1b[theRowNum], panelProp, xlims[theColNum], ylims[theRowNum], binno=(xrange[1]-xrange[0])/binwidth, \
+                                                panelBins=[MassBins[theColNum]], rowno=rowno, colno=colno, aveType='Median', linestyle='dashed', \
+                                                linewidth=defaultLinewidth*scaleFactor, textPadder=12., colour=model1col, minInBin=1, \
+                                                newSubplot=None, plot1sig=1, plot2sig=1, inputCentres=1, zorder=-2) #colour=model1bcol
+            cloudsp, = plt.plot(np.nan, np.nan, linewidth=defaultLinewidth, linestyle='solid', color="black", zorder=-1, label=r'Molecular clouds')
+            diffp, = plt.plot(np.nan, np.nan, linewidth=defaultLinewidth, linestyle='dashed', color="black", zorder=-1, label=r'Diffuse gas')             
+        else :
+            robs_plot_profile(theX, theY[theRowNum], panelProp, xlims[theColNum], ylims[theRowNum], binno=(xrange[1]-xrange[0])/binwidth, \
+                                            panelBins=[MassBins[theColNum]], rowno=rowno, colno=colno, aveType='Median', linewidth=defaultLinewidth*scaleFactor, \
+                                            textPadder=12., colour=model1col, minInBin=1, panelLabelDecs=2, \
+                                            newSubplot=None, plot1sig=1, plot2sig=1, inputCentres=1, panelLabel=thePanelLabel, zorder=-1)
+        #legend:
+        if ((props[theRowNum] == 'CvsD_DTM') & (theColNum == 0)) :               
+            legend0 = plt.legend(handles=[cloudsp, diffp], \
+                  loc='lower left', fontsize='small' , frameon=False, labelspacing=0.2)
+            legend0._legend_box.align = "left"              
+            plt.gca().add_artist(legend0)
+        if ((props[theRowNum] == 'Z_stars') | (props[theRowNum] == 'FeH_stars')) & (theColNum == 0) :
+            robs_plot_text(panel, SolarNorm, vpos='top', hpos='left')
+    
+    pdf.savefig(bbox_inches='tight')     
+    pdf.close()
+    
+    
+#################
+def plot_profs_together(Hubble_h, Omega_M, Omega_Lambda, Samp1, struct1, MassBins=None, props='All') :      
+    pdf = PdfPages(PlotDir+"various_profs"+"_"+comp+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+Samp1['z_lower']+".pdf")
+    El1 = robs_element_list_finder(struct1)
+        
+    #Set-up plot:
+    xlimits = np.array([0.0,3.0])
+    ylimits = np.array([2.0,11.99])
+    binno = defaultBinno #50 
+    theMinInBin = 2
+    binwidth = 0.2
+    thelinewidth = 2.
+    SFRScaleFactor = 1.e+08
+    DTGScaleFactor = 1.e+06
+    title = None
+    xlab = [r'$R/\textnormal{R}_{\textnormal{e}}$']
+    rowno = 2
+    colno = 1
+    
+    #For comparison to the HERACLES sample (Abdurro'uf+22a):
+    MassBins=np.array([[9.7,11.2]])
+    title = 'HERACLES sample'
+    kpcBins = None
+
+    if props == 'All' :
+        props = [['MstarD','SFRD','McoldD','OISMD'],['HID','H2D','MdustD','DTG']]
+        
+    #Set-up panels:
+    numPanels = rowno*colno
+    ylab = [r'log($y$)']
+    xlabs = np.full(colno,xlab)
+    ylabs = np.full(rowno,ylab)
+    xlims = [xlimits,xlimits]
+    ylims = [ylimits,ylimits]
+    fig = plt.figure(figsize=(4,3.5*rowno))
+        
+    for kk in range(numPanels) :
+        panel = robs_plot_panels(kk, rows=rowno, columns=colno, xlimits=xlims, ylimits=ylims, \
+                                     xlab=xlabs, ylab=ylabs, SecondXAxis=None, title=title)
+        labs = props[kk]
+        for ii in range(len(labs)) :      
+            #Calc properties to plot:   
+            theX = Samp1['RReRings'][:,:] 
+            if labs[ii] == 'MstarD' :  
+                ylegend = r'$\Sigma_{*} / \textnormal{M}_{\odot}\textnormal{ kpc}^{-2}$'
+                linecol = "orange"  
+                avelinecol = robs_get_colour(linecol, shade=0.5)
+                MstarDp, = plt.plot([np.nan,np.nan], [np.nan,np.nan], '-', linewidth=thelinewidth, color=avelinecol, label=ylegend)
+                PropRings = Samp1['G_samp']['DiskMassRings'] + Samp1['G_samp']['BulgeMassRings']
+            elif labs[ii] == 'SFRD' :
+                ylegend = r'$10^{8}\,\Sigma_{\rm SFR} / \textnormal{ M}_{\odot}\textnormal{ yr}^{-1}\textnormal{ kpc}^{-2}$'
+                linecol = "blue"
+                avelinecol = robs_get_colour(linecol, shade=0.5)
+                SFRDp, = plt.plot([np.nan,np.nan], [np.nan,np.nan], '-', linewidth=thelinewidth, color=avelinecol, label=ylegend)
+                PropRings = Samp1['G_samp']['SfrRings'][:,:] * SFRScaleFactor
+            elif labs[ii] == 'HID' :  
+                ylegend = r'$\Sigma_{\rm HI} / \textnormal{M}_{\odot}\textnormal{ kpc}^{-2}$'
+                linecol = "green"
+                avelinecol = robs_get_colour(linecol, shade=0.5)
+                HIDp, = plt.plot([np.nan,np.nan], [np.nan,np.nan], '-', linewidth=thelinewidth, color=avelinecol, label=ylegend)
+                PropRings = Samp1['G_samp']['ColdGasDiffRings_elements'][:,:,El1["H_NUM"]]
+            elif labs[ii] == 'H2D' :
+                ylegend = r'$\Sigma_{\rm H2} / \textnormal{M}_{\odot}\textnormal{ kpc}^{-2}$'
+                linecol = "black"
+                avelinecol = robs_get_colour(linecol, shade=0.5)
+                H2Dp, = plt.plot([np.nan,np.nan], [np.nan,np.nan], '-', linewidth=thelinewidth, color=avelinecol, label=ylegend)
+                PropRings = Samp1['G_samp']['ColdGasCloudsRings_elements'][:,:,El1["H_NUM"]]
+            elif labs[ii] == 'MdustD' :
+                ylegend = r'$\Sigma_{\rm dust} / \textnormal{M}_{\odot}\textnormal{ kpc}^{-2}$'
+                linecol = "red"
+                avelinecol = robs_get_colour(linecol, shade=0.5)
+                MdustDp, = plt.plot([np.nan,np.nan], [np.nan,np.nan], '-', linewidth=thelinewidth, color=avelinecol, label=ylegend)
+                PropRings = np.nansum(Samp1['G_samp']['DustColdGasCloudsRings_elements'], axis=2) + np.nansum(Samp1['G_samp']['DustColdGasDiffRings_elements'], axis=2)
+            elif labs[ii] == 'McoldD' :
+                ylegend = r'$\Sigma_{\rm gas} / \textnormal{M}_{\odot}\textnormal{ kpc}^{-2}$'
+                linecol = "purple"
+                avelinecol = robs_get_colour(linecol, shade=0.9)
+                McoldDp, = plt.plot([np.nan,np.nan], [np.nan,np.nan], '-', linewidth=thelinewidth, color=avelinecol, label=ylegend)
+                PropRings = Samp1['G_samp']['ColdGasRings'][:,:] - np.nansum(Samp1['G_samp']['DustColdGasCloudsRings_elements'], axis=2) - np.nansum(Samp1['G_samp']['DustColdGasDiffRings_elements'], axis=2)
+            elif labs[ii] == 'OISMD' :
+                ylegend = r'$\Sigma_{\rm O,ISM} / \textnormal{M}_{\odot}\textnormal{ kpc}^{-2}$'
+                linecol = "pink"
+                avelinecol = robs_get_colour(linecol, shade=0.5)
+                OISMDp, = plt.plot([np.nan,np.nan], [np.nan,np.nan], '-', linewidth=thelinewidth, color=avelinecol, label=ylegend)
+                PropRings = Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["O_NUM"]]# * OISMScaleFactor #Oxygen in gas and dust
+            elif labs[ii] == 'OStarsD' :
+                ylegend = r'$\Sigma_{\rm O,*} / \textnormal{M}_{\odot}\textnormal{ kpc}^{-2}$'
+                linecol = "grey"
+                avelinecol = robs_get_colour(linecol, shade=0.5)
+                OStarsDp, = plt.plot([np.nan,np.nan], [np.nan,np.nan], '-', linewidth=thelinewidth, color=avelinecol, label=ylegend)
+                PropRings = Samp1['G_samp']['DiskMassRings_elements'][:,:,El1["O_NUM"]]# * OISMScaleFactor #Oxygen in stellar disc
+            elif labs[ii] == 'DTG' :
+                ylegend = r'$10^{6}\,M_{\rm dust} /M_{\rm H}$'
+                linecol = "cyan"
+                avelinecol = robs_get_colour(linecol, shade=0.5)
+                DTGp, = plt.plot([np.nan,np.nan], [np.nan,np.nan], '-', linewidth=thelinewidth, color=avelinecol, label=ylegend)
+                TotMdustRings = np.nansum(Samp1['G_samp']['DustColdGasCloudsRings_elements'], axis=2) + np.nansum(Samp1['G_samp']['DustColdGasDiffRings_elements'], axis=2) 
+                TotHMassRings = Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["H_NUM"]]
+                PropRings = (TotMdustRings/TotHMassRings) * DTGScaleFactor * Samp1['RingArea'] #Multiply by Ring areas here to cancel out the dividion by ring area to get the Y below (DTD is not a density property).      
+            theY = np.log10(PropRings/Samp1['RingArea']) #in Msun/kpc^2 (or 1.e8*Msun/yr/kpc^2 for the SFRD) (or 1.e6*Msun/yr/kpc^2 for the DTG)
+            panelProp = np.log10(Samp1['G_samp']['StellarMass'])
+            xrange = [theX[np.isfinite(theX)].min(), theX[np.isfinite(theX)].max()]
+                            
+            noShade = 0
+            if kk == numPanels-1 :
+                thePanelLabel = r'log$(M_{*}/\textnormal{M}_{\odot}) =$ '
+                basicLabel = None
+                basicLabelPos = None
+            elif kk == 0 :
+                thePanelLabel = None
+                basicLabel = None
+                basicLabelPos = None
+            robs_plot_profile(theX, theY, panelProp, xlimits, ylimits, xlab, ylab, \
+                              (xrange[1]-xrange[0])/binwidth, MassBins, aveType='Median', rowno=rowno, colno=colno, \
+                               colour=linecol, noShade=noShade, minInBin=1, plot1sig=1, plot2sig=1, linewidth=thelinewidth, inputCentres=1, \
+                               newSubplot=None, textPadder=15., panelLabel=thePanelLabel, basicLabel=basicLabel, basicLabelPos=basicLabelPos,
+                               discreteBins=kpcBins)
+            
+        #Legend:
+        if kk == 0 :
+            theHandles = [MstarDp,SFRDp,McoldDp]
+            legend0 = plt.legend(handles=theHandles, loc='upper right', fontsize='small', frameon=False, labelspacing=0.2)
+        else :
+            theHandles = [HIDp,H2Dp,MdustDp]
+            legend0 = plt.legend(handles=theHandles, loc='upper right', fontsize='small', frameon=False, labelspacing=0.2)
+        legend0._legend_box.align = "left"
+        plt.gca().add_artist(legend0)
+    
+    pdf.savefig(bbox_inches='tight')     
+    pdf.close()
+    

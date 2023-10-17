@@ -14,6 +14,7 @@ chemistry.py
   ;Rob Yates 22-04-2021
   ;
   ;08-11-22: This version was adapted for use at the L-Galaxies workshop 2022
+  ;17-10-23: This version was adapted for use with the publicly-available code for the Yates+23 model
   ;
 """
 
@@ -25,9 +26,11 @@ N_aw = 14.01
 O_aw = 16.0
 Ne_aw = 20.18
 Mg_aw = 24.31
+Al_aw = 26.982
 Si_aw = 28.09
 S_aw = 32.07
 Ca_aw = 40.08
+Mn_aw = 54.938
 Fe_aw = 55.84
 
 #Solar mass fractions (from Wiersma et al. 2009a):
@@ -56,6 +59,7 @@ S_nr = 1.86E-5
 Ca_nr = 2.29E-6
 Fe_nr = 2.82E-5
 
+
 ##########  
 #Assumed solar metallicity for many old models:
 Z_mf_mod = 0.02
@@ -72,16 +76,18 @@ X_mf_bulk_A09 = 0.7154 #This is M_hydrogen/M_baryons in the whole bulk of the Su
 Y_mf_bulk_A09 = 0.2703 #This is M_helium/M_baryons in the whole bulk of the Sun (Asplund+09, section 3.12).
 Z_mf_bulk_A09 = 0.0142 #This is M_metals/M_baryons in the whole bulk of the Sun (Asplund+09, section 3.12).
 
-#Solar abundances (in 12+log(x/H)):
+#Solar abundances in the photosphere (in 12+log(x/H)):
 HeH_A09 = 10.93
 CH_A09 = 8.43
 NH_A09 = 7.83
 OH_A09 = 8.69
 NeH_A09 = 7.93
 MgH_A09 = 7.60
+AlH_A09 = 6.45
 SiH_A09 = 7.51
 SH_A09 = 7.12
 CaH_A09 = 6.34
+MnH_A09 = 5.43
 FeH_A09 = 7.50
 
 #Solar abundances (mass fractions for x/H):
@@ -91,10 +97,14 @@ NH_mf_A09 = (N_aw/H_aw)*10.0**(NH_A09-12.)
 OH_mf_A09 = (O_aw/H_aw)*10.0**(OH_A09-12.)
 NeH_mf_A09 = (Ne_aw/H_aw)*10.0**(NeH_A09-12.)
 MgH_mf_A09 = (Mg_aw/H_aw)*10.0**(MgH_A09-12.)
+AlH_mf_A09 = (Al_aw/H_aw)*10.0**(AlH_A09-12.)
 SiH_mf_A09 = (Si_aw/H_aw)*10.0**(SiH_A09-12.)
 SH_mf_A09 = (S_aw/H_aw)*10.0**(SH_A09-12.)
 CaH_mf_A09 = (Ca_aw/H_aw)*10.0**(CaH_A09-12.)
+MnH_mf_A09 = (Mn_aw/H_aw)*10.0**(MnH_A09-12.)
 FeH_mf_A09 = (Fe_aw/H_aw)*10.0**(FeH_A09-12.)
+
+#print([HeH_mf_A09, CH_mf_A09, NH_mf_A09, OH_mf_A09, NeH_mf_A09, MgH_mf_A09, SiH_mf_A09, SH_mf_A09, CaH_mf_A09, FeH_mf_A09])
 
 #Solar abundances (mass fractions for x/baryons):
 H_mf_bary_A09 = X_mf_A09
@@ -104,10 +114,17 @@ N_mf_bary_A09 = NH_mf_A09 * X_mf_A09
 O_mf_bary_A09 = OH_mf_A09 * X_mf_A09
 Ne_mf_bary_A09 = NeH_mf_A09 * X_mf_A09
 Mg_mf_bary_A09 = MgH_mf_A09 * X_mf_A09
+Al_mf_bary_A09 = AlH_mf_A09 * X_mf_A09
 Si_mf_bary_A09 = SiH_mf_A09 * X_mf_A09
 S_mf_bary_A09 = SH_mf_A09 * X_mf_A09
 Ca_mf_bary_A09 = CaH_mf_A09 * X_mf_A09
+Mn_mf_bary_A09 = MnH_mf_A09 * X_mf_A09
 Fe_mf_bary_A09 = FeH_mf_A09 * X_mf_A09
+
+# print(H_mf_bary_A09, He_mf_bary_A09, C_mf_bary_A09, N_mf_bary_A09, O_mf_bary_A09, Ne_mf_bary_A09, Mg_mf_bary_A09, \
+#       Si_mf_bary_A09, S_mf_bary_A09, Ca_mf_bary_A09, Fe_mf_bary_A09)
+#print(H_mf_bary_A09+He_mf_bary_A09+C_mf_bary_A09+N_mf_bary_A09+O_mf_bary_A09+Ne_mf_bary_A09+Mg_mf_bary_A09+ \
+#      Si_mf_bary_A09+S_mf_bary_A09+Ca_mf_bary_A09+Fe_mf_bary_A09)
 
 #Solar abundances (number fractions):
 HeH_nf_A09 = 10.0**(HeH_A09-12.)
@@ -116,12 +133,12 @@ NH_nf_A09 = 10.0**(NH_A09-12.)
 OH_nf_A09 = 10.0**(OH_A09-12.)
 NeH_nf_A09 = 10.0**(NeH_A09-12.)
 MgH_nf_A09 = 10.0**(MgH_A09-12.)
+AlH_nf_A09 = 10.0**(AlH_A09-12.)
 SiH_nf_A09 = 10.0**(SiH_A09-12.)
 SH_nf_A09 = 10.0**(SH_A09-12.)
 CaH_nf_A09 = 10.0**(CaH_A09-12.)
+MnH_nf_A09 = 10.0**(MnH_A09-12.)
 FeH_nf_A09 = 10.0**(FeH_A09-12.)
-
-
 
 
 ##########
@@ -140,11 +157,14 @@ NH_AG89 = 8.05
 OH_AG89 = 8.93
 NeH_AG89 = 8.09
 MgH_AG89 = 7.58
+AlH_AG89 = 6.47
 SiH_AG89 = 7.55
 SH_phot_AG89 = 7.21
 SH_mete_AG89 = 7.27
 CaH_phot_AG89 = 6.36
 CaH_mete_AG89 = 6.34
+MnH_phot_AG89 = 5.39
+MnH_mete_AG89 = 5.53
 FeH_phot_AG89 = 7.67
 FeH_mete_AG89 = 7.51
   
@@ -155,15 +175,25 @@ NH_mf_AG89 = (N_aw/H_aw)*10.0**(NH_AG89-12.)
 OH_mf_AG89 = (O_aw/H_aw)*10.0**(OH_AG89-12.)
 NeH_mf_AG89 = (Ne_aw/H_aw)*10.0**(NeH_AG89-12.)
 MgH_mf_AG89 = (Mg_aw/H_aw)*10.0**(MgH_AG89-12.)
+AlH_mf_AG89 = (Al_aw/H_aw)*10.0**(AlH_AG89-12.)
 SiH_mf_AG89 = (Si_aw/H_aw)*10.0**(SiH_AG89-12.)
 SH_mf_phot_AG89 = (S_aw/H_aw)*10.0**(SH_phot_AG89-12.)
 SH_mf_mete_AG89 = (S_aw/H_aw)*10.0**(SH_mete_AG89-12.)
 CaH_mf_phot_AG89 = (Ca_aw/H_aw)*10.0**(CaH_phot_AG89-12.)
 CaH_mf_mete_AG89 = (Ca_aw/H_aw)*10.0**(CaH_mete_AG89-12.)
+MnH_mf_phot_AG89 = (Mn_aw/H_aw)*10.0**(MnH_phot_AG89-12.)
+MnH_mf_mete_AG89 = (Mn_aw/H_aw)*10.0**(MnH_mete_AG89-12.)
 FeH_mf_phot_AG89 = (Fe_aw/H_aw)*10.0**(FeH_phot_AG89-12.)  
 FeH_mf_mete_AG89 = (Fe_aw/H_aw)*10.0**(FeH_mete_AG89-12.) 
-
-
+  
+#aFe_mf_phot_AG = MEAN([alog10(MgH_mf_AG/FeH_mf_phot_AG),alog10(SiH_mf_AG/FeH_mf_phot_AG),alog10(SH_mf_AG/FeH_mf_phot_AG),alog10(CaH_mf_AG/FeH_mf_phot_AG)])
+#aFe_mf_mete_AG = MEAN([alog10(MgH_mf_AG/FeH_mf_mete_AG),alog10(SiH_mf_AG/FeH_mf_mete_AG),alog10(SH_mf_AG/FeH_mf_mete_AG),alog10(CaH_mf_AG/FeH_mf_mete_AG)])
+#SolarFeH_phot_AG = FeH_mf_phot_AG*(H_aw/Fe_aw) ;Solar iron abundance by number from Anders & Grevesse (1989) using photospheric abundance
+#SolarFeH_mete_AG = FeH_mf_mete_AG*(H_aw/Fe_aw) ;Solar iron abundance by number from Anders & Grevesse (1989) using meteric abundance
+#SolarOH_AG = OH_mf_AG*(H_aw/O_aw) ;Solar oxygen abundance by number from Anders & Grevesse (1989)
+#SolarNeH_AG = NeH_mf_AG*(H_aw/Ne_aw) ;Solar neon abundance by number from Anders & Grevesse (1989)
+#SolarMgH_AG = MgH_mf_AG*(H_aw/Mg_aw) ;Solar magnesium abundance by number from Anders & Grevesse (1989)
+#SolarSiH_AG = SiH_mf_AG*(H_aw/Si_aw) ;Solar silicon abundance by number from Anders & Grevesse (1989)
 
 
 ##########
@@ -173,6 +203,7 @@ FeH_mf_mete_AG89 = (Fe_aw/H_aw)*10.0**(FeH_mete_AG89-12.)
 Y_mf_GAS07 = 0.2485 #This is M_helium/M_baryons in the solar photosphere
 Z_mf_GAS07 = 0.0122 #This is M_metals/M_baryons in the solar photosphere
 X_mf_GAS07 = 1.0 - Y_mf_GAS07 - Z_mf_GAS07 #This is M_hydrogen/M_baryons in the solar photosphere
+ZH_mf_GAS07 = Z_mf_GAS07 / X_mf_GAS07 #This is M_metals/M_hydrogen in the solar photosphere
 Y_mf_proto_GAS07 = 0.2735 #This is an estimate of the protosolar M_helium/M_baryons
 Z_mf_proto_GAS07 = 0.0132 #This is an estimate of the protosolar M_metals/M_baryons
 X_mf_proto_GAS07 = 1.0 - Y_mf_proto_GAS07 - Z_mf_proto_GAS07 #This is an estimate of the protosolar M_hydrogen/M_baryons
@@ -184,9 +215,11 @@ NH_GAS07 = 7.78
 OH_GAS07 = 8.66
 NeH_GAS07 = 7.84 #Indirect estimate
 MgH_GAS07 = 7.53
+AlH_GAS07 = 6.37
 SiH_GAS07 = 7.51
 SH_GAS07 = 7.14
 CaH_GAS07 = 6.31
+MnH_GAS07 = 5.39
 FeH_GAS07 = 7.45
   
 #Solar abundances (mass fractions):
@@ -196,7 +229,9 @@ NH_mf_GAS07 = (N_aw/H_aw)*10.0**(NH_GAS07-12.)
 OH_mf_GAS07 = (O_aw/H_aw)*10.0**(OH_GAS07-12.)
 NeH_mf_GAS07 = (Ne_aw/H_aw)*10.0**(NeH_GAS07-12.)
 MgH_mf_GAS07 = (Mg_aw/H_aw)*10.0**(MgH_GAS07-12.)
+AlH_mf_GAS07 = (Al_aw/H_aw)*10.0**(AlH_GAS07-12.)
 SiH_mf_GAS07 = (Si_aw/H_aw)*10.0**(SiH_GAS07-12.)
 SH_mf_GAS07 = (S_aw/H_aw)*10.0**(SH_GAS07-12.)
 CaH_mf_GAS07 = (Ca_aw/H_aw)*10.0**(CaH_GAS07-12.)
+MnH_mf_GAS07 = (Mn_aw/H_aw)*10.0**(MnH_GAS07-12.)
 FeH_mf_GAS07 = (Fe_aw/H_aw)*10.0**(FeH_GAS07-12.)  

@@ -45,6 +45,7 @@ robs_contour_plot.py
   ;27-04-23: Added the ability to give custom contour levels as a numpy array.
   ;27-04-23: Added outlierFrac optional argument, allowing user to scale down the number of outliers actually plotted (e.g. if reduced file size is important)
   ;07-09-23: Added the cleaning of the input theX and theY arrays, to remove all NaNs and Infinities.
+  ;17-10-23: This version was adapted for use with the publicly-available code for the Yates+23 model
   ;
 """
 #Basic packages:
