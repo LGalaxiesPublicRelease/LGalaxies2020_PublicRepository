@@ -50,7 +50,7 @@ MASS_CHECKS = 0 #If on (and LOAD_SAMPLE is off), key mass properties will be che
 COMBINE_MODELS = 0 #If on, MR-I and MR-II versions of the same model are combined (if the other version has a .npy sample already saved).
 STELLAR_MASS_CUT = 1 #If on, only galaxies above the mass resolution thresholds of log(M*/Msun) >= 8.0 for Millennium-I and log(M*/Msun) >= 7.0 for Millennium-II will be selected.
 CALC_RINGS_AND_SFH_INFO = 0 #If on, ring centre radii, Re, etc & SFH info will be calculated and added to the sample dictionaries
-GENERAL_PLOTS = 1 #If on, general plots are produced, such as the SMF, etc.
+GENERAL_PLOTS = 1 #If on, general plots are produced, such as the SMF, MZR, etc.
 PAPER_PLOTS = 0 #If on, the plots presented in Yates+23 are produced.
 MULTI_REDSHIFT_PLOTS = 0 #If on, in combination with either GENERAL_PLOTS or PAPER_PLOTS, plots requiring multiple redshift outputs will be calculated and made.
 
@@ -320,9 +320,9 @@ if GENERAL_PLOTS == 1 :
         plot_mzgr(Samp1, struct1, char_z_low, pdf=pdf)
         plot_mzsr(Samp1, char_z_low, pdf=pdf)
         if CALC_RINGS_AND_SFH_INFO == 1 :
+            plot_sfrd_prof(Samp1, struct1, char_z_low, MassBins, pdf=pdf)
             if not ("liteOutput" in (STRUCT_TYPE)) :
                 plot_sfhs(Samp1, SFH_bins, snap_z0, char_z_low, pdf=pdf)
-            plot_sfrd_prof(Samp1, struct1, char_z_low, MassBins, pdf=pdf)        
     pdf.close()
         
 if PAPER_PLOTS == 1 :
@@ -339,8 +339,12 @@ if PAPER_PLOTS == 1 :
             plot_cosmic_dust_evos(Volume, Hubble_h, Omega_M, Omega_b, FullRedshiftList, FullSnapnumList, RedshiftsToRead, \
                                   char_z_low, char_z_high, Samp1, obs=1, plotTotal=None)
     else :
-        plot_timescales(Samp1, struct1, REDSHIFT, Samp2, struct2, xprop='OH', yprops='All', contourLines='graded', \
+        plot_timescales(Samp1, struct1, REDSHIFT, xprop='OH', yprops='All', contourLines='graded', \
                         outlierFrac=0.0, SolarNorm=SOLAR_ABUNDANCE_SET)
+        plot_smf(Hubble_h, Samp1, REDSHIFT, Add_Edd_bias=None)
+        plot_himf(Hubble_h, Samp1, struct1, REDSHIFT, prop="H")
+        plot_mssfr(Hubble_h, Samp1, REDSHIFT, contourLines='graded')
+        plot_snrates(Samp1, REDSHIFT)
 
 print("DONE!")
 

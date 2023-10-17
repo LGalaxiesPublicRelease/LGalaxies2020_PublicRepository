@@ -28,12 +28,18 @@ from chemistry import *
 from robs_contour_plot import robs_contour_plot
 from robs_plot_average import robs_plot_average
 from robs_plot_profile import robs_plot_profile
+from robs_solarnorm_finder import robs_solarnorm_finder
+from robs_element_list_finder import robs_element_list_finder
+from robs_plot_text import robs_plot_text
+from robs_plot_panels import robs_plot_panels
 
+
+#################
+#Default parameters:
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.size'] = 14
 plt.rcParams['font.serif'] = 'Times'
-
-
+defaultOutlierFrac = 0.25
 
 
 #################
@@ -41,8 +47,6 @@ plt.rcParams['font.serif'] = 'Times'
 BaseDir = '../../' #project root directory
 OutputDir = BaseDir+'output/' #where the L-Galaxies output files are kept
 PlotDir = BaseDir+'figures/' #where plots created by this script are sent
-
-
 
 
 #################
@@ -559,5 +563,323 @@ def plot_cosmic_SFRD(Volume, Hubble_h, FullRedshiftList, FullSnapnumList, Redshi
     print("SFHs plotted")
     
 
+#################
+#Plot tau_acc, tau_shock, and tau_sput,CGM, and tau_sput,Ejec:
+def plot_timescales(Samp1, struct1, redshift, xprop='OH', \
+                    yprops='All', contourLines='solid', outlierFrac=defaultOutlierFrac, SolarNorm=None, label=1) : 
+    pdf = PdfPages(PlotDir+"dust_timescales"+"_"+xprop+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
+    SolarAbunds = robs_solarnorm_finder(SolarNorm)
+    El1 = robs_element_list_finder(struct1)
+    if yprops == 'All' :
+        yprops = ['tau_acc','tau_shock','tau_sput_hotGas','tau_sput_ejecta']
+    
+    #Set-up multi-panel plot:
+    fig = plt.figure(figsize=(4.5*len(yprops),4))
+    panelNum = 0
+    rowno = 1
+    colno = len(yprops)
+    binno = 35
+    VolRings = np.repeat(Samp1["Volumes"][:,np.newaxis], Samp1["RNUM"], axis=1) #Extend Volumes array to an extra dimension
+    Samp1Linestyle = contourLines
+    Samp1Alpha = 1.0
+    Samp1Fill = 1 #0
+    if (outlierFrac == 0.0) | (outlierFrac == None) :
+        Samp1NoOutliers = 1
+    else :
+        Samp1NoOutliers = 0
+    Samp1Linecolour = 'black'
+    Samp1zorder = 2
+        
+    #####
+    #tau_acc for rings: 
+    if 'tau_acc' in yprops :
+        panelNum += 1
+        ax = plt.subplot(rowno, colno, panelNum)
+        if xprop == 'OH' :
+            xlimits = np.array([6.5,9.75])
+            plt.xlabel(r'12+log(O/H)')
+            ylimits = np.array([4.5,12.0])
+            plt.ylabel(r'log$(\tau_{\rm acc}/\textnormal{yr})$')
+        if xprop == 'logZ' :
+            xlimits = np.array([-2.5,1.0])
+            plt.xlabel(r'log($Z/Z_{\odot}$)')
+            ylimits = np.array([-2.0,7.0])
+            plt.ylabel(r'log$(\tau_{\rm acc}/\textnormal{Myr})$')
+        elif xprop == 'H2D' :
+            xlimits = np.array([-2.0,4.0])
+            plt.xlabel(r'log($\Sigma_{\rm H2} / \textnormal{M}_{\odot}\textnormal{ pc}^{-2}$)')
+            ylimits = np.array([-2.0,7.0])
+            plt.ylabel(r'log$(\tau_{\rm acc}/\textnormal{Myr})$')
+        plt.xlim(xlimits)
+        plt.ylim(ylimits)
+       
+        t_acc_rings = Samp1['G_samp']['t_acc'][:,:]
+        if xprop == 'OH' :
+            Zg = 12. + np.log10((Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["O_NUM"]] / Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["H_NUM"]]) * (H_aw/O_aw))        
+            ww = np.where((t_acc_rings > 0.0) & (np.isfinite(t_acc_rings)) & (~np.isnan(t_acc_rings)) & (Zg > 0.0) & (np.isfinite(Zg)) & (~np.isnan(Zg)))  
+            theX = Zg[ww]
+            theY = np.log10(t_acc_rings[ww]) #log(t_acc/yr)
+        elif xprop == 'logZ' :
+            Zg = np.log10((np.nansum(Samp1['G_samp']['MetalsColdGasRings'], axis=2) / Samp1['G_samp']['ColdGasRings']) / SolarAbunds['Z_mf_sun'])
+            ww = np.where((t_acc_rings > 0.0) & (np.isfinite(t_acc_rings)) & (~np.isnan(t_acc_rings)) & (np.isfinite(Zg)) & (~np.isnan(Zg)))  
+            theX = Zg[ww]
+            theY = np.log10(t_acc_rings[ww]/1.e6) #log(t_acc/Myr)
+        elif xprop == 'H2D' :
+            H2D = np.log10((Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["H_NUM"]] * (Samp1['G_samp']['H2fractionRings']))/Samp1['RingArea']/(1000.**2)) #to get Msun/pc^2 
+            ww = np.where((t_acc_rings > 0.0) & (np.isfinite(t_acc_rings)) & (~np.isnan(t_acc_rings)) & (np.isfinite(H2D)) & (~np.isnan(H2D)))  
+            theX = H2D[ww]
+            theY = np.log10(t_acc_rings[ww]/1.e6) #log(t_acc/Myr)
+        theWeights = 1./VolRings[ww]
+        robs_contour_plot(theX, theY, binno, '4sig', noOutliers=Samp1NoOutliers, fill=Samp1Fill, alpha=Samp1Alpha, theRange=[xlimits,ylimits], weights=theWeights, \
+                          linestyle=Samp1Linestyle, linecolour=Samp1Linecolour, outlierFrac=outlierFrac, zorder=Samp1zorder)
+        
+        robs_plot_text(ax, r'z = '+str(redshift), vpos='bottom', hpos='left')
+        if label :
+            robs_plot_text(ax, [r'MM+\textsc{binary\_c}', r'MM+singleStars'], vpos='top', hpos='right', colour=[model1avecol,model2col], padder=0.06)
+           
+    #####
+    #tau_shock for rings: 
+    if 'tau_shock' in yprops :
+        panelNum += 1
+        xlimits = np.array([6.5,9.75]) 
+        ylimits = np.array([7.0,19.0])
+        plt.subplot(rowno, colno, panelNum)
+        plt.xlabel(r'12+log(O/H)')
+        plt.ylabel(r'log$(\tau_{\rm shock}/\textnormal{yr})$')
+        plt.xlim(xlimits)
+        plt.ylim(ylimits)
+     
+        Zg = 12. + np.log10((Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["O_NUM"]] / Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["H_NUM"]]) * (H_aw/O_aw))        
+        t_des_rings = Samp1['G_samp']['t_des'][:,:]
+        ww = np.where((t_des_rings > 0.0) & (np.isfinite(t_des_rings)) & (~np.isnan(t_des_rings)) & (Zg > 0.0) & (np.isfinite(Zg)) & (~np.isnan(Zg)))  
+        theX = Zg[ww]
+        theY = np.log10(t_des_rings[ww])
+        theWeights = 1./VolRings[ww]
+        robs_contour_plot(theX, theY, binno, '4sig', noOutliers=Samp1NoOutliers, fill=Samp1Fill, alpha=Samp1Alpha, theRange=[xlimits,ylimits], weights=theWeights, \
+                          linestyle=Samp1Linestyle, linecolour=Samp1Linecolour, outlierFrac=outlierFrac, zorder=Samp1zorder)
 
+    #####
+    #tau_sput for HotGas:  
+    if 'tau_sput_hotGas' in yprops :
+        panelNum += 1
+        xlimits = np.array([8.5,12.0])
+        plt.subplot(rowno, colno, panelNum)
+        plt.xlabel(r'log$(M_{*} / \textnormal{M}_{\odot})$')
+        plt.ylabel(r'log$(\tau_{\rm sput,CGM}/\textnormal{yr})$')
+        plt.xlim(xlimits)
+        plt.ylim(ylimits)
+      
+        tau_sput = Samp1['G_samp']['t_sput_HotGas']*1.e9 #convert from Gyr to yr      
+        ww = np.where((tau_sput > 0.0) & (np.isfinite(tau_sput)) & (~np.isnan(tau_sput)))  
+        theX = np.log10(Samp1['G_samp']['StellarMass'][ww])
+        theY = np.log10(tau_sput[ww])
+        theWeights = 1./Samp1["Volumes"][ww]
+        robs_contour_plot(theX, theY, binno, '3sig', noOutliers=Samp1NoOutliers, fill=Samp1Fill, alpha=Samp1Alpha, theRange=[xlimits,ylimits], weights=theWeights, \
+                          linestyle=Samp1Linestyle, linecolour=Samp1Linecolour, outlierFrac=outlierFrac, zorder=Samp1zorder)
+
+    #####
+    #tau_sput for EjectedMass:  
+    if 'tau_sput_ejecta' in yprops :
+        panelNum += 1
+        xlimits = np.array([8.5,12.0])
+        plt.subplot(rowno, colno, panelNum)
+        plt.xlabel(r'log$(M_{*} / \textnormal{M}_{\odot})$')
+        plt.ylabel(r'log$(\tau_{\rm sput,Ejecta}/\textnormal{yr})$')
+        plt.xlim(xlimits)
+        plt.ylim(ylimits)
+          
+        tau_sput = Samp1['G_samp']['t_sput_EjectedMass']*1.e9 #convert from Gyr to yr     
+        ww = np.where((tau_sput > 0.0) & (np.isfinite(tau_sput)) & (~np.isnan(tau_sput)))  
+        theX = np.log10(Samp1['G_samp']['StellarMass'][ww])
+        theY = np.log10(tau_sput[ww])
+        theWeights = 1./Samp1["Volumes"][ww]
+        robs_contour_plot(theX, theY, binno, '3sig', noOutliers=Samp1NoOutliers, fill=Samp1Fill, alpha=Samp1Alpha, theRange=[xlimits,ylimits], weights=theWeights, \
+                          linestyle=Samp1Linestyle, linecolour=Samp1Linecolour, outlierFrac=outlierFrac, zorder=Samp1zorder)
+
+    pdf.savefig(bbox_inches='tight') 
+    pdf.close()
+    
+    
+#################
+def plot_smf(Hubble_h, Samp1, redshift, Add_Edd_bias=None) :  
+    pdf = PdfPages(PaperPlotDir+"smf"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
+    
+    xlimits = np.array([8.0,12.0])
+    ylimits = np.array([-5.9,-0.5])
+    
+    #Set-up plot:
+    fig, ax = plt.subplots(figsize=(5,5))
+    plt.xlabel(r'log$(M_{*} / \textnormal{M}_{\odot})$')
+    plt.ylabel(r'log$(\phi / \textnormal{Mpc}^{-3} \textnormal{ dex}^{-1})$')
+    plt.xlim(xlimits)
+    plt.ylim(ylimits)
+    binwidth = 0.1
+    bin_arr = np.arange(xlimits[0],xlimits[1]+binwidth,binwidth)
+    
+    if ((Samp1["MRI_gals"] > 0) & (Samp1["MRII_gals"] > 0)) :
+        prop_MRI = np.log10(Samp1['G_samp']['StellarMass'][0:Samp1['MRI_gals']])
+        prop_MRII = np.log10(Samp1['G_samp']['StellarMass'][Samp1['MRI_gals']:])
+        if Add_Edd_bias :
+            prop_MRI += np.random.randn(len(Samp1['G_samp']['StellarMass'][0:Samp1['MRI_gals']]))*0.08*(1+float(Samp1['z_lower'])) #Add Eddington bias to more fa
+            prop_MRII += np.random.randn(len(Samp1['G_samp']['StellarMass'][Samp1['MRI_gals']:]))*0.08*(1+float(Samp1['z_lower']))
+        bin_arr_MRI = np.arange(np.log10(Samp1["MRI_cutoff"]),xlimits[1]+binwidth,binwidth)
+        bin_arr_MRII = np.arange(xlimits[0],np.log10(Samp1["MRI_cutoff"])+(2.*binwidth),binwidth)
+        hist_MRI = np.histogram(prop_MRI, bins=bin_arr_MRI, range=(np.log10(Samp1["MRI_cutoff"]),xlimits[1])) 
+        hist_MRII = np.histogram(prop_MRII, bins=bin_arr_MRII, range=(xlimits[0],np.log10(Samp1["MRI_cutoff"]))) 
+        plt.plot(hist_MRI[1][0:len(hist_MRI[1][:])-1]+binwidth/2., np.log10((hist_MRI[0][:]/(Samp1["Volumes"][0]*binwidth))*Hubble_h**3), \
+                 linewidth=defaultLinewidth, color=model1avecol)#, label=Samp1['Label']) 
+        plt.plot(hist_MRII[1][0:len(hist_MRII[1][:])-1]+binwidth/2., np.log10((hist_MRII[0][:]/(Samp1["Volumes"][Samp1['MRI_gals']]*binwidth))*Hubble_h**3), \
+                 linewidth=defaultLinewidth, linestyle='dotted', color=model1avecol) 
+    else :
+        prop = np.log10(Samp1['G_samp']['StellarMass'])
+        if Add_Edd_bias :
+            prop += np.random.randn(len(Samp1['G_samp']['StellarMass']))*0.08*(1+float(Samp1['z_lower']))
+        hist = np.histogram(prop, bins=bin_arr, range=(xlimits[0],xlimits[1])) 
+        plt.plot(hist[1][0:len(hist[1][:])-1]+binwidth/2., np.log10((hist[0][:]/(Samp1['Volumes'][0]*binwidth))*Hubble_h**3), \
+                 linewidth=defaultLinewidth, color=model1avecol, label=Samp1['Label'])   
+   
+    #Labels:
+    robs_plot_text(ax, [r'MM+\textsc{binary\_c}', r'MM+singleStars', r'Observations'], hpos='left', vpos='bottom', \
+                   colour=[model1avecol, model2col, obscol])
+    robs_plot_text(ax, r'a)', hpos='right', vpos='top')
+    
+    pdf.savefig(bbox_inches='tight')     
+    pdf.close()
+
+    
+#################
+#Plot HI mass function (HIMF):
+def plot_himf(Hubble_h, Samp1, struct1, redshift, prop="ColdGas") :  
+    pdf = PdfPages(PaperPlotDir+"himf"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
+    if prop == "H" :
+        El1 = robs_element_list_finder(struct1)
+    xlimits = np.array([7.0,11.0])
+    ylimits = np.array([-5.9,0.0])
+    
+    #Set-up plot:
+    fig, ax = plt.subplots(figsize=(5,5))
+    plt.xlabel(r'log$(M_{\rm HI} / \textnormal{M}_{\odot})$')
+    plt.ylabel(r'log$(\phi / \textnormal{Mpc}^{-3} \textnormal{ dex}^{-1})$')
+    plt.xlim(xlimits)
+    plt.ylim(ylimits)
+    
+    #Plot HIMF:
+    binwidth = 0.1
+    bin_arr = np.arange(xlimits[0],xlimits[1]+binwidth,binwidth)
+    if ((Samp1["MRI_gals"] > 0) & (Samp1["MRII_gals"] > 0)) :
+        MRI_HI_cutoff = 10**(9.5)
+        if prop == "ColdGas" :
+            prop_MRI = np.log10(Samp1['G_samp']['ColdGas'][0:Samp1['MRI_gals']]*(1.-Samp1['G_samp']['H2fraction'][0:Samp1['MRI_gals']]))
+            prop_MRII = np.log10(Samp1['G_samp']['ColdGas'][Samp1['MRI_gals']:]*(1.-Samp1['G_samp']['H2fraction'][Samp1['MRI_gals']:]))
+        elif prop == "H" :
+            prop_MRI = np.log10(Samp1['G_samp']['ColdGas_elements'][0:Samp1['MRI_gals'],El1["H_NUM"]]*(1.-Samp1['G_samp']['H2fraction'][0:Samp1['MRI_gals']]))
+            prop_MRII = np.log10(Samp1['G_samp']['ColdGas_elements'][Samp1['MRI_gals']:,El1["H_NUM"]]*(1.-Samp1['G_samp']['H2fraction'][Samp1['MRI_gals']:]))
+        bin_arr_MRI = np.arange(np.log10(MRI_HI_cutoff),xlimits[1]+binwidth,binwidth)
+        bin_arr_MRII = np.arange(xlimits[0],np.log10(MRI_HI_cutoff)+(2.*binwidth),binwidth)
+        hist_MRI = np.histogram(prop_MRI, bins=bin_arr_MRI, range=(np.log10(MRI_HI_cutoff),xlimits[1])) 
+        hist_MRII = np.histogram(prop_MRII, bins=bin_arr_MRII, range=(xlimits[0],np.log10(MRI_HI_cutoff))) 
+        plt.plot(hist_MRI[1][0:len(hist_MRI[1][:])-1]+binwidth/2., np.log10((hist_MRI[0][:]/(Samp1["Volumes"][0]*binwidth))*Hubble_h**3), \
+                  linewidth=defaultLinewidth, color=model1avecol)#, label=Samp1['Label']) 
+        plt.plot(hist_MRII[1][0:len(hist_MRII[1][:])-1]+binwidth/2., np.log10((hist_MRII[0][:]/(Samp1["Volumes"][Samp1['MRI_gals']]*binwidth))*Hubble_h**3), \
+                  linewidth=defaultLinewidth, linestyle='dotted', color=model1avecol) 
+    else :
+        if prop == "ColdGas" :
+            propAll = np.log10(Samp1['G_samp']['ColdGas']*(1.-Samp1['G_samp']['H2fraction']))
+        elif prop == "H" :
+            propAll = np.log10(Samp1['G_samp']['ColdGas_elements'][:,El1["H_NUM"]]*(1.-Samp1['G_samp']['H2fraction']))
+        hist = np.histogram(propAll, bins=bin_arr, range=(xlimits[0],xlimits[1])) 
+        plt.plot(hist[1][0:len(hist[1][:])-1]+binwidth/2., np.log10((hist[0][:]/(Samp1['Volumes'][0]*binwidth))*Hubble_h**3), \
+             linewidth=defaultLinewidth, color=model1avecol)  
  
+    #Plot panel label:
+    robs_plot_text(ax, r'b)', hpos='right', vpos='top')
+
+    pdf.savefig(bbox_inches='tight')     
+    pdf.close()
+    
+
+#################
+#Plot M* - sSFR relation:
+def plot_mssfr(Hubble_h, Samp1, redshift, contourLines=None) :  
+    pdf = PdfPages(PaperPlotDir+"mstar-ssfr"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
+    
+    if Samp1["MRII_gals"] > 0 :
+        xlimits = np.array([8.5,12.0])
+    else :
+        xlimits = np.array([9.0,12.0])
+    ylimits = np.array([-14.5,-8.0])
+    
+    if contourLines is None :
+        ls1 = 'solid'
+    else :
+        ls1 = contourLines
+    
+    #Set-up plot:
+    fig, ax = plt.subplots(figsize=(5,5))
+    plt.xlabel(r'log$(M_{*} / \textnormal{M}_{\odot})$')
+    plt.ylabel(r'log$(\textnormal{sSFR} / \textnormal{yr}^{-1})$')
+    plt.xlim(xlimits)
+    plt.ylim(ylimits)
+    
+    binno = 25
+    theX = np.log10(Samp1['G_samp']['StellarMass'][Samp1['G_samp']['Sfr']>0.0])
+    theY = np.log10(Samp1['G_samp']['Sfr'][Samp1['G_samp']['Sfr']>0.0]/Samp1['G_samp']['StellarMass'][Samp1['G_samp']['Sfr']>0.0])
+    robs_contour_plot(theX, theY, binno, '3sig', noOutliers=0, fill=1, alpha=1.0, theRange=[xlimits,ylimits], \
+                      colour=model1col, linestyle=ls1, weights=1./Samp1['Volumes'][Samp1['G_samp']['Sfr']>0.0], outlierFrac=defaultOutlierFrac)
+
+    #Plot panel label:
+    robs_plot_text(ax, r'c)', hpos='right', vpos='top')
+    
+    pdf.savefig(bbox_inches='tight')     
+    pdf.close()  
+    
+
+#################
+def plot_snrates(Samp1, redshift) :     
+    pdf = PdfPages(PaperPlotDir+"sSFR-SNRates"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
+    xlimits = np.array([-13.0,-9.0])
+    xticks = [-13.0,-12.0,-11.0,-10.0,-9.0]
+    ylimits = np.array([[-4.5,3.0],[-5.5,1.5]])
+    theMinInBin = 1
+    
+    #Set-up plot:
+    rows=2
+    columns=1
+    numPanels = rows*columns
+    xlabs = [r'log(sSFR / yr$^{-1}$)',r'log(sSFR / yr$^{-1}$)']
+    ylabs = [r'log($R_{\rm SNII}$ / SNuM)',r'log($R_{\rm SNIa}$ / SNuM)']
+    xlims = [xlimits,xlimits]
+    ylims = ylimits
+    yticks = [[-4.0,-2.0,0.0]]*rows
+    fig, ax = plt.subplots(figsize=(5,5))
+    for ii in range(numPanels) :
+        panel = robs_plot_panels(ii, rows=rows, columns=columns, xlimits=xlims, ylimits=ylims, \
+                                 xlab=xlabs, ylab=ylabs, xticks=xticks, yticks=yticks, SecondXAxis=None)
+        if ii == 0 :
+            #Plot SN-II rate:
+            binno = defaultBinno #50
+            SNIIRate = Samp1['G_samp']['DiskSNIIRate'] + Samp1['G_samp']['BulgeSNIIRate'] + Samp1['G_samp']['ICMSNIIRate'] #[1/yr]
+            SNIIRate_SNuM = SNIIRate * 1.e2 / (Samp1['G_samp']['StellarMass']/1.e10) #[1/100yr * 1/10^10Msun]
+            theX = np.log10(Samp1['G_samp']['Sfr'][(SNIIRate_SNuM > 0.0) & (Samp1['G_samp']['Sfr'] > 0.0)] / Samp1['G_samp']['StellarMass'][(SNIIRate_SNuM > 0.0) & (Samp1['G_samp']['Sfr'] > 0.0)])
+            theY = np.log10(SNIIRate_SNuM[(SNIIRate_SNuM > 0.0) & (Samp1['G_samp']['Sfr'] > 0.0)])
+            theWeights = 1./Samp1["Volumes"][(SNIIRate_SNuM > 0.0) & (Samp1['G_samp']['Sfr'] > 0.0)]
+            robs_plot_average(theX, theY, binno=10, aveType='Median', minInBin=theMinInBin, colour=model1col, \
+                              linewidth=defaultLinewidth, plot1sig=1, plot2sig=1, inputCentres=1, invertLinestyle=1, \
+                              weights=theWeights, plotlims=[xlimits,ylimits[ii]])     
+        elif ii == 1 :
+            #Plot SN-Ia rate:
+            SNIaRate = Samp1['G_samp']['DiskSNIaRate'] + Samp1['G_samp']['BulgeSNIaRate'] + Samp1['G_samp']['ICMSNIaRate'] #[1/yr]
+            SNIaRate_SNuM = SNIaRate * 1.e2 / (Samp1['G_samp']['StellarMass']/1.e10) #[1/100yr * 1/10^10Msun]
+            theX = np.log10(Samp1['G_samp']['Sfr'][(SNIaRate_SNuM > 0.0) & (Samp1['G_samp']['Sfr'] > 0.0)] / Samp1['G_samp']['StellarMass'][(SNIaRate_SNuM > 0.0) & (Samp1['G_samp']['Sfr'] > 0.0)])
+            theY = np.log10(SNIaRate_SNuM[(SNIaRate_SNuM > 0.0) & (Samp1['G_samp']['Sfr'] > 0.0)])
+            theWeights = 1./Samp1["Volumes"][(SNIaRate_SNuM > 0.0) & (Samp1['G_samp']['Sfr'] > 0.0)]
+            robs_plot_average(theX, theY, binno=10, aveType='Median', minInBin=theMinInBin, colour=model1col, \
+                              linewidth=defaultLinewidth, plot1sig=1, plot2sig=1, inputCentres=1, invertLinestyle=1, \
+                                  weights=theWeights, plotlims=[xlimits,ylimits[ii]]) #linestyle='--',         
+    
+        #Plot panel label:
+        if ii == 0 :   
+            robs_plot_text(ax, r'd)', hpos='right', vpos='top')
+    
+    pdf.savefig(bbox_inches='tight')     
+    pdf.close()  
