@@ -345,6 +345,7 @@ if PAPER_PLOTS == 1 :
         plot_himf(Hubble_h, Samp1, struct1, REDSHIFT, prop="H")
         plot_mssfr(Hubble_h, Samp1, REDSHIFT, contourLines='graded')
         plot_snrates(Samp1, REDSHIFT)
-
+        plot_mzgr(Hubble_h, Samp1, struct1, REDSHIFT, dustCorrec=1, contourLines='graded')
+        plot_mzsr(Hubble_h, Omega_M, Omega_Lambda, Samp1, REDSHIFT, ApertureCorrec=1, contourLines='graded')
 print("DONE!")
 

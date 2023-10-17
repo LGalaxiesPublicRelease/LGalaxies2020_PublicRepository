@@ -882,4 +882,156 @@ def plot_snrates(Samp1, redshift) :
             robs_plot_text(ax, r'd)', hpos='right', vpos='top')
     
     pdf.savefig(bbox_inches='tight')     
-    pdf.close()  
+    pdf.close() 
+    
+    
+#################
+#Plot M* - Zg relation: 12+log(O/H), rings-based, SFR weighted:
+def plot_mzgr(Hubble_h, Samp1, struct1, redshift, dustCorrec=None, \
+              contourLines=None, plotAve=None, plotRedshift=None) :     
+    pdf = PdfPages(PaperPlotDir+"mzgr"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")   
+    El1 = robs_element_list_finder(struct1)
+    
+    if Samp1["MRII_gals"] > 0 :
+        xlimits = np.array([8.5,12.0])
+    else :
+        xlimits = np.array([9.0,12.0])
+    if redshift > 6.0 :
+        xlimits = np.array([7.0,10.6])
+        ylimits = np.array([6.0,8.75])
+    else :
+        ylimits = np.array([7.0,9.75])
+    
+    if contourLines is None :
+        ls1 = 'solid'
+    else :
+        ls1 = contourLines
+    
+    #Set-up plot:
+    fig, ax = plt.subplots(figsize=(5,5))
+    plt.xlabel(r'log$(M_{*} / \textnormal{M}_{\odot})$')
+    plt.ylabel(r'12+log(O/H)')
+    plt.xlim(xlimits)
+    plt.ylim(ylimits)
+    binno = 25
+    SFRmax = np.max(Samp1['G_samp']['SfrRings'], axis=1) #Max SFR from all rings, for every galaxy
+    SFRfrac = Samp1['G_samp']['SfrRings']/SFRmax[:,None] #Fraction of max SFR in each ring, for every galaxy
+    Mstar = Samp1['G_samp']['StellarMass']
+    Vol = Samp1['Volumes']
+    SFRtot = np.nansum(SFRfrac, axis=1) #Sum of the SFR fractions from all rings, for evey galaxy. (Minimum must be 1.0)
+    if dustCorrec :    
+        H_rings = Samp1['G_samp']['ColdGasCloudsRings_elements'][:,:,El1["H_NUM"]] + Samp1['G_samp']['ColdGasDiffRings_elements'][:,:,El1["H_NUM"]] \
+                - Samp1['G_samp']['DustColdGasCloudsRings_elements'][:,:,El1["H_NUM"]] - Samp1['G_samp']['DustColdGasDiffRings_elements'][:,:,El1["H_NUM"]]
+        O_rings = Samp1['G_samp']['ColdGasCloudsRings_elements'][:,:,El1["O_NUM"]] + Samp1['G_samp']['ColdGasDiffRings_elements'][:,:,El1["O_NUM"]] \
+                - Samp1['G_samp']['DustColdGasCloudsRings_elements'][:,:,El1["O_NUM"]] - Samp1['G_samp']['DustColdGasDiffRings_elements'][:,:,El1["O_NUM"]]
+    else :
+        H_rings = Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["H_NUM"]]
+        O_rings = Samp1['G_samp']['ColdGasRings_elements'][:,:,El1["O_NUM"]]
+    Zg_rings = (O_rings / H_rings) * (H_aw/O_aw) * SFRfrac
+    Zg_tot = np.nansum(Zg_rings, axis=1)
+    Zg = 12. + np.log10(Zg_tot[Zg_tot > 0.0] / SFRtot[Zg_tot > 0.0])
+    Mstar = Mstar[Zg_tot > 0.0] 
+    Vol = Vol[Zg_tot > 0.0] 
+    theX = np.log10(Mstar[Zg > 0.0])
+    theY = Zg[Zg > 0.0]
+    robs_contour_plot(theX, theY, binno, '3sig', noOutliers=0, fill=1, alpha=1.0, theRange=[xlimits,ylimits], \
+                      colour=model1col, linestyle=ls1, weights=1./Vol[Zg > 0.0], outlierFrac=defaultOutlierFrac)
+    if plotAve :
+        Samp1_ave = robs_plot_average(theX, theY, binno=10, aveType='Median', minInBin=50, \
+                          linewidth=4., inputCentres=1, returnValues=1) 
+            
+    #Plot panel label:
+    if plotRedshift :
+        robs_plot_text(ax, "z="+char_z_low, hpos='right', vpos='top')
+    else :
+        robs_plot_text(ax, r'e)', hpos='right', vpos='top')
+    
+    pdf.savefig(bbox_inches='tight')     
+    pdf.close() 
+
+
+#################
+#Plot M* - Zs relation: Z*/Zsun, rings-based, mass weighted, within 3 arcsec (i.e. first 7 rings, for z=0.037):
+def plot_mzsr(Hubble_h, Omega_M, Omega_Lambda, Samp1, redshift, \
+              SolarNorm="A09_bulk", ApertureCorrec=None, contourLines=None) :  
+    pdf = PdfPages(PaperPlotDir+"mzsr"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+str(redshift)+".pdf")
+    SolarAbunds = robs_solarnorm_finder(SolarNorm)
+    #N.B. SolarNorm default is "A09_bulk" to match the observations that are plotted for comparison in Yates+23.
+
+    if Samp1["MRII_gals"] > 0 :
+        xlimits = np.array([minMassPlotMRII,12.0])
+    else :
+        xlimits = np.array([9.0,12.0])
+    ylimits = np.array([-1.5,0.5])
+    
+    if contourLines is None :
+        ls1 = 'solid'
+    else :
+        ls1 = contourLines
+    
+    #Set-up plot:
+    fig, ax = plt.subplots(figsize=(5,5))
+    plt.xlabel(r'log$(M_{*} / \textnormal{M}_{\odot})$')
+    plt.ylabel(r'$Z_{*\textnormal{,}<3\textnormal{arcsec}} / \textnormal{Z}_{\odot}$')
+    plt.xlim(xlimits)
+    plt.ylim(ylimits)
+    plt.tick_params(direction="in", top=True, bottom=True, left=True, right=True)
+    
+    binno = 25
+    if ApertureCorrec is None :
+        max_ring = Samp1['RNUM']
+    else :
+        if redshift == 0.0 :
+            scale_redshift = 0.037 #Average redshift of MaNGA
+        else :
+            scale_redshift = redshift
+        aperture_diameter_arcsec = 3. #Diameter of an SDSS fibre
+        aperture_diameter_kpc = robs_arcsec_to_kpc(aperture_diameter_arcsec, scale_redshift, \
+                                                   OmegaM=Omega_M, OmegaL=Omega_Lambda, Hubble_h=Hubble_h)
+        for ii in range(Samp1['RNUM']) :
+            if Samp1['RingRadii'][ii]*2. < aperture_diameter_kpc :
+                max_ring = ii+2 #Has +2 to get the ring that is just beyond the required aperture (rather than just within)
+    TotMetalsStarsRings = np.nansum(Samp1['G_samp']['MetalsDiskMassRings'][:,0:max_ring,:], axis=2) + np.nansum(Samp1['G_samp']['MetalsBulgeMassRings'][:,0:max_ring,:], axis=2)
+    TotMassRings = Samp1['G_samp']['DiskMassRings'][:,0:max_ring] + Samp1['G_samp']['BulgeMassRings'][:,0:max_ring]
+    TotMetalsStars = np.nansum(TotMetalsStarsRings, axis=1)
+    ZsRings = np.log10(TotMetalsStarsRings / TotMassRings) - np.log10(SolarAbunds['Z_mf_sun']) #np.log10(Z_mf_bulk_A09)
+    Zs = np.nansum(ZsRings*TotMassRings, axis=1) / np.nansum(TotMassRings, axis=1) #Mass-weighted mean ZsRings
+    theX = np.log10(Samp1['G_samp']['StellarMass'][TotMetalsStars > 0.0])
+    theY = Zs[TotMetalsStars > 0.0]
+    robs_contour_plot(theX, theY, binno, '3sig', noOutliers=0, fill=1, alpha=1.0, theRange=[xlimits,ylimits], \
+                      colour=model1col, linestyle=ls1, weights=1./Samp1['Volumes'][TotMetalsStars > 0.0], outlierFrac=defaultOutlierFrac)
+    #robs_plot_average(theX, theY, binno=10, aveType='Median', minInBin=50, linewidth=4., inputCentres=1)
+    
+    if Samp2 :
+        TotMetalsStarsRings = np.nansum(Samp2['G_samp']['MetalsDiskMassRings'][:,0:max_ring,:], axis=2) + np.nansum(Samp2['G_samp']['MetalsBulgeMassRings'][:,0:max_ring,:], axis=2)
+        TotMassRings = Samp2['G_samp']['DiskMassRings'][:,0:max_ring] + Samp2['G_samp']['BulgeMassRings'][:,0:max_ring]
+        TotMetalsStars = np.nansum(TotMetalsStarsRings, axis=1)
+        ZsRings = np.log10(TotMetalsStarsRings / TotMassRings) - np.log10(SolarAbunds['Z_mf_sun'])
+        Zs = np.nansum(ZsRings*TotMassRings, axis=1) / np.nansum(TotMassRings, axis=1) #Mass-weighted mean ZsRings
+        theX = np.log10(Samp2['G_samp']['StellarMass'][TotMetalsStars > 0.0])
+        theY = Zs[TotMetalsStars > 0.0]
+        robs_contour_plot(theX, theY, binno, '3sig', noOutliers=1, fill=0, alpha=1.0, theRange=[xlimits,ylimits], \
+                          linestyle=ls2, colour=model2col, weights=1./Samp2['Volumes'][TotMetalsStars > 0.0])
+        #robs_plot_average(theX, theY, binno=10, aveType='Median', minInBin=50, colour=samp2col, linestyle='--', linewidth=4., inputCentres=1, invertLinestyle=1)
+
+    if obs :
+        Z17 = Z17_MZsR_obs_data()
+        Y21a = Y21a_MZgR_obs_data()
+        Z17p = plt.errorbar(Z17['logMstar'], Z17['logZs_mw'], \
+                yerr=[Z17['logZs_mw_lower_err'],Z17['logZs_mw_upper_err']], \
+                color=obscol, marker='s', linestyle='', linewidth=1.6, capsize=3, markeredgecolor='black', \
+                #color=obscol, marker='s', markersize=obsMarkerSize, linestyle='', linewidth=1., capsize=3, markeredgecolor='black', \
+                markersize=obsMarkerSize, label=r'Zahid+17')
+            
+        Y21a = Y21a_MZsR_obs_data()
+        Y21ap = plt.errorbar(Y21a['logMstar'], Y21a['Zs_mean'], \
+                yerr=[Y21a['Zs_mean']-Y21a['Zs_16p'],Y21a['Zs_84p']-Y21a['Zs_mean']], \
+                color=obscol, marker='o', linestyle='', linewidth=1.6, capsize=3, markeredgecolor='black', \
+                #color=obscol, marker='o', markersize=obsMarkerSize, linestyle='', linewidth=1., capsize=3, markeredgecolor='black', \
+                markersize=obsMarkerSize, label=r'Yates+21a')
+    
+    #Plot panel label:
+    robs_plot_text(ax, r'f)', hpos='right', vpos='top')
+    
+    pdf.savefig(bbox_inches='tight')     
+    pdf.close() 
