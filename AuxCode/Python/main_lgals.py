@@ -58,7 +58,7 @@ PAPER_PLOTS = 0 #If on, the plots presented in Yates+23 are produced.
 MULTI_REDSHIFT_PLOTS = 0 #If on, in combination with either GENERAL_PLOTS or PAPER_PLOTS, plots requiring multiple redshift outputs will be calculated and made.
 
 SELECT_MAIN_PROGENITORS = 1 #Only works if FILE_TYPE = 'galtree'. If on, galaxies will be selected at a fixed redshift (the one given by REDSHIFT below), and then all their progenitors & descendents will be included too. If off, galaxies at all redshifts will be selected under the same criteria.
-GALTREE_REDSHIFT_TO_PLOT = 3.95 #Only works if FILE_TYPE = 'galtree and MULTI_REDSHIFT_PLOTS is off. If on, only galaxies at this redshift will plotted. Choose from: 0.00,1.04,2.07,3.11,3.95,5.03,5.92,6.97,8.22,8.93
+GALTREE_REDSHIFT_TO_PLOT = 0.00 #Only works if FILE_TYPE = 'galtree and MULTI_REDSHIFT_PLOTS is off. If on, only galaxies at this redshift will plotted. Choose from: 0.00,1.04,2.07,3.11,3.95,5.03,5.92,6.97,8.22,8.93
 
 #################
 #Sample info:
