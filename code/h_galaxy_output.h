@@ -281,10 +281,12 @@ struct GALAXY_OUTPUT {
 #ifdef   POST_PROCESS_MAGS
     float rbandWeightAge; // 10^9yr // The age of this galaxy weighted by mass of its components.
 #endif   //POST_PROCESS_MAGS
-#ifndef LITE_OUTPUT
 #ifdef OUTPUT_SFH
+#if defined(GALAXYTREE) || !defined(LITE_OUTPUT)
     int sfh_ibin; // None // Index of highest star formation history bin currently in use
     int sfh_numbins; // None // Number of non empty star formation history bins
+#endif //defined(GALAXYTREE) || !defined(LITE_OUTPUT)
+#ifndef LITE_OUTPUT
 #ifndef    NORMALIZEDDB
     /* float sfh_time[SFH_NBIN]; // yr // lookback time to middle of star formation history bin. */
     /* float sfh_dt[SFH_NBIN]; // yr // Width of star formation history bin. */
@@ -311,8 +313,8 @@ struct GALAXY_OUTPUT {
     float sfh_BurstMass[SFH_NBIN]; // 10^10 Msun/h // Star formation history of stars formed in starbursts.
 #endif //TRACK_BURST
 #endif     //NORMALIZEDDB
-#endif   //OUTPUT_SFH
 #endif //LITE_OUTPUT
+#endif   //OUTPUT_SFH
 
 #ifdef OUTPUT_ELEMENTS
     //All: [H][He][Cb][N][O][Ne][Mg][Si][S][Ca][Fe] or //Only [H][He][O][Mg][Fe]
