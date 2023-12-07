@@ -14,6 +14,8 @@ main_lgals.py
   ;Rob Yates 04-11-2021
   ;
   ;08-11-22: This version was adapted for use at the L-Galaxies workshop 2022
+  ;12-10-23: Adapted for use with the Yates+23 version of L-Galaxies
+  ;07-12-23: Adapted to enable reading/plotting of GALAXYTREE outputs too
   ;
 """
 
@@ -50,9 +52,13 @@ MASS_CHECKS = 0 #If on (and LOAD_SAMPLE is off), key mass properties will be che
 COMBINE_MODELS = 0 #If on, MR-I and MR-II versions of the same model are combined (if the other version has a .npy sample already saved).
 STELLAR_MASS_CUT = 1 #If on, only galaxies above the mass resolution thresholds of log(M*/Msun) >= 8.0 for Millennium-I and log(M*/Msun) >= 7.0 for Millennium-II will be selected.
 CALC_SFH_INFO = 0 #If on, SFH info will be calculated and added to the sample dictionaries
+
 GENERAL_PLOTS = 1 #If on, general plots are produced, such as the SMF, MZR, etc.
 PAPER_PLOTS = 0 #If on, the plots presented in Yates+23 are produced.
 MULTI_REDSHIFT_PLOTS = 0 #If on, in combination with either GENERAL_PLOTS or PAPER_PLOTS, plots requiring multiple redshift outputs will be calculated and made.
+
+SELECT_MAIN_PROGENITORS = 1 #Only works if FILE_TYPE = 'galtree'. If on, galaxies will be selected at a fixed redshift (the one given by REDSHIFT below), and then all their progenitors & descendents will be included too. If off, galaxies at all redshifts will be selected under the same criteria.
+GALTREE_REDSHIFT_TO_PLOT = 3.95 #Only works if FILE_TYPE = 'galtree and MULTI_REDSHIFT_PLOTS is off. If on, only galaxies at this redshift will plotted. Choose from: 0.00,1.04,2.07,3.11,3.95,5.03,5.92,6.97,8.22,8.93
 
 #################
 #Sample info:
@@ -130,6 +136,7 @@ elif COSMOLOGY == 'Planck' :
     Omega_Lambda  = 0.683  
 else : print("***** ERROR: Cosmology unknown. Please choose from: WMAP1, PLANCK *****") 
 
+#NOTE: In galtree mode, there is no internal minimum galaxy stellar mass applied to L-Galaxies outputs. (In snashot mode, this is typicaly set to 1.e8 Msun/h for Millennium-I.)
 MRI_cutoff = 1.e9 #Msun
 MRI_BoxSideLength = 500.*0.960558 #Mpc/h
 MRII_BoxSideLength = 100.*0.960558 #Mpc/h
@@ -160,10 +167,13 @@ Volume = (BoxSideLength**3.0) * TreeFilesUsed / TotTreeFiles #(Mpc/h)^3 #Note, t
 print('\n**************************') 
 print('L-GALAXIES 2020 (Yates+23)')
 print('**************************')  
-print('MODEL:'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+'\n')  
+if FILE_TYPE == "snapshots" :
+    print('MODEL:'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+'\n') 
+elif FILE_TYPE == "galtree" :
+    print('MODEL:'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+SAMPLE_TYPE+'\n')   
 
 if LOAD_SAMPLE == 0 :
-    G_lgal, SFH_bins = read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
+    G_lgal, SFH_bins = read_lgals_outputs(OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
                                           FirstFile, LastFile, FullRedshiftList, RedshiftsToRead)
 
     if MASS_CHECKS == 1 :
@@ -172,25 +182,33 @@ if LOAD_SAMPLE == 0 :
     #################                                                            
     #Make and pickle sample data (NOTE: "mark" is not included in the sample filename, so these will be overwritten if the same model is run again):          
     G_samp1 = make_lgals_sample(G_lgal, FILE_TYPE, SAMPLE_TYPE, SIMULATION, COSMOLOGY, Hubble_h, DMParticleMass, ParticleMassRes, StellarMassRes, \
-                           FullRedshiftList, RedshiftsToRead)
-    np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE, G_samp1, allow_pickle=True)
+                           FullRedshiftList, RedshiftsToRead, select_main_progenitors=SELECT_MAIN_PROGENITORS)
     NumGals = len(G_samp1) #Number of galaxies in the sample selected in make_lgals_sample (not the total number of objects in the treefiles used).
-    #Save treefile info:
-    np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+"_"+"treefiles", [FirstFile,LastFile], allow_pickle=True)
+    
+    #Save info:
+    if FILE_TYPE == "snapshots" :
+	    np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE, G_samp1, allow_pickle=True)
+	    np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+"_"+"treefiles", [FirstFile,LastFile], allow_pickle=True)
+	elif FILE_TYPE == "galtree" :
+		np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+SAMPLE_TYPE, G_samp1, allow_pickle=True)
+	    np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+SAMPLE_TYPE+"_"+"treefiles", [FirstFile,LastFile], allow_pickle=True)
     print('Sample data pickled\n')
 
 elif LOAD_SAMPLE == 1 :
-    G_samp1 = np.load(OutputDir+"/samples/"+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+".npy")
+    if FILE_TYPE == "snapshots" :
+    	G_samp1 = np.load(OutputDir+"/samples/"+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+".npy")
+    	treefiles = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+"_"+"treefiles"+".npy")
+    elif FILE_TYPE == "galtree" :
+    	G_samp1 = np.load(OutputDir+"/samples/"+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+SAMPLE_TYPE+".npy")
+    	treefiles = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+SAMPLE_TYPE+"_"+"treefiles"+".npy")
     NumGals = len(G_samp1)
     print('Pickled sample data loaded\n')
     
     #Check treefile info:
-    treefiles = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+"_"+"treefiles"+".npy")
     if ((treefiles[0] != FirstFile) | (treefiles[1] != LastFile)) :
         errString = "***** ERROR: The treefile range "+str(treefiles)+" from the loaded sample doesn't match the FirstFile ["+str(FirstFile)+"] and LastFile ["+str(LastFile)+"] requested. *****"
         sys.exit(errString)
 else : print("***** ERROR: No sample calculated or pre-loaded. Please set LOAD_SAMPLE parameter to 0 or 1. *****")
-
 
 
 #################
@@ -212,15 +230,23 @@ elif SIMULATION == 'Mil-II' :
 #Combine MRI and MRII data, with MRI galaxies always first:
 if COMBINE_MODELS == 1 :
     if SIMULATION == 'Mil-I' :
-        G_sampb = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+"Mil-II"+"_"+FILE_TYPE+"_"+MODEL+"_"+"MRII_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+".npy")
-        treefilesb = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+"Mil-II"+"_"+FILE_TYPE+"_"+MODEL+"_"+"MRII_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+"_"+"treefiles"+".npy")
+        if FILE_TYPE == "snapshots" :
+        	G_sampb = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+"Mil-II"+"_"+FILE_TYPE+"_"+MODEL+"_"+"MRII_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+".npy")
+        	treefilesb = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+"Mil-II"+"_"+FILE_TYPE+"_"+MODEL+"_"+"MRII_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+"_"+"treefiles"+".npy")
+        elif FILE_TYPE == "galtree" :
+        	G_sampb = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+"Mil-II"+"_"+FILE_TYPE+"_"+MODEL+"_"+"MRII_"+VERSION+"_"+SAMPLE_TYPE+".npy")
+        	treefilesb = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+"Mil-II"+"_"+FILE_TYPE+"_"+MODEL+"_"+"MRII_"+VERSION+"_"+SAMPLE_TYPE+"_"+"treefiles"+".npy")
         MRII_gals = len(G_sampb)
         Volume_MRII = (MRII_BoxSideLength**3.0) * (treefilesb[1]-treefilesb[0]+1) / TotTreeFiles #(Mpc/h)^3 #Note, this volume needs to be divided by h^3 to get the cosmology-dependent value in Mpc^3
         G_samp1 = np.hstack((G_samp1,G_sampb))
         NumGals = len(G_samp1)
     elif SIMULATION == "Mil-II" :   
-        G_sampb = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+"Mil-I"+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION.replace("MRII_","")+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+".npy")
-        treefilesb = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+"Mil-I"+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION.replace("MRII_","")+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+"_"+"treefiles"+".npy")
+        if FILE_TYPE == "snapshots" :
+        	G_sampb = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+"Mil-I"+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION.replace("MRII_","")+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+".npy")
+        	treefilesb = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+"Mil-I"+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION.replace("MRII_","")+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+"_"+"treefiles"+".npy")
+        elif FILE_TYPE == "galtree" :
+        	G_sampb = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+"Mil-I"+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION.replace("MRII_","")+"_"+SAMPLE_TYPE+".npy")
+        	treefilesb = np.load(OutputDir+'samples/'+COSMOLOGY+"_"+"Mil-I"+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION.replace("MRII_","")+"_"+SAMPLE_TYPE+"_"+"treefiles"+".npy")
         MRI_gals = len(G_sampb)
         Volume_MRI = (MRI_BoxSideLength**3.0) * (treefilesb[1]-treefilesb[0]+1) / TotTreeFiles #(Mpc/h)^3 #Note, this volume needs to be divided by h^3 to get the cosmology-dependent value in Mpc^3
         G_samp1 = np.hstack((G_sampb,G_samp1))
@@ -286,7 +312,19 @@ if CALC_SFH_INFO == 1 :
     for ii in range(NumGals) :
         for jj in range(RNUM) :
             SFH_bins_lbt_allGals[ii][jj][0:SFH_bins_num] = SFH_bins_lbt
-          
+
+#################
+#################
+#SET PLOTTING REDSHIFT (GALAXYTREE MODE):
+#################
+#################
+if (FILE_TYPE == 'galtree') & (MULTI_REDSHIFT_PLOTS != 1) & ((GENERAL_PLOTS == 1) | (PAPER_PLOTS == 1)) :
+    print("Plotting only galaxies at redshift = "+str(GALTREE_REDSHIFT_TO_PLOT))
+    snap_to_plot = int(robs_snapnum_from_redshift(SIMULATION, COSMOLOGY, [GALTREE_REDSHIFT_TO_PLOT]))
+    char_z_low = "%0.2f" % GALTREE_REDSHIFT_TO_PLOT
+    char_z_high = "%0.2f" % GALTREE_REDSHIFT_TO_PLOT
+    G_samp1 = G_samp1[G_samp1['SnapNum'] == snap_to_plot]
+
             
 #################
 #################

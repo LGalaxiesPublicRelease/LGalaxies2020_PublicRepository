@@ -15,6 +15,7 @@ read_lgals_outputs.py
   ;
   ;08-11-22: Adapted for use at the L-Galaxies workshop 2022
   ;12-10-23: Adapted for use with the Yates+23 version of L-Galaxies
+  ;07-12-23: Adapted to enable reading of GALAXYTREE outputs too
   ;
 """
 
@@ -28,14 +29,10 @@ from astropy.io import fits
 import procedures
 reload (procedures)
 from procedures import read_snap, read_tree
-# import sys
-# sys.path.append('../awk/output/python/')
-
-
 
 
 #################
-def read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
+def read_lgals_outputs(OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
                        FirstFile, LastFile, FullRedshiftList, RedshiftsToRead) :         
     if VERSION == '' :
         if MODEL == 'default' : 
@@ -73,7 +70,7 @@ def read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRU
             (G_lgal, SnapshotList) = read_snap(OutputDir+'MRII/', FirstFile, LastFile, \
                                                properties_used, LGalaxiesStruct, \
                                                RedshiftsToRead, FullRedshiftList, model_suffix)
-    elif FILE_TYPE == 'galtree' :  #<--WARNING: Untested! (21-04-21) 
+    elif FILE_TYPE == 'galtree' :  
         if STRUCT_TYPE == 'liteOutput' :
             from LGalaxy_galtree_liteOutput import LGalaxiesStruct
             from LGalaxy_galtree_liteOutput import properties_used
@@ -87,11 +84,7 @@ def read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRU
         #     from LGalaxy_galtree_new import LGalaxiesStruct
         #     from LGalaxy_galtree_new import properties_used
         else : print("***** ERROR: Output structure type unknown. Please choose from: LG2020, plusBinaries *****") 
-        (G_lgal) = read_tree(OutputDir,FirstFile,LastFile,properties_used,LGalaxiesStruct)    
-        SnapshotList = np.zeros(len(FullRedshiftList),dtype=np.int32)
-        for ii in range(0,len(FullRedshiftList)):                  
-            G0=G_lgal[ np.rint(G_lgal['Redshift']*100.) == FullRedshiftList[ii]*100. ]             
-            SnapshotList[ii]=G0['SnapNum'][0]
+        (G_lgal) = read_tree(OutputDir, FirstFile, LastFile, properties_used, LGalaxiesStruct, model_suffix) 
     else : print("***** ERROR: File type unknown. Please choose from: snapshots, galtree *****")
     
     print('\nReading done')

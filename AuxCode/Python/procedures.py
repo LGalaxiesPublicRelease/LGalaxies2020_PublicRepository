@@ -15,11 +15,12 @@ procedures.py
   ;
   ;Rob Yates 04-11-2021
   ;
+  ;
+  ;07-12-23: Adapted to enable reading of GALAXYTREE outputs too
+  ;
 """
 
 import numpy as np
-#from plots_input import *
-#import matplotlib.pyplot as plt
 
 def read_snap(folder,FirstFile,LastFile,
               props,template,RedshiftsToRead,FullRedshiftList,model_suffix):    
@@ -104,8 +105,7 @@ def read_snap(folder,FirstFile,LastFile,
 
 
 
-def read_tree(folder,FirstFile,LastFile,
-              props,template):    
+def read_tree(folder, FirstFile, LastFile, props, template, model_suffix):     
     """ Reads L-Galaxy output files.
     Returns: (nTrees,nHalos,nTreeHalos,gals)
     Inputs: (folder,file_prefix,FirstFile,LastFile,props,template)
@@ -118,13 +118,11 @@ def read_tree(folder,FirstFile,LastFile,
         if props[prop]:
             filter_list.append((prop,template[prop]))
     filter_dtype = np.dtype(filter_list)  
-            
-    SnapshotList=np.array([],dtype=np.int32)
     
     #read only headers to figure out total nGals
     print ("\n\nReading Headers\n")
     for ifile in range(FirstFile,LastFile+1):       
-        filename = folder+'/'+'SA_galtree_'+"%d"%(ifile)               
+        filename = folder+'SA'+"_"+model_suffix+"_"+"%d"%(ifile)             
         f = open(filename,"rb")
         one = np.fromfile(f,np.int32,1)
         nbytes = np.fromfile(f,np.int32,1)
@@ -137,7 +135,7 @@ def read_tree(folder,FirstFile,LastFile,
     
     offset=0
     for ifile in range(FirstFile,LastFile+1):         
-        filename = folder+'/'+'SA_galtree_'+"%d"%(ifile)             
+        filename = folder+'SA'+"_"+model_suffix+"_"+"%d"%(ifile)         
         f = open(filename,"rb")
         one = np.fromfile(f,np.int32,1)
         nbytes = np.fromfile(f,np.int32,1)  
@@ -147,7 +145,7 @@ def read_tree(folder,FirstFile,LastFile,
         print ("File ", ifile," nGals = ",this_nGals)      
         ib=np.fromfile(f,np.float32,int(nskip))          
        
-        full_this_gals = np.fromfile(f,template,this_nGals) # all properties      
+        full_this_gals = np.fromfile(f,template,int(this_nGals)) # all properties   
         this_gals = np.zeros(this_nGals,dtype=filter_dtype) # selected props
                
        
@@ -155,12 +153,15 @@ def read_tree(folder,FirstFile,LastFile,
             if props[prop]:
                 this_gals[prop] = full_this_gals[prop]
                               
-        gals[offset:offset+this_nGals] = this_gals[:]    
-        offset+=this_nGals
+        #gals[offset:offset+this_nGals] = this_gals[:]    
+        #offset+=this_nGals
+        gals[offset:offset+int(this_nGals)] = this_gals[:]    
+        offset+=int(this_nGals)
         f.close()           
     #endfor
    
     return (gals)
+    
 
 def redshift_to_time (z):
     Tyr = 977.8    ;# coefficent for converting 1/H into Gyr                               

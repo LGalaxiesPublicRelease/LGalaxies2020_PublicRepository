@@ -11,14 +11,15 @@ robs_snapnum_from_redshift.py
   ;
   ;Rob Yates 16-09-2022
   ;
+  ;UPDATES: 
   ;08-11-22: This version was adapted for use at the L-Galaxies workshop 2022
+  ;06-12-23: Changed the match between the redshifts listed below and the inputted redshifts so that they are 
+  ;          compared after being rounded to the *same* number of decimal places.
   ;
 """
 
 #Basic packages:
 import numpy as np
-
-
 
 
 ##########
@@ -44,10 +45,12 @@ def robs_snapnum_from_redshift(sim, cos, redshifts) :
                             0.352951,0.306211,0.262623,0.221449,0.183387,0.147548,0.11378,0.082661,0.053316,\
                             0.025612,2.64E-4,-0.023571,-0.046002,-0.066833,-0.085948,-0.103822]
 
-    All_redshifts_2dp = np.around(All_redshifts, decimals=2)
+    All_redshifts_dp = np.around(All_redshifts, decimals=decimal_places)
+    redshifts_dp = np.around(redshifts, decimals=decimal_places)
     snapnums = np.empty(len(redshifts), dtype=int)
     for iz in range(0,len(redshifts)) :
-        snap = np.where(All_redshifts_2dp == redshifts[iz])
+        #snap = np.where(All_redshifts_dp == redshifts[iz])
+        snap = np.where(All_redshifts_dp == redshifts_dp[iz])
         snapnums[iz] = snap[0] #.astype(int)
     
     return snapnums
