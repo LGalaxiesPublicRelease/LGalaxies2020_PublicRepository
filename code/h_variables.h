@@ -332,10 +332,12 @@ double NormSNIaMetalEjecRate[STEPS*MAXSNAPS][SFH_NBIN][LIFETIME_Z_NUM];
 double NormSNIaYieldRate[STEPS*MAXSNAPS][SFH_NBIN][LIFETIME_Z_NUM][NUM_ELEMENTS];
 #endif
 
+#ifdef INDIVIDUAL_ELEMENTS
 //Yield arrays for a 1Msun burst in the first SFH minibin (for writing to a text file from yields_integrals.c):
 double NormSNIIYieldRate_burst[STEPS*MAXSNAPS][LIFETIME_Z_NUM][NUM_ELEMENTS];
 double NormSNIaYieldRate_burst[STEPS*MAXSNAPS][LIFETIME_Z_NUM][NUM_ELEMENTS];
 double NormAGBYieldRate_burst[STEPS*MAXSNAPS][LIFETIME_Z_NUM][NUM_ELEMENTS];
+#endif
 
 //Arrays used to plot SNe rates from SFH bins (yield_integrals.c):
 double TheSFH[SFH_NBIN];

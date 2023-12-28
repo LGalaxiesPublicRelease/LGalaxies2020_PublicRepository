@@ -221,7 +221,7 @@ void read_yield_tables(void)
             exit(0);
           }
 
-	  for(i8=0; i8<NUM_ELEMENTS; i8++) //Number of element species (inc H and He) = 11
+	  for(i8=0; i8</*NUM_ELEMENTS*/11; i8++) //Number of element species (inc H and He) = 11
           {
           for(j8=0; j8<AGB_MASS_NUM; j8++)
             {
@@ -420,7 +420,7 @@ void read_yield_tables(void)
             exit(0);
           }
 
-	  for(i13=0; i13<NUM_ELEMENTS; i13++) //Number of element species (inc H and He) = 11
+	  for(i13=0; i13</*NUM_ELEMENTS*/11; i13++) //Number of element species (inc H and He) = 11
           {
             for(j13=0; j13<SNII_MASS_NUM; j13++) //Number of initial masses = 85 (for Portinari yields) (11 in initial yield tables)
 	    {

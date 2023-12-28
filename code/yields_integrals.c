@@ -116,7 +116,7 @@ void integrate_yields()
   int L1AGB,L2AGB,L3AGB,L4AGB,L5AGB,L6AGB,L7AGB;
   L1AGB=0;L2AGB=0;L3AGB=0;L4AGB=0;L5AGB=0;L6AGB=0;L7AGB=0;
 
-  double Solar_mass_ratios[NUM_ELEMENTS];
+  double Solar_mass_ratios[11];//[NUM_ELEMENTS];
   int ee2=0.;
   for (int ee=0;ee<11;ee++) {
 #ifndef MAINELEMENTS
@@ -927,8 +927,8 @@ void integrate_yields()
 				      {
 				        printf("L1AGB: step = %i | SFHbin = %i | Zi = %i | AGBYields[%i][10][%i] = %f | AGBYields[%i][kk][%i] = %f | NormAGBYieldRate[(STEPS*snap)+step][i][Zi][10] = %f\n", (STEPS*snap)+step, i, Zi, Zi_AGB, j, AGBYields[Zi_AGB][kk][j], Zi_AGB, j+1, AGBYields[Zi_AGB][kk][j+1], NormAGBYieldRate[(STEPS*snap)+step][i][Zi][10]);
 				      }
-				    }
 #endif //INDIVIDUAL_ELEMENTS
+				    }
 				  else if (j == Mi_lower_AGB && j == Mi_upper_AGB && Mi_lower_actual >= AGB_MIN_MASS && Mi_lower_actual <= AGB_MAX_MASS && Mi_upper_actual <= AGB_MAX_MASS) //NB: Mi_lower_actual cannot be below AGB_MIN_MASS
 				    {
 				      L2AGB++;
@@ -1057,6 +1057,7 @@ void integrate_yields()
 			    } //if (Mi_lower_AGB <= Mi_upper_AGB)
 			  } //if (t_upper >= lifetimes[Zi][Mi_lower+1])
 		      //**********
+#ifdef INDIVIDUAL_ELEMENTS
 		      //Record the yields ejected by each channel from just the first minibin of the first snapshot (i.e. a 1Msun burst at the start of the simulation):
 		      if (i ==0 && mb == 1) { //snap < 58 &&
 				  for (int ee=0;ee<NUM_ELEMENTS;ee++) {
@@ -1072,8 +1073,10 @@ void integrate_yields()
 #endif
 				  }
 			  }
+#endif //INDIVIDUAL_ELEMENTS
 		      //**********
 		    } //for (Zi=0;Zi<LIFETIME_Z_NUM;Zi++)
+#ifdef INDIVIDUAL_ELEMENTS
 		  if (i==0 && mb==1){ // && mb==1
 			  Tot_N_SNII_burst += NormSNIIYieldRate[(STEPS*snap)+step][i][Zi_pick][3];
 			  Tot_N_SNIa_burst += NormSNIaYieldRate[(STEPS*snap)+step][i][Zi_pick][3];
@@ -1088,7 +1091,9 @@ void integrate_yields()
 			  Tot_EjecMass_SNIa_burst += NormSNIaMassEjecRate[(STEPS*snap)+step][i][Zi_pick];
 			  Tot_EjecMass_AGB_burst += NormAGBMassEjecRate[(STEPS*snap)+step][i][Zi_pick];
 		  }
+#endif //INDIVIDUAL_ELEMENTS
 		} //for (mb=1;mb<=mbmax;mb++) //MINI_BINS
+#ifdef INDIVIDUAL_ELEMENTS
 	      if (snap <= 58) {
 	    	Tot_N_SNII += NormSNIIYieldRate[(STEPS*snap)+step][i][Zi_pick][3];
 	    	Tot_N_SNIa += NormSNIaYieldRate[(STEPS*snap)+step][i][Zi_pick][3];
@@ -1101,6 +1106,7 @@ void integrate_yields()
 	    	Tot_Fe_AGB += NormAGBYieldRate[(STEPS*snap)+step][i][Zi_pick][10];
 	      }
 	      //if (NormAGBYieldRate[(STEPS*snap)+step][i][Zi_pick][10] > 0.0) {printf("AGB Fe yield = %f\n",NormAGBYieldRate[(STEPS*snap)+step][i][Zi_pick][10]);}
+#endif //INDIVIDUAL_ELEMENTS
 	    } //for (i=0;i<=SFH_ibin_structure[(SFH_NBIN*snap)+step];i++)
 	  Tot_SNII += SNII_Rate[(STEPS*snap)+step][Zi_pick]*(dt*(UnitTime_in_years/Hubble_h));
 	  Tot_SNIa += SNIa_Rate[(STEPS*snap)+step][Zi_pick]*(dt*(UnitTime_in_years/Hubble_h));
