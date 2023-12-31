@@ -2,7 +2,7 @@
 28
 #Name                          PropValue   PriorMin  PriorMax     Type      Sampling_Switch
 SfrEfficiency                     0.06      1.e-12    1.e7       Physical         1
-SfrColdCrit                       0.14      1.e-3     10.0       Physical         1
+SfrColdCrit                       0.14      1.e-3     10.0       Physical         0
 SfrBurstEfficiency                0.50      0.1       1.0        Physical         1
 SfrBurstSlope                     0.38      0.1       2.0        Physical         1
 AgnEfficiency                     0.0025    1.e-8     1.e-1      Physical         1
@@ -16,14 +16,14 @@ FeedbackEjectionEfficiency        5.5       0.01      10.        Physical       
 EjectPreVelocity                  220.      1.        1000.      Physical         1
 EjectSlope                        2.0       0.1       5.0        Physical         1
 ReIncorporationFactor             1.2e10    1.e-7     1.e15      Physical         1
-FracZSNIItoHot                    0.9       0.0       1.0        Physical         0
-FracZSNIatoHot                    0.8       0.0       1.0        Physical         0
+FracZSNIItoHot                    0.3       0.0       1.0        Physical         0
+FracZSNIatoHot                    0.3       0.0       1.0        Physical         0
 Yield                             0.03      0.01      0.1        Physical         0
 ThreshMajorMerger                 0.1       0.01      1.0        Physical         1 
 MergerTimeMultiplier              1.8       0.1       10.        Physical         1 
 RamPressureStrip_CutOffMass       5.1e4     0.0       1.e6       Physical         1 
 RamPressureRadiusThreshold        0.0       0.0       1.0        Physical         0 
-GasInflowVel                      600.      0.0       1.e4       Physical         0
+GasInflowVel                      1000.     0.0       1.e4       Physical         0
 ReincZpower                       2.41      0.1       10.        Physical         0
 ReincVelocitypower                3.26      0.1       10.        Physical         0
 Omega_m                           0.315     0.1       0.6      Cosmological       0

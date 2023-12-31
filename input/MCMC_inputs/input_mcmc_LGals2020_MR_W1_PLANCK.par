@@ -119,8 +119,8 @@ H2FractionRecipe                  0 	;choice of H2 mass fraction recipe
 StarFormationModel                4  	;%*0 -- Croton2006, Delucia2007, Guo2011, Henriques2015 
 				         % 1 -- Alternative SF law
 		                          % 2 -- Available if OPT += -DH2_AND_RINGS: sf proportional to tdyn (as in previous models but with rings - KENNICUTT)
-					 % 3 -- Availavle if OPT += -DH2_AND_RINGS: Krumholz et al. 2009
-					 %*4 -- Availavle if OPT += -DH2_AND_RINGS: Fu et al. 2010 (BIGEIL)
+					 % 3 -- Available if OPT += -DH2_AND_RINGS: Krumholz et al. 2009
+					 %*4 -- Available if OPT += -DH2_AND_RINGS: Fu et al. 2010 (BIGEIL)
 		
 SFRtdyn                           1  	;*0 -- constant SFE
                                      	% 1 -- SFE inversly proportional to tdyn		
@@ -219,7 +219,7 @@ Clumpingfactor              1.0      	;clumping factor in Krumholz' H2 fraction 
 					% instead concentrated in spiral arms
 					% for KMT09 H2 formation there is an additional pow((1.0/metallicityr),0.7)
 					% dependence to solve issues with low-metallicity galaxies
-GasInflowVel                600.      	;km/s/Mpc
+GasInflowVel                1000.      	;km/s/Mpc
 
 %-------------------------------------------
 %% Star formation bursts during mergers
@@ -252,12 +252,12 @@ ReIncorporationFactor	   1.2e+10  	;(eq. S22 in Henriques15) Fraction of ejected
 %-------------------------------------------
 %% Metal enrichment parameters
 %-------------------------------------------
-FracZSNIItoHot				0.9 	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNII metals put into hot gas from the disc
+FracZSNIItoHot				0.3 	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNII metals put into hot gas from the disc
 									%(in situations where DETAILED_METALS_AND_MASS_RETURN is OFF, FracSNIItoHot is assumed for all metals)
-FracZSNIatoHot				0.8  	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNIa metals put into hot gas from the disc
-FracZAGBtoHot				0.25    	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNIa metals put into hot gas from the disc
+FracZSNIatoHot				0.3  	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNIa metals put into hot gas from the disc
+FracZAGBtoHot				0.0    	;if FEEDBACK_COUPLED_WITH_MASS_RETURN this is the fraction of SNIa metals put into hot gas from the disc
 
-A_FACTOR 				0.035	;Fraction of mass from all objects between SNIa_MIN_MASS and SNIA_MAX_MASS that comes from SN-Ia
+A_FACTOR 				0.04	;Fraction of mass from all objects between SNIa_MIN_MASS and SNIA_MAX_MASS that comes from SN-Ia
 
 %-------------------------------------------
 %% IMF
