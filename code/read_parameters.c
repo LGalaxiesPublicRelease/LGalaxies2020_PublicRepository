@@ -683,19 +683,23 @@ void read_parameter_file(char *fname)
   for(i = 0; i < nt; i++) {
     if(*tag[i]) {
       if (strcmp("MinGalOutputMass", tag[i]) == 0)
-	MinGalOutputMass=0.;
+	      MinGalOutputMass=0.;
 #ifdef EXCESS_MASS
       else if (strcmp("InfallModel", tag[i]) == 0)
-	InfallModel=1;
+	      InfallModel=1;
 #endif
       else if (strcmp("FeedbackEagleScaling", tag[i]) == 0)
       	FeedbackEagleScaling=0;
       else if (strcmp("FeedbackReheatingDeansityScaling", tag[i]) == 0)
-	FeedbackReheatingDeansityScaling=0;
+	      FeedbackReheatingDeansityScaling=0;
+#ifdef MCMC
+      else if (strcmp("MCMCStartingParFile", tag[i]) == 0)
+	      MCMCStartingParFile[0]='\0';
+#endif
 
       else {
-	printf("Error. I miss a value for tag '%s' in parameter file '%s'.\n", tag[i], fname);
-	errorFlag = 1;
+        printf("Error. I miss a value for tag '%s' in parameter file '%s'.\n", tag[i], fname);
+        errorFlag = 1;
       }
     }
   }

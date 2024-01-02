@@ -105,7 +105,7 @@ int main(int argc, char **argv)
   //copy input parameters and makefile options to output directory
   if (ThisTask == 0)
     {
-      sprintf(buf, "mkdir %s/inputs/", FinalOutputDir);
+      sprintf(buf, "mkdir -p %s/inputs/", FinalOutputDir);
       system(buf);
       sprintf(buf, "cp %s %s/inputs/", argv[1], FinalOutputDir);
       system(buf);
@@ -113,7 +113,7 @@ int main(int argc, char **argv)
       system(buf);
       sprintf(buf, "cp ./My_Makefile_options %s/inputs/", FinalOutputDir);
       system(buf);
-      sprintf(buf, "cp ./Makefile_compilers %s/inputs/", FinalOutputDir);
+      sprintf(buf, "cp ./My_Makefile_compilers %s/inputs/", FinalOutputDir);
       system(buf);
     }
 
@@ -154,7 +154,7 @@ int main(int argc, char **argv)
 #else //MCMC
   /* In MCMC mode only one file is loaded into memory
    * and the sampling for all the steps is done on it */    
-      sprintf(SimulationDir, "%s/MergerTrees_%d/", SimulationDir, 0);
+      //sprintf(SimulationDir, "%s/MergerTrees_%d/", SimulationDir, 0);
       for(filenr = MCMCTreeSampleFile; filenr <= MCMCTreeSampleFile; filenr++)
 	{
 #endif //MCMC

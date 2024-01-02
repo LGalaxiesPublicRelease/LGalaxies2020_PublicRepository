@@ -108,8 +108,8 @@ void init_H2fraction_KMT08()
     {
       for ( j=0;j<LENZ;j++ )
 	{
-	  fscanf ( fd,"%lf",&H2Fraction[i][j] );
-	  printf("%0.2e\n",H2Fraction[i][j]);
+	  fscanf ( fd,"%lf",&H2Fraction/*[i][j]*/[j][i] );
+	  printf("%0.2e\n",H2Fraction/*[i][j]*/[j][i]);
 	}
 
     }
