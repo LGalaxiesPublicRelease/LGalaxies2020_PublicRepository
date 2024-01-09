@@ -398,11 +398,13 @@ double NormSNIaYieldRate[STEPS*MAXSNAPS][SFH_NBIN][ARRAY_Z_NUM][NUM_ELEMENTS];
 #endif //INDIVIDUAL_ELEMENTS
 
 #ifdef WRITE_YIELD_DATA
-double solarAbundMassRatios[11]; //Array to store solar abundance ratios from Asplund+09 (see yields_read_tables.c)
+#ifdef INDIVIDUAL_ELEMENTS
+double solarAbundMassRatios[NUM_ELEMENTS]; //[11] //Array to store solar abundance ratios from Asplund+09 (see yields_read_tables.c)
 //Yield arrays for a 1Msun burst in the first SFH minibin (for writing to a text file from yields_integrals.c):
 double NormSNIIYieldRate_burst[STEPS*MAXSNAPS][ARRAY_Z_NUM][NUM_ELEMENTS];
 double NormSNIaYieldRate_burst[STEPS*MAXSNAPS][ARRAY_Z_NUM][NUM_ELEMENTS];
 double NormAGBYieldRate_burst[STEPS*MAXSNAPS][ARRAY_Z_NUM][NUM_ELEMENTS];
+#endif //INDIVIDUAL_ELEMENTS
 //Arrays for total mass ejected per Msun formed from every SFH bin for each timestep [Msun/Msun]:
 double TotNormSNIIEjMass[STEPS*MAXSNAPS][ARRAY_Z_NUM];
 double TotNormSNIaEjMass[STEPS*MAXSNAPS][ARRAY_Z_NUM];

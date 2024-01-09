@@ -126,8 +126,10 @@ void init_H2fraction_KMT08()
     {
       for ( j=0;j<LENZ;j++ )
 	{
-	  fscanf ( fd,"%lf",&H2Fraction[i][j] );
-	  printf("%0.2e\n",&H2Fraction[i][j]);
+	  //fscanf ( fd,"%lf",&H2Fraction[i][j] );
+	  //printf("%0.2e\n",&H2Fraction[i][j]);
+	  fscanf ( fd,"%lf",&H2Fraction[j][i] );
+	  printf("%0.2e\n",&H2Fraction[j][i]);
 	}
 
     }
@@ -159,8 +161,10 @@ double update_H2fraction_KMT08(double logsigmah, double metallicity )
 	if ( metallicity>lgZ[j-1] ) metallicity=lgZ[j-1];
 	for ( j=0;metallicity>lgZ[j+1];j++ );
 
-	mf1=H2Fraction[i][j]+ ( H2Fraction[i][j+1]-H2Fraction[i][j] ) * ( metallicity-lgZ[j] ) / ( lgZ[j+1]-lgZ[j] );
-	mf2=H2Fraction[i+1][j]+ ( H2Fraction[i+1][j+1]-H2Fraction[i+1][j] ) * ( metallicity-lgZ[j] ) / ( lgZ[j+1]-lgZ[j] );
+	//mf1=H2Fraction[i][j]+ ( H2Fraction[i][j+1]-H2Fraction[i][j] ) * ( metallicity-lgZ[j] ) / ( lgZ[j+1]-lgZ[j] );
+	//mf2=H2Fraction[i+1][j]+ ( H2Fraction[i+1][j+1]-H2Fraction[i+1][j] ) * ( metallicity-lgZ[j] ) / ( lgZ[j+1]-lgZ[j] );
+	mf1=H2Fraction[j][i]+ ( H2Fraction[j][i+1]-H2Fraction[j][i] ) * ( metallicity-lgZ[j] ) / ( lgZ[j+1]-lgZ[j] );
+	mf2=H2Fraction[j+1][i]+ ( H2Fraction[j+1][i+1]-H2Fraction[j+1][i] ) * ( metallicity-lgZ[j] ) / ( lgZ[j+1]-lgZ[j] );
 	mf=mf1+ ( mf2-mf1 ) * ( logsigmah-logNHtot[i] ) / ( logNHtot[i+1]-logNHtot[i] );
 
 	return ( mf );
