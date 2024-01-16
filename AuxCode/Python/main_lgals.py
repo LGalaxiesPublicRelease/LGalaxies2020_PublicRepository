@@ -23,7 +23,7 @@ main_lgals.py
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 import astropy
-#from astropy.io import fits
+import os
 
 #Local packages
 import sys
@@ -47,7 +47,7 @@ PlotDir = BaseDir+'figures/' #where plots created by this script are sent
 #################
 #################
 #Switches:
-LOAD_SAMPLE = 1 #If on, a pre-made sample of galaxies is loaded from the pickeled save file (quicker). If off, L-Galaxies outputs are read in and a sample is made (slower).
+LOAD_SAMPLE = 0 #If on, a pre-made sample of galaxies is loaded from the pickeled save file (quicker). If off, L-Galaxies outputs are read in and a sample is made (slower).
 MASS_CHECKS = 0 #If on (and LOAD_SAMPLE is off), key mass properties will be checked for Nans, negatives, and whether sub-components add up to component masses properly.
 COMBINE_MODELS = 0 #If on, MR-I and MR-II versions of the same model are combined (if the other version has a .npy sample already saved).
 STELLAR_MASS_CUT = 1 #If on, only galaxies above the mass resolution thresholds of log(M*/Msun) >= 8.0 for Millennium-I and log(M*/Msun) >= 7.0 for Millennium-II will be selected.
@@ -172,8 +172,13 @@ if FILE_TYPE == "snapshots" :
 elif FILE_TYPE == "galtree" :
     print('MODEL:'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+SAMPLE_TYPE+'\n')   
 
+#Make the samples directory, if necessary:
+if not os.path.exists(OutputDir+"/samples/") : 
+  os.mkdir(OutputDir+"/samples/")
+  print('n/output/samples/ directory created')
+  
 if LOAD_SAMPLE == 0 :
-    G_lgal, SFH_bins = read_lgals_outputs(OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
+    G_lgal, SFH_bins = read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
                                           FirstFile, LastFile, FullRedshiftList, RedshiftsToRead)
 
     if MASS_CHECKS == 1 :
@@ -189,9 +194,9 @@ if LOAD_SAMPLE == 0 :
     if FILE_TYPE == "snapshots" :
 	    np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE, G_samp1, allow_pickle=True)
 	    np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+'z'+char_z_low+"-"+char_z_high+"_"+SAMPLE_TYPE+"_"+"treefiles", [FirstFile,LastFile], allow_pickle=True)
-	elif FILE_TYPE == "galtree" :
-		np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+SAMPLE_TYPE, G_samp1, allow_pickle=True)
-	    np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+SAMPLE_TYPE+"_"+"treefiles", [FirstFile,LastFile], allow_pickle=True)
+    elif FILE_TYPE == "galtree" :
+        np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+SAMPLE_TYPE, G_samp1, allow_pickle=True)
+        np.save(OutputDir+'samples/'+COSMOLOGY+"_"+SIMULATION+"_"+FILE_TYPE+"_"+MODEL+"_"+VERSION+"_"+SAMPLE_TYPE+"_"+"treefiles", [FirstFile,LastFile], allow_pickle=True)
     print('Sample data pickled\n')
 
 elif LOAD_SAMPLE == 1 :
@@ -358,11 +363,11 @@ if GENERAL_PLOTS == 1 :
         plot_cosmic_SFRD(Volume, Hubble_h, FullRedshiftList, FullSnapnumList, RedshiftsToRead, Samp1, struct1, char_z_low, pdf=pdf)
     else :
         plot_dists(Samp1, struct1, char_z_low, pdf=pdf)
-        plot_smf(Volume, Hubble_h, Samp1, char_z_low, pdf=pdf)
-        plot_himf(Volume, Hubble_h, Samp1, char_z_low, pdf=pdf)
-        plot_mssfr(Volume, Hubble_h, Samp1, char_z_low, pdf=pdf)
-        plot_mzgr(Samp1, struct1, char_z_low, pdf=pdf)
-        plot_mzsr(Samp1, char_z_low, pdf=pdf)
+        plot_smf_general(Volume, Hubble_h, Samp1, char_z_low, pdf=pdf)
+        plot_himf_general(Volume, Hubble_h, Samp1, char_z_low, pdf=pdf)
+        plot_mssfr_general(Volume, Hubble_h, Samp1, char_z_low, pdf=pdf)
+        plot_mzgr_general(Samp1, struct1, char_z_low, pdf=pdf)
+        plot_mzsr_general(Samp1, char_z_low, pdf=pdf)
         plot_sfrd_prof(Samp1, struct1, char_z_low, MassBins, pdf=pdf)
         if CALC_SFH_INFO == 1 :
             if not ("liteOutput" in (STRUCT_TYPE)) :

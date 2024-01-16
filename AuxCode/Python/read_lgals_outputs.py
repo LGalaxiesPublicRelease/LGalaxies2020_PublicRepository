@@ -32,7 +32,7 @@ from procedures import read_snap, read_tree
 
 
 #################
-def read_lgals_outputs(OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
+def read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
                        FirstFile, LastFile, FullRedshiftList, RedshiftsToRead) :         
     if VERSION == '' :
         if MODEL == 'default' : 

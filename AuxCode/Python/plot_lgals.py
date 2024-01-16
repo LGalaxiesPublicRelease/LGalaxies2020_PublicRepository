@@ -18,6 +18,7 @@ plot_lgals.py
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.collections as mcoll
+from matplotlib.backends.backend_pdf import PdfPages
 import astropy
 from astropy.io import fits
 
@@ -32,6 +33,8 @@ from robs_solarnorm_finder import robs_solarnorm_finder
 from robs_element_list_finder import robs_element_list_finder
 from robs_plot_text import robs_plot_text
 from robs_plot_panels import robs_plot_panels
+from robs_get_colour import robs_get_colour
+from robs_arcsec_to_kpc import robs_arcsec_to_kpc
 
 
 #################
@@ -39,6 +42,23 @@ from robs_plot_panels import robs_plot_panels
 plt.rcParams['text.usetex'] = True
 plt.rcParams['font.size'] = 14
 plt.rcParams['font.serif'] = 'Times'
+defaultOutlierFrac = 0.25
+model1col = 'blue'
+model1avecol = robs_get_colour(model1col, shade=0.5)
+model2col = 'red' #'green'
+model2avecol = robs_get_colour(model2col, shade=0.5)
+obscol = 'orange'
+model1bcol = 'green'
+model1bavecol = robs_get_colour(model1bcol, shade=0.5)
+model2bcol = 'pink'
+model2bavecol = robs_get_colour(model2bcol, shade=0.5)
+obsMarkerSize = 5. #4. #6. #3.
+defaultBinno = 50
+defaultLinewidth = 2.
+textPadder = 20. #For legends on profile plots
+scaleFactor = 2. #For average lines on profile plots
+prof_figsize = (17,4) #Default figsize for profile plots #(17,5)
+minMassPlotMRII = 8.5 #8.0
 defaultOutlierFrac = 0.25
 
 
@@ -163,7 +183,7 @@ def plot_dists(Samp1, struct1, char_z_low, pdf=None) :
 
 
 #################
-def plot_smf(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :  
+def plot_smf_general(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :  
     #Set axis limits:
     xlimits = np.array([9.0,12.0])
     ylimits = np.array([-5.9,-0.5])
@@ -177,6 +197,8 @@ def plot_smf(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :
     plt.tick_params(direction="in", top=True, bottom=True, left=True, right=True)
     
     #Plot stellar mass function:
+    binwidth = 0.1
+    bin_arr=np.arange(xlimits[0],xlimits[1]+binwidth,binwidth)
     if ((Samp1["MRI_gals"] > 0) & (Samp1["MRII_gals"] > 0)) :
         prop_MRI = np.log10(Samp1['G_samp']['StellarMass'][0:Samp1['MRI_gals']])
         prop_MRII = np.log10(Samp1['G_samp']['StellarMass'][Samp1['MRI_gals']:])
@@ -203,7 +225,7 @@ def plot_smf(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :
 
 
 #################
-def plot_himf(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :  
+def plot_himf_general(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :  
     #Set axis limits:
     xlimits = np.array([7.0,11.0])
     ylimits = np.array([-5.9,-0.5])
@@ -246,7 +268,7 @@ def plot_himf(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :
     
 
 #################
-def plot_mssfr(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :  
+def plot_mssfr_general(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :  
     #Set axis limits:
     xlimits = np.array([9.0,12.0])
     ylimits = np.array([-14.0,-7.5])
@@ -280,7 +302,7 @@ def plot_mssfr(Volume, Hubble_h, Samp1, char_z_low, pdf=None) :
     
     
 #################
-def plot_mzgr(Samp1, struct1, char_z_low, pdf=None) :  
+def plot_mzgr_general(Samp1, struct1, char_z_low, pdf=None) :  
     ##########    
     # Plot ColdGas metallicity as mass-weighted M_Z/M_tot, using metals arrays, normalised to Sun:
     ##########     
@@ -347,7 +369,7 @@ def plot_mzgr(Samp1, struct1, char_z_low, pdf=None) :
     
     
 #################
-def plot_mzsr(Samp1, char_z_low, pdf=None) : 
+def plot_mzsr_general(Samp1, char_z_low, pdf=None) : 
     ##########    
     # Plot Stellar metallicity as mass-weighted M_Z/M_tot, using metals arrays, normalised to Sun:
     ########## 
@@ -999,35 +1021,7 @@ def plot_mzsr(Hubble_h, Omega_M, Omega_Lambda, Samp1, redshift, \
     robs_contour_plot(theX, theY, binno, '3sig', noOutliers=0, fill=1, alpha=1.0, theRange=[xlimits,ylimits], \
                       colour=model1col, linestyle=ls1, weights=1./Samp1['Volumes'][TotMetalsStars > 0.0], outlierFrac=defaultOutlierFrac)
     #robs_plot_average(theX, theY, binno=10, aveType='Median', minInBin=50, linewidth=4., inputCentres=1)
-    
-    if Samp2 :
-        TotMetalsStarsRings = np.nansum(Samp2['G_samp']['MetalsDiskMassRings'][:,0:max_ring,:], axis=2) + np.nansum(Samp2['G_samp']['MetalsBulgeMassRings'][:,0:max_ring,:], axis=2)
-        TotMassRings = Samp2['G_samp']['DiskMassRings'][:,0:max_ring] + Samp2['G_samp']['BulgeMassRings'][:,0:max_ring]
-        TotMetalsStars = np.nansum(TotMetalsStarsRings, axis=1)
-        ZsRings = np.log10(TotMetalsStarsRings / TotMassRings) - np.log10(SolarAbunds['Z_mf_sun'])
-        Zs = np.nansum(ZsRings*TotMassRings, axis=1) / np.nansum(TotMassRings, axis=1) #Mass-weighted mean ZsRings
-        theX = np.log10(Samp2['G_samp']['StellarMass'][TotMetalsStars > 0.0])
-        theY = Zs[TotMetalsStars > 0.0]
-        robs_contour_plot(theX, theY, binno, '3sig', noOutliers=1, fill=0, alpha=1.0, theRange=[xlimits,ylimits], \
-                          linestyle=ls2, colour=model2col, weights=1./Samp2['Volumes'][TotMetalsStars > 0.0])
-        #robs_plot_average(theX, theY, binno=10, aveType='Median', minInBin=50, colour=samp2col, linestyle='--', linewidth=4., inputCentres=1, invertLinestyle=1)
 
-    if obs :
-        Z17 = Z17_MZsR_obs_data()
-        Y21a = Y21a_MZgR_obs_data()
-        Z17p = plt.errorbar(Z17['logMstar'], Z17['logZs_mw'], \
-                yerr=[Z17['logZs_mw_lower_err'],Z17['logZs_mw_upper_err']], \
-                color=obscol, marker='s', linestyle='', linewidth=1.6, capsize=3, markeredgecolor='black', \
-                #color=obscol, marker='s', markersize=obsMarkerSize, linestyle='', linewidth=1., capsize=3, markeredgecolor='black', \
-                markersize=obsMarkerSize, label=r'Zahid+17')
-            
-        Y21a = Y21a_MZsR_obs_data()
-        Y21ap = plt.errorbar(Y21a['logMstar'], Y21a['Zs_mean'], \
-                yerr=[Y21a['Zs_mean']-Y21a['Zs_16p'],Y21a['Zs_84p']-Y21a['Zs_mean']], \
-                color=obscol, marker='o', linestyle='', linewidth=1.6, capsize=3, markeredgecolor='black', \
-                #color=obscol, marker='o', markersize=obsMarkerSize, linestyle='', linewidth=1., capsize=3, markeredgecolor='black', \
-                markersize=obsMarkerSize, label=r'Yates+21a')
-    
     #Plot panel label:
     robs_plot_text(ax, r'f)', hpos='right', vpos='top')
     
@@ -1119,25 +1113,17 @@ def plot_dust_scaling_relations(Hubble_h, Samp1, struct1, redshift, props='All',
             ylabs[ii] = r'log$(M_{\rm dust} / M_{\rm metal,tot})$'
             TotMmetal1 = np.nansum(Samp1['G_samp']['MetalsColdGas'], axis=1)
             theY1[ii] = np.log10(TotMdust1/TotMmetal1)
-            if Samp2 :
-                TotMmetal2 = np.nansum(Samp2['G_samp']['MetalsColdGas'], axis=1)
-                theY2[ii] = np.log10(TotMdust2/TotMmetal2)
         elif props[ii] == 'DTG' :
             ylims[ii] = np.array([-5.9,-0.5])
             yticks[ii] = [-5.0,-4.0,-3.0,-2.0,-1.0]
             ylabs[ii] = r'log$(M_{\rm dust} /M_{\rm HI+H2})$'
             H_mass1 = Samp1['G_samp']['ColdGas_elements'][:,El1["H_NUM"]]
             theY1[ii] = np.log10(TotMdust1/H_mass1)
-            if Samp2 :
-                H_mass2 = Samp2['G_samp']['ColdGas_elements'][:,El2["H_NUM"]]
-                theY2[ii] = np.log10(TotMdust2/H_mass2)
         elif props[ii] == 'Mdust' :
             ylims[ii] = np.array([1.5,9.5])
             yticks[ii] = [2,3,4,5,6,7,8,9]
             ylabs[ii] = r'log$(M_{\rm dust} / \textnormal{M}_{\odot})$'
             theY1[ii] = np.log10(TotMdust1)
-            if Samp2 :
-                theY2[ii] = np.log10(TotMdust2)
         
     for kk in range(numPanels) :
         panel = robs_plot_panels(kk, rows=rowno, columns=colno, xlimits=xlims, ylimits=ylims, \
@@ -1169,7 +1155,7 @@ def plot_dust_scaling_relations(Hubble_h, Samp1, struct1, redshift, props='All',
     
         #Labels:
         if kk == 0 :
-            robs_plot_text(panel, r'z = '+char_z_low, vpos='top', hpos='left')
+            robs_plot_text(panel, r'z = '+str(redshift), vpos='top', hpos='left')
     
     pdf.savefig(bbox_inches='tight')     
     pdf.close()  
@@ -1758,7 +1744,7 @@ def plot_profs_multiplot(Samp1, struct1, Hubble_h, Omega_M, Omega_Lambda, \
     
 #################
 def plot_profs_together(Hubble_h, Omega_M, Omega_Lambda, Samp1, struct1, MassBins=None, props='All') :      
-    pdf = PdfPages(PlotDir+"various_profs"+"_"+comp+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+Samp1['z_lower']+".pdf")
+    pdf = PdfPages(PlotDir+"various_profs"+"_"+Samp1['Model']+"_"+Samp1['Sample_type']+"_z"+Samp1['z_lower']+".pdf")
     El1 = robs_element_list_finder(struct1)
         
     #Set-up plot:
