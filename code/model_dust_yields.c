@@ -1382,7 +1382,7 @@ if (((Gal[p].MetalsColdGas[0]+Gal[p].MetalsColdGas[1]+Gal[p].MetalsColdGas[2])>0
 		}
 
 		if (DustClouds_init == 0) {
-            tacc = 1e15; //ROB: This should be it's default value anyway. (07-02-22)
+            tacc = 1e15; //This should be it's default value anyway. (07-02-22)
         }
         else {
             tacc = Dust_tAcc0*(Clouds_tot/DustClouds_init);

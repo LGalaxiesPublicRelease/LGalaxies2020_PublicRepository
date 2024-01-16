@@ -232,49 +232,5 @@ int find_agb_mass_bin_dust(double masslimit)
 	}
 }
 
-/*void find_actual_ejecta_limits_dust(int channel_type, double Mi_lower_actual, double Mi_upper_actual, int Mi_lower, int Mi_upper, int Zi,
-double* Yields_lower_actual, double* Yields_upper_actual)
-{
-	switch (channel_type)
-	{
-	case 4: //AGB
-		if (Mi_lower == 0)
-		{
-		    int k;
-		    for (k=0;k<AGB_DUST_TYPE_NUM;k++)
-		    {
-		    	Yields_lower_actual[k] = AGBDustCreated[Zi][0][k];
-		    }
-		}
-		else
-		{
-		    int k;
-		    for (k=0;k<AGB_DUST_TYPE_NUM;k++)
-		    {
-				Yields_lower_actual[k] = AGBDustCreated[Zi][Mi_lower][k] + ((AGBDustCreated[Zi][Mi_lower+1][k]-AGBDustCreated[Zi][Mi_lower][k]) * ((Mi_lower_actual-AGBDustMasses[Mi_lower])/(AGBDustMasses[Mi_lower+1]-AGBDustMasses[Mi_lower])));
-		    }
-		}
-
-		if (Mi_upper == AGB_MASS_NUM-1)
-		//if (Mi_upper == AGB_DUST_MASS_NUM-1)
-		{
-		    int k;
-		    for (k=0;k<AGB_DUST_TYPE_NUM;k++)
-		    {
-		    	Yields_upper_actual[k] = AGBDustCreated[Zi][AGB_DUST_MASS_NUM-1][k];
-		    }
-		}
-		else
-		{
-		    int k;
-		    for (k=0;k<AGB_DUST_TYPE_NUM;k++)
-		    {
-		    	Yields_upper_actual[k] = AGBDustCreated[Zi][Mi_upper][k] + ((AGBDustCreated[Zi][Mi_upper+1][k]-AGBDustCreated[Zi][Mi_upper][k]) * ((Mi_upper_actual-AGBDustMasses[Mi_upper])/(AGBDustMasses[Mi_upper+1]-AGBDustMasses[Mi_upper])));
-		     }
-		}
-		break;
-	}
-}*/
-
 #endif //DETAILED_EMRICHMENT
 

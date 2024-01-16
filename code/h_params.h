@@ -12,7 +12,7 @@
 #define  PROTONMASS  1.6726e-24 //[grams]
 #define  HUBBLE      3.2407789e-18   /* in h/sec */
 #define  MUMH        0.59341*PROTONMASS // Could be a variable but we never change it!
-#define	 PI			 3.14159 //ROB: Added on 16-03-22: My mind is blown that this wasn't already here?! How have we not needed pi before? It was only defined in mcmc_halomodel.c
+#define	 PI			 3.14159 //ROB: Added on 16-03-22:
 
 //To understand the units in the code read through set_units in init.c!!!
 #define  SEC_PER_MEGAYEAR   3.155e13

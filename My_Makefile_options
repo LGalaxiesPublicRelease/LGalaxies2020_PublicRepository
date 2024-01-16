@@ -195,7 +195,7 @@ OPT += -DUSE_BETA_MODEL #If off: isothermal density is used for all sputtering. 
 # Output diff/cloud gas/dust rings arrays (only works if H2_AND_RINGS is on too):
 ifeq (H2_AND_RINGS,$(findstring H2_AND_RINGS,$(OPT)))
 OPT += -DOUTPUT_DUST_RINGS
-OPT += -DTAU_RINGS #If on, graing growth and SN shock timescales are outputted for each ring. If off, the average for the whole galaxy is outputted.
+OPT += -DTAU_RINGS #If on, grain growth and SN shock timescales are outputted for each ring. If off, the average for the whole galaxy is outputted.
 endif #ifeq (H2_AND_RINGS,$(findstring H2_AND_RINGS,$(OPT)))
 # The following is nothing to do with dust but does help to reduce the output file size.
 #OPT += -DREDUCED_OUTPUT

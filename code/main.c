@@ -281,11 +281,7 @@ void SAM(int filenr)
 //***************************************************************************************
 //***************************************************************************************
 
-  //for(treenr = 0; treenr < NTrees_Switch_MR_MRII/5.; treenr++)
-  //for(treenr = NTrees_Switch_MR_MRII; treenr < Ntrees; treenr++)
   for(treenr = 0; treenr < Ntrees; treenr++)
-  //for(treenr = 0; treenr <10+1;treenr++)
-  //for(treenr = 0; treenr <100;treenr++)
   {
       //printf("doing tree %d of %d (MR trees=%d)\n", treenr, Ntrees, NTrees_Switch_MR_MRII);
       //if(treenr%1000==0)
@@ -898,42 +894,6 @@ void evolve_galaxies(int halonr, int ngal, int treenr)
 	mass_checks(FOF_centralgal,"main.c",__LINE__);
 
 	for (p = 0; p < ngal; p++) {
-		/*if (p == 0 && Gal[p].SnapNum < 16) printf("\nSnap = %i | Step = %i :\n", Gal[p].SnapNum, nstep);
-		tot_ele_clouds=0.0;
-		tot_ele_diff=0.0;
-		met_ele_clouds=0.0;
-		met_ele_diff=0.0;
-		for (int jjj=0;jjj<RNUM;jjj++) {
-			tot_ele_clouds_rings[jjj]=0.0;
-			tot_ele_diff_rings[jjj]=0.0;
-			met_ele_clouds_rings[jjj]=0.0;
-			met_ele_diff_rings[jjj]=0.0;
-		}
-		for (int eee=0;eee<NUM_ELEMENTS;eee++) {
-			tot_ele_clouds += Gal[p].ColdGasClouds_elements[eee];
-			tot_ele_diff += Gal[p].ColdGasDiff_elements[eee];
-			if (eee > 1) {
-				met_ele_clouds += Gal[p].ColdGasClouds_elements[eee];
-				met_ele_diff += Gal[p].ColdGasDiff_elements[eee];
-			}
-			for (int jjj=0;jjj<RNUM;jjj++) {
-				tot_ele_clouds_rings[jjj] += Gal[p].ColdGasCloudsRings_elements[jjj][eee];
-				tot_ele_diff_rings[jjj] += Gal[p].ColdGasDiffRings_elements[jjj][eee];
-				if (eee > 1) {
-					met_ele_clouds_rings[jjj] += Gal[p].ColdGasCloudsRings_elements[jjj][eee];
-					met_ele_diff_rings[jjj] += Gal[p].ColdGasDiffRings_elements[jjj][eee];
-				}
-			}
-		}
-		//if (p == 0 && Gal[p].SnapNum < 16) printf("\n0) Before Reinc: Snap = %i | Step = %i | Z_cloud = %e | Z_diff = %e\n", Gal[p].SnapNum, nstep, met_ele_clouds/tot_ele_clouds, met_ele_diff/tot_ele_diff);
-		if (p == 0 && Gal[p].SnapNum < 16) printf("0) BEFORE REINC: Z_cloud = %e | Z_diff = %e\n", met_ele_clouds/tot_ele_clouds, met_ele_diff/tot_ele_diff);
-		if (p == 0 && Gal[p].SnapNum < 16) printf("   Z_cloudr = [%e,%e,%e,%e] | Z_diffr = [%e,%e,%e,%e] | H2fracr = [%f,%f,%f,%f] \nM_cloudsr_HHe = [%e,%e,%e,%e] | M_diffr_HHe = [%e,%e,%e,%e]\n",
-										met_ele_clouds_rings[0]/tot_ele_clouds_rings[0],met_ele_clouds_rings[1]/tot_ele_clouds_rings[1],met_ele_clouds_rings[2]/tot_ele_clouds_rings[2],met_ele_clouds_rings[3]/tot_ele_clouds_rings[3],
-										met_ele_diff_rings[0]/tot_ele_diff_rings[0],met_ele_diff_rings[1]/tot_ele_diff_rings[1],met_ele_diff_rings[2]/tot_ele_diff_rings[2],met_ele_diff_rings[3]/tot_ele_diff_rings[3],
-										Gal[p].H2fractionRings[0],Gal[p].H2fractionRings[1],Gal[p].H2fractionRings[2],Gal[p].H2fractionRings[3],
-										tot_ele_clouds_rings[0]-met_ele_clouds_rings[0],tot_ele_clouds_rings[1]-met_ele_clouds_rings[1],tot_ele_clouds_rings[2]-met_ele_clouds_rings[2],tot_ele_clouds_rings[3]-met_ele_clouds_rings[3],
-										tot_ele_diff_rings[0]-met_ele_diff_rings[0],tot_ele_diff_rings[1]-met_ele_diff_rings[1],tot_ele_diff_rings[2]-met_ele_diff_rings[2],tot_ele_diff_rings[3]-met_ele_diff_rings[3]);
-		*/
 		/* don't treat galaxies that have already merged */
 		/*for (int ee=0;ee<NUM_ELEMENTS;ee++)
 			if (Gal[p].EjectedMass_elements[ee] < 0.0)
@@ -950,10 +910,10 @@ void evolve_galaxies(int halonr, int ngal, int treenr)
 		    reincorporate_gas(p, deltaT / STEPS);
 		// determine cooling gas given halo properties and add it to the cold phase
 		mass_checks(p,"main.c",__LINE__);
-		for (int ee=0;ee<NUM_ELEMENTS;ee++)
+		/*for (int ee=0;ee<NUM_ELEMENTS;ee++)
 			if (Gal[p].EjectedMass_elements[ee] < 0.0)
 				printf("AFTER reincorporate_gas(): %i: Gal[%i].EjectedMass_elements[%i] = %e\n", nstep, p, ee, Gal[p].EjectedMass_elements[ee]);
-
+		*/
 		compute_cooling(p, deltaT / STEPS, ngal);
 	      }
 	}
