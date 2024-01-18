@@ -304,14 +304,14 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	rescale_ejected_material(p, jj, "DiskMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
 								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
 								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
-								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
-								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+								 SNIIAllElements, SNIaAllElements, AGBAllElements,
+								 SNIIUnProcessedElements, SNIaUnProcessedElements, AGBUnProcessedElements);
 #else //H2_AND_RINGS
 		rescale_ejected_material(p, "DiskMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
 								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
 								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
-								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
-								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+								 SNIIAllElements, SNIaAllElements, AGBAllElements,
+								 SNIIUnProcessedElements, SNIaUnProcessedElements, AGBUnProcessedElements);
 #endif //H2_AND_RINGS
 #endif //INDIVIDUAL_ELEMENTS
 
@@ -532,14 +532,14 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	rescale_ejected_material(p, jj, "BulgeMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
 								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
 								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
-								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
-								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+								 SNIIAllElements, SNIaAllElements, AGBAllElements,
+								 SNIIUnProcessedElements, SNIaUnProcessedElements, AGBUnProcessedElements);
 #else //H2_AND_RINGS
 		rescale_ejected_material(p, "BulgeMass", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
 								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
 								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
-								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
-								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+								 SNIIAllElements, SNIaAllElements, AGBAllElements,
+								 SNIIUnProcessedElements, SNIaUnProcessedElements, AGBUnProcessedElements);
 #endif //H2_AND_RINGS
 #endif //INDIVIDUAL_ELEMENTS
 
@@ -760,14 +760,14 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	rescale_ejected_material(p, jj, "ICM", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
 								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
 								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
-								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
-								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+								 SNIIAllElements, SNIaAllElements, AGBAllElements,
+								 SNIIUnProcessedElements, SNIaUnProcessedElements, AGBUnProcessedElements);
 #else //H2_AND_RINGS
 		rescale_ejected_material(p, "ICM", SNIIEjectaMass, SNIaEjectaMass, AGBEjectaMass,
 								 &SNIIUnProcessedMetals, &SNIaUnProcessedMetals, &AGBUnProcessedMetals,
 								 &SNIIAllMetals, &SNIaAllMetals, &AGBAllMetals,
-								 &SNIIAllElements, &SNIaAllElements, &AGBAllElements,
-								 &SNIIUnProcessedElements, &SNIaUnProcessedElements, &AGBUnProcessedElements);
+								 SNIIAllElements, SNIaAllElements, AGBAllElements,
+								 SNIIUnProcessedElements, SNIaUnProcessedElements, AGBUnProcessedElements);
 #endif //H2_AND_RINGS
 #endif //INDIVIDUAL_ELEMENTS
 
