@@ -228,7 +228,9 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	//pre-calculations to speed up the code
 	    //timestep_width and dt units cancel out
 #ifdef H2_AND_RINGS
-    	DiskSFRxStep = timestep_width * Gal[p].sfh_DiskMassRings[jj][ii]/Gal[p].sfh_dt[ii]; //[in code units].
+     	//sfh_print(p);
+     	//exit(1);
+     	DiskSFRxStep = timestep_width * Gal[p].sfh_DiskMassRings[jj][ii]/Gal[p].sfh_dt[ii]; //[in code units].
     	DiskSFRxStep_Phys = DiskSFRxStep * (1.0e10/Hubble_h); //[in Msun].
 
     	DiskMetallicity = 0.;

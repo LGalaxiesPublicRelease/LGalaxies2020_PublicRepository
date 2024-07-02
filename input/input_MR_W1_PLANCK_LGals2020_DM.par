@@ -2,7 +2,7 @@
 %----- SA model inputs       --------------
 %------------------------------------------
 
-FileNameGalaxies          SA_DM_test1
+FileNameGalaxies          SA_DM_test2
 FirstFile         	  5
 LastFile          	  5
 
@@ -10,7 +10,7 @@ FileWithOutputRedshifts   ./input/desired_output_redshifts.txt
 McFile			  ./input/Mc.txt
 CoolFunctionsDir          ./CoolFunctions/
 
-SpecPhotDir               ./SpecPhotTables/
+SpecPhotDir               C:\Users\ry22aas\robyates\Astro\L-Galaxies\SpecPhotTables  ;./SpecPhotTables/
 PhotPrefix                WMAP7 ;PLANCK
 SpecPhotIMF               Chabrier ; Salpeter ; Kroupa 
 FileWithFilterNames       ./input/Filter_Sloan.txt
@@ -20,8 +20,8 @@ FileWithFilterNames       ./input/Filter_Sloan.txt
 %----- Simulation input/output files  ------------
 %-------------------------------------------------
 
-SimulationDir		 ./MergerTrees/MR/
-OutputDir		  ./output/
+SimulationDir		C:\Users\ry22aas\robyates\Astro\L-Galaxies\Millennium\modified_trees  ;./MergerTrees/MR/
+OutputDir			./output/
 
 LastDarkMatterSnapShot    63
 Hashbits                  8    ;needed for Peano hilbert key output with the GALAXYTREE option

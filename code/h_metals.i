@@ -3,4 +3,4 @@
 # 0 "<built-in>"
 # 0 "<command-line>"
 # 1 "./code/h_metals.h"
-//NOTE: This header file was written by the binary_c yields generator on 30/05/2023:
+//NOTE: This header file was written by process_binaryc_outputs.py on 10/12/2023 at 13:03:30.

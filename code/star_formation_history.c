@@ -255,6 +255,7 @@ void sfh_print(int p) {
   int i;
 
   printf("For galaxy %d:\n",p);
+  printf("snapnum=%d\n",Gal[p].SnapNum);
   printf("sfh_ibin=%d\n",Gal[p].sfh_ibin);
   printf("sfh_age=%f\n",Gal[p].sfh_age);
   printf("  i    dt   t      Stars      Metals\n");
