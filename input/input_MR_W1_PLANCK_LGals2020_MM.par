@@ -2,7 +2,7 @@
 %----- SA model inputs       --------------
 %------------------------------------------
 
-FileNameGalaxies          SA_MM_test3
+FileNameGalaxies          SA_MM_test1
 FirstFile         	  5
 LastFile          	  5
 
@@ -10,7 +10,7 @@ FileWithOutputRedshifts   ./input/desired_output_redshifts.txt
 McFile			  ./input/Mc.txt
 CoolFunctionsDir          ./CoolFunctions/
 
-SpecPhotDir               C:\Users\ry22aas\robyates\Astro\L-Galaxies\SpecPhotTables  ;./SpecPhotTables/
+SpecPhotDir               ./SpecPhotTables/
 PhotPrefix                WMAP7 ;PLANCK
 SpecPhotIMF               Chabrier ; Salpeter ; Kroupa 
 FileWithFilterNames       ./input/Filter_Sloan.txt
@@ -20,7 +20,7 @@ FileWithFilterNames       ./input/Filter_Sloan.txt
 %----- Simulation input/output files  ------------
 %-------------------------------------------------
 
-SimulationDir		C:\Users\ry22aas\robyates\Astro\L-Galaxies\Millennium\modified_trees  ;./MergerTrees/MR/
+SimulationDir		./MergerTrees/MR/
 OutputDir			./output/
 
 LastDarkMatterSnapShot    63
