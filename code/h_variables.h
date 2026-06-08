@@ -459,9 +459,9 @@ double DiskAGBAllElements_ts[RNUM][NUM_ELEMENTS]; //Total element masses ejected
 double BulgeSNIIAllElements_ts[RNUM][NUM_ELEMENTS]; //Total element masses ejected by bulge SNe-II in this timestep [units: Msun]
 double BulgeSNIaAllElements_ts[RNUM][NUM_ELEMENTS]; //Total element masses ejected by bulge SNe-Ia in this timestep [units: Msun]
 double BulgeAGBAllElements_ts[RNUM][NUM_ELEMENTS]; //Total element masses ejected by bulge AGBs in this timestep [units: Msun]
-double ICMSNIIAllElements_ts[RNUM][NUM_ELEMENTS]; //Total element masses ejected by halo SNe-II in this timestep [units: Msun]
-double ICMSNIaAllElements_ts[RNUM][NUM_ELEMENTS]; //Total element masses ejected by halo SNe-Ia in this timestep [units: Msun]
-double ICMAGBAllElements_ts[RNUM][NUM_ELEMENTS]; //Total element masses ejected by halo AGBs in this timestep [units: Msun]
+double ICMSNIIAllElements_ts[NUM_ELEMENTS]; //Total element masses ejected by halo SNe-II in this timestep [units: Msun]
+double ICMSNIaAllElements_ts[NUM_ELEMENTS]; //Total element masses ejected by halo SNe-Ia in this timestep [units: Msun]
+double ICMAGBAllElements_ts[NUM_ELEMENTS]; //Total element masses ejected by halo AGBs in this timestep [units: Msun]
 #endif //DUST_HOTGAS
 #endif //INDIVIDUAL_ELEMENTS
 #else //H2_AND_RINGS

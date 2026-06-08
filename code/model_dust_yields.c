@@ -1173,11 +1173,8 @@ for (j=Rings) {
 
 				//Check how much gas there is actually available to form dust:
 				HotGasDiff_avail = Gal[p].HotGas_elements[ee] - Gal[p].DustHotGas_elements[ee]; //Total HotGas available to form dust
-#ifdef H2_AND_RINGS
-				SNIIAllElementsDiff_avail = ICMSNIIAllElements_ts[j][ee]; //Newly-ejected element mass into HotGas available to form dust
-#else
 				SNIIAllElementsDiff_avail = ICMSNIIAllElements_ts[ee]; //Newly-ejected element mass into HotGas available to form dust
-#endif //H2_AND_RINGS
+
 				//Add newly-formed dust from this particular ring to HotGas:
 				Gal[p].DustHotGas_elements[ee]  += min(New_dust_diff, min(HotGasDiff_avail, SNIIAllElementsDiff_avail));
 			} //for (ee=0; ee<NUM_ELEMENTS; ee++)

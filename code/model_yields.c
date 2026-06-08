@@ -79,9 +79,9 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 			BulgeSNIIAllElements_ts[jj][ee]=0.0; //Total element masses ejected by bulge SNe-II in this timestep (stored for use in model_dust_yields.c)
 			BulgeSNIaAllElements_ts[jj][ee]=0.0; //Total element masses ejected by bulge SNe-Ia in this timestep (stored for use in model_dust_yields.c)
 			BulgeAGBAllElements_ts[jj][ee]=0.0; //Total element masses ejected by bulge AGBs in this timestep (stored for use in model_dust_yields.c)
-			ICMSNIIAllElements_ts[jj][ee]=0.0; //Total element masses ejected by halo SNe-II in this timestep (stored for use in model_dust_yields.c)
-			ICMSNIaAllElements_ts[jj][ee]=0.0; //Total element masses ejected by halo SNe-Ia in this timestep (stored for use in model_dust_yields.c)
-			ICMAGBAllElements_ts[jj][ee]=0.0; //Total element masses ejected by halo AGBs in this timestep (stored for use in model_dust_yields.c)
+			ICMSNIIAllElements_ts[ee]=0.0; //Total element masses ejected by halo SNe-II in this timestep (stored for use in model_dust_yields.c)
+			ICMSNIaAllElements_ts[ee]=0.0; //Total element masses ejected by halo SNe-Ia in this timestep (stored for use in model_dust_yields.c)
+			ICMAGBAllElements_ts[ee]=0.0; //Total element masses ejected by halo AGBs in this timestep (stored for use in model_dust_yields.c)
 		}
     }
 #else //H2_AND_RINGS
@@ -783,9 +783,9 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 		//ICMAGBRate_current_ts[jj] += AGBRate; //Not currently used, but calculated anyway. (29-11-21)
 #ifdef INDIVIDUAL_ELEMENTS
 		for(ee=0;ee<NUM_ELEMENTS;ee++) {
-			ICMSNIIAllElements_ts[jj][ee] += SNIIAllElements[ee];
-			ICMSNIaAllElements_ts[jj][ee] += SNIaAllElements[ee];
-			ICMAGBAllElements_ts[jj][ee] += AGBAllElements[ee];
+			ICMSNIIAllElements_ts[ee] += SNIIAllElements[ee];
+			ICMSNIaAllElements_ts[ee] += SNIaAllElements[ee];
+			ICMAGBAllElements_ts[ee] += AGBAllElements[ee];
 		}
 #endif //INDIVIDUAL_ELEMENTS
 #else //H2_AND_RINGS
