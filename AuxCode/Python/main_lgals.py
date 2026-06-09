@@ -16,6 +16,7 @@ main_lgals.py
   ;08-11-22: This version was adapted for use at the L-Galaxies workshop 2022
   ;12-10-23: Adapted for use with the Yates+23 version of L-Galaxies
   ;07-12-23: Adapted to enable reading/plotting of GALAXYTREE outputs too
+  ;09-06-26: Adapted to work with noDust structures too
   ;
 """
 
@@ -66,7 +67,7 @@ COSMOLOGY = 'Planck' #Choose from: 'WMAP1', 'Planck'
 SIMULATION  = 'Mil-I' #Choose from: 'Mil-I', 'Mil-II' 
 FILE_TYPE = 'snapshots' #Choose from: 'snapshots', 'galtree'
 REDSHIFT = 0.00 #Only used if MULTI_REDSHIFT_PLOTS is off
-STRUCT_TYPE = 'liteOutput' #Choose from: 'normal', 'liteOutput', 'ringSFHs'
+STRUCT_TYPE = 'liteOutput' #Choose from: 'normal', 'liteOutput', 'ringSFHs', liteOutput_noDust'
 MODEL = 'modified' #Choose from: 'default', 'modified'
 VERSION = 'test1' #Pick a memorable name
 LABEL = MODEL+' model '+VERSION #NEEDS TO BE IN SIMPLE ASCII (so it can be used in a filename ok in Linux, and read by latex). White space is ok [removed later]). A label that wll be added to plots to denote this model if MULTIPLE_MODELS is on.
@@ -97,7 +98,7 @@ else :
 
 #################  
 #Plot suffix:
-mark = 'mk2'
+mark = 'mk3'
 
 
 #################

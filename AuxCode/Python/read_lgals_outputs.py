@@ -58,6 +58,9 @@ def read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRU
         elif STRUCT_TYPE == 'ringSFHs' :
             from LGalaxy_snapshots_ringSFHs import LGalaxiesStruct
             from LGalaxy_snapshots_ringSFHs import properties_used
+        elif STRUCT_TYPE == 'liteOutput_noDust' :
+            from LGalaxy_snapshots_liteOutput_noDust import LGalaxiesStruct
+            from LGalaxy_snapshots_liteOutput_noDust import properties_used
         # elif STRUCT_TYPE == '[ADD_YOUR_OWN_STRUCT_TYPE_HERE]' :
         #     from LGalaxy_snapshots_new import LGalaxiesStruct
         #     from LGalaxy_snapshots_new import properties_used
@@ -80,6 +83,9 @@ def read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRU
         elif STRUCT_TYPE == 'ringSFHs' :
             from LGalaxy_galtree_ringSFHs import LGalaxiesStruct
             from LGalaxy_galtree_ringSFHs import properties_used
+        elif STRUCT_TYPE == 'liteOutput_noDust' :
+            from LGalaxy_galtree_liteOutput_noDust import LGalaxiesStruct
+            from LGalaxy_galtree_liteOutput_noDust import properties_used
         # elif STRUCT_TYPE == '[ADD_YOUR_OWN_STRUCT_TYPE_HERE]' :
         #     from LGalaxy_galtree_new import LGalaxiesStruct
         #     from LGalaxy_galtree_new import properties_used
