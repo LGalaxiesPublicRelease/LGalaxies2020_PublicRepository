@@ -1082,7 +1082,7 @@ for (j=Rings) {
 				//Check how much gas there is actually available to form dust:
 				HotGasDiff_avail = Gal[p].HotGas_elements[ee] - Gal[p].DustHotGas_elements[ee]; //Total HotGas available to form dust
 #ifdef H2_AND_RINGS
-				AGBAllElementsDiff_avail = ICMAGBAllElements_ts[j][ee]; //Newly-ejected element mass into HotGas available to form dust
+				AGBAllElementsDiff_avail = ICMAGBAllElements_ts[ee]; //Newly-ejected element mass into HotGas available to form dust
 #else
 				AGBAllElementsDiff_avail = ICMAGBAllElements_ts[ee]; //Newly-ejected element mass into HotGas available to form dust
 #endif //H2_AND_RINGS
@@ -1204,7 +1204,7 @@ for (j=Rings) {
 			New_dust_diff = Dust_Iron * 1.0;
 			HotGasDiff_avail = Gal[p].HotGas_elements[Fe_NUM] - Gal[p].DustHotGas_elements[Fe_NUM]; //Total HotGas available to form dust
 #ifdef H2_AND_RINGS
-			SNIaAllElementsDiff_avail = ICMSNIaAllElements_ts[j][Fe_NUM]; //Newly-ejected element mass into HotGas available to form dust
+			SNIaAllElementsDiff_avail = ICMSNIaAllElements_ts[Fe_NUM]; //Newly-ejected element mass into HotGas available to form dust
 #else //H2_AND_RINGS
 			SNIaAllElementsDiff_avail = ICMSNIaAllElements_ts[Fe_NUM];
 #endif //H2_AND_RINGS
