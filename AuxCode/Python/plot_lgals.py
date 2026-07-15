@@ -445,14 +445,14 @@ def plot_mzsr_general(Samp1, char_z_low, pdf=None) :
 
 #################
 def plot_sfhs(Samp1, SFH_bins, snap_z0, char_z_low, pdf=None) :   
-    #Get SFH bin info:
+    # Get SFH bin info:
     if Samp1['File_type'] == 'snapshots' :
         theSnap = Samp1['G_samp']['SnapNum'][0] #The snapshot number corresponding to this snapshot file
     elif Samp1['File_type'] == 'galtree' :
         theSnap = snap_z0
-    SFH_bins_lbt_z0 = SFH_bins.LOOKBACKTIME[SFH_bins.SNAPNUM == theSnap]/1.e9 #Gyr #Lookback times from z=0 to centre of each z=0 SFH bin
-    SFH_bins_dt_z0 = SFH_bins.DT[SFH_bins.SNAPNUM == theSnap] #yr #Width of bins from the z=0 SFH
-    SFH_bins_num = SFH_bins.BIN[SFH_bins.SNAPNUM == theSnap][-1] #Number of bins active in the z=0 SFH
+    SFH_bins_lbt_z0 = Samp1['SFH_bins']['lookbacktime'][Samp1['SFH_bins']['snapnum'] == theSnap]/1.e9 #Gyr #Lookback times from z=0 to centre of each SFH bin
+    SFH_bins_dt_z0 = Samp1['SFH_bins']['dt'][Samp1['SFH_bins']['snapnum'] == theSnap] #yr #Width of bins from this snap's SFH
+    SFH_bins_num = Samp1['SFH_bins']['bin'][Samp1['SFH_bins']['snapnum'] == theSnap][-1] #Number of bins active in this snap's SFH
     
     #Set-up plot:
     fig = plt.figure(figsize=(15,12))

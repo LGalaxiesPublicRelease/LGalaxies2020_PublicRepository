@@ -23,7 +23,7 @@ size_t * output_sizes;
 hsize_t dims[6];
  
 // The number of fields in the data
-int nfields=81;
+int nfields=83;
  
 // The field names
 const char * field_names[]={
@@ -74,7 +74,9 @@ const char * field_names[]={
 "BulgeSNIaRate",
 "ICMSNIaRate",
 "Sfr",
+"SfrInst",
 "SfrRings",
+"SfrInstRings",
 "SfrBulge",
 "BulgeSize",
 "DiskRadius",
@@ -125,6 +127,8 @@ char types[]={
 'f',
 'f',
 'i',
+'f',
+'f',
 'f',
 'f',
 'f',
@@ -279,9 +283,13 @@ int flag3[]={
 0,
 0,
 0,
+0,
+0,
 }; 
  
 int flagMag[]={
+0,
+0,
 0,
 0,
 0,
@@ -413,6 +421,8 @@ int flagRings[]={
 0,
 0,
 0,
+0,
+1,
 1,
 0,
 0,
@@ -450,6 +460,8 @@ int flagRings[]={
 }; 
  
 int flagSFH[]={
+0,
+0,
 0,
 0,
 0,
@@ -615,8 +627,12 @@ int flagMetals[]={
 0,
 0,
 0,
+0,
+0,
 }; 
 int flagElements[]={
+0,
+0,
 0,
 0,
 0,

@@ -45,7 +45,9 @@ DiskSNIaRate,float,4,1
 BulgeSNIaRate,float,4,1
 ICMSNIaRate,float,4,1
 Sfr,float,4,1
+SfrInst,float,4,1
 SfrRings,float,4,RNUM
+SfrInstRings,float,4,RNUM
 SfrBulge,float,4,1
 BulgeSize,float,4,1
 DiskRadius,float,4,1

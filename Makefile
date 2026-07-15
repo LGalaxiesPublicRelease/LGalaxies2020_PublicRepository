@@ -75,6 +75,13 @@ clean:
 tidy:
 	rm -f $(OBJS) .$(EXEC)
 
+# Collect values of array dimensions for writing the python script below:
+RNUM := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_params.h | awk '/^#define[ \t]+RNUM/ {print $$3}')
+NUM_METAL_CHANNELS := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_metals.h | awk '/^#define[ \t]+NUM_METAL_CHANNELS/ {print $$3}')
+NUM_ELEMENTS := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_metals.h | awk '/^#define[ \t]+NUM_ELEMENTS/ {print $$3}')
+NUM_COLDGAS_DUST_RATES := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_params.h | awk '/^#define[ \t]+NUM_COLDGAS_DUST_RATES/ {print $$3}')
+NUM_HOTGAS_DUST_RATES := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_params.h | awk '/^#define[ \t]+NUM_HOTGAS_DUST_RATES/ {print $$3}')
+
 # use next target to generate metadata about the result files
 # uses -E compiler option to preprocess the allvars.h file, stores result in allvars.i
 # uses -CC compiler option to save comments, needed for HDF5 output
@@ -97,8 +104,7 @@ endif
 	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_LGalaxy.awk > ./AuxCode/awk/output/L-Galaxies.h
 	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_FileFormat.awk > ./AuxCode/awk/output/L-Galaxies_FileFormat.csv
 	awk -f ./AuxCode/awk/extract_SFH_BIN.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/MOMAF_INPUT_2_MoMaFGalaxy.awk >> ./AuxCode/awk/output/L-Galaxies.h
-	#awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_python_struct.awk >  ./AuxCode/awk/output/python/LGalaxy.py
-	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_python_struct.awk >  ./AuxCode/Python/LGalaxy_from_awk.py
+	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -v RNUM=$(RNUM) -v NUM_METAL_CHANNELS=$(NUM_METAL_CHANNELS) -v NUM_ELEMENTS=$(NUM_ELEMENTS) -v NUM_COLDGAS_DUST_RATES=$(NUM_COLDGAS_DUST_RATES) -v NUM_HOTGAS_DUST_RATES=$(NUM_HOTGAS_DUST_RATES) -f ./AuxCode/awk/GALAXY_OUTPUT_2_python_struct.awk > ./AuxCode/Python/auto_LGalaxy_struct.py
 	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_2_HDF5.awk > ./code/io_hdf5.h
 	awk -f ./AuxCode/awk/extract_GALAXY_OUTPUT_props.awk ./code/h_galaxy_output.i |awk -f ./AuxCode/awk/GALAXY_OUTPUT_prop_2_HDF5_proptable.awk > ./input/hdf5_field_props.txt
 

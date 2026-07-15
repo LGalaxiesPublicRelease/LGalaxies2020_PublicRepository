@@ -1,2 +1,14 @@
-#Ignore all files in the /output directory (and its sub-directories), as L-Galaxies output files are too big for GitHub
-output/
+#FOlder and files to ignore when pushing to the remote repo:
+output/*
+figures/*
+*.o
+AuxCode/Python/Robs_python_routines/__pycache__/
+AuxCode/Python/__pycache__/
+.cproject
+.project
+.settings/
+input/input_MR_W1_PLANCK_LGals2020_MM_RobsLaptop.par
+
+!figures/figures_README.txt
+!output/SFH_Bins_MilI
+!output/SFH_Bins_MilII

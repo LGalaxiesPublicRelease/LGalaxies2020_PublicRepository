@@ -1,76 +1,120 @@
-# from a cleaned list of variables defining the GALAXY_OUPUT C struct, define a default IDL struct definition
-BEGIN{
-    print "# numpy dtype for LGAL_GAL_STRUCT"
+# from a cleaned list of variables defining the GALAXY_OUTPUT C struct
+# generate numpy dtype with SHAPES preserved
+
+BEGIN {
+    print "# Automatically generated python structure to match the L-Galaxy binary output"
     print "import numpy"
-    print "struct_dtype = numpy.dtype(["
-    n=0
-    size=0
+    print "LGalaxiesStruct = numpy.dtype(["
+    n = 0
+
+    sizes["RNUM"] = RNUM
+    sizes["NUM_METAL_CHANNELS"] = NUM_METAL_CHANNELS
+    sizes["NUM_ELEMENTS"] = NUM_ELEMENTS
+    sizes["NUM_COLDGAS_DUST_RATES"] = NUM_COLDGAS_DUST_RATES
+    sizes["NUM_HOTGAS_DUST_RATES"] = NUM_HOTGAS_DUST_RATES
 }
+
+function resolve_dim(x) {
+    if (x in sizes) return sizes[x]
+    return x + 0  # converts numeric strings safely, leaves symbols unchanged otherwise
+}
+
 {
-    line=$0
-    split(line,fields)
+    line = $0
+    split(line, fields)
 
-    type=fields[1]
-    name=fields[2]
-    original_name=name
-    arraysize=1
-
-    if(type == "long" || type == "double") 
-    {
-	dsize = 8
-    } else if(type=="short")
-    {
-	dsize = 2
-    } else 
-    {
-	dsize = 4
-    }
-    
-    if(type == "float") {type= "numpy.float32"} 
-    else if(type == "int"){type= "numpy.int32"}
-    else if(type == "long" && name == "long") {
-    	type="numpy.int64"
-    	name=fields[3]
-    }
-    else if(type == "struct" && name == "metals") {
-    	type="numpy.float32,[Nmetals"
-    	name=fields[3]
-    }
-    else if(type == "struct" && name == "elements") {
-    	type="numpy.float32,[Nelements"
-    	name=fields[3]
-    }
-
-    ia=match(line,/\[.*\]/)
-    if(ia>0) 
-    {
-	arraysize=substr(line,ia+1)
-	ic=index(arraysize,"]")
-	if(ic > 0)
-	    arraysize=substr(arraysize,0,ic-1)
-    }
-    ia=match(name,/\[.*\]/)
-    if(ia>0) 
-	name=substr(name,0,ia-1)
-    ia=match(name,";")
-    if(ia>0) 
-	name=substr(name,0,ia-1)
-
-    size += arraysize * dsize
-    if(original_name == "metals" || original_name == "elements") 
-	{
- 	   print "('" name "'," type "," arraysize "]),"
+	if (fields[1] == "long" && fields[2] == "long") {
+	    type = "long long"
+	    name = fields[3]
+	} else {
+	    type = fields[1]
+	    name = fields[2]
 	}
-	else
-	{
-   	 print "('" name "'," type "," arraysize "),"
+	original_name = name
+
+    # -----------------------------
+    # dtype mapping
+    # -----------------------------
+    if (type == "float") {
+        dtype = "numpy.float32"
+        base_size = 4
+    }
+    else if (type == "long long") {
+	    dtype = "numpy.int64"
+	    base_size = 8
 	}
-    n+=1
+    else if (type == "double" || type == "long") {
+        dtype = "numpy.float64"
+        base_size = 8
+    }
+    else if (type == "short") {
+        dtype = "numpy.int16"
+        base_size = 2
+    }
+    else {
+        dtype = "numpy.int32"
+        base_size = 4
+    }
+
+    # fix special cases
+    if (type == "int") dtype = "numpy.int32"
+
+    # -----------------------------
+    # extract all dimensions
+    # -----------------------------
+    ndims = 0
+    shape_str = ""
+
+    n = split(line, tmp, /\[|\]/)
+
+    for (i = 2; i <= n; i += 2) {
+        dim = tmp[i]
+        if (dim == "") continue
+
+        dim = resolve_dim(dim)
+
+        if (shape_str == "")
+            shape_str = dim
+        else
+            shape_str = shape_str ", " dim
+
+        ndims++
+    }
+
+    # -----------------------------
+    # clean variable name
+    # -----------------------------
+    ia = match(name, /\[/)
+    if (ia > 0)
+        name = substr(name, 1, ia - 1)
+
+    ia = index(name, ";")
+    if (ia > 0)
+        name = substr(name, 1, ia - 1)
+
+    # -----------------------------
+	# emit dtype entry (uniform tuple shapes)
+	# -----------------------------
+	
+	if (ndims == 0) {
+	    # scalar field → (1,)
+	    print "('" name "', " dtype "),"
+	}
+	else if (ndims == 1) {
+	    print "('" name "', " dtype ", (" shape_str ",)),"
+	}
+	else {
+	    print "('" name "', " dtype ", (" shape_str ")),"
+	}
+
+    n++
 }
-END{
+
+END {
     print "('ending','i4',0)"
     print "])"
+
     print "properties_used = {}"
-    print "for el in struct_dtype.names:"
-    print "\tproperties_used[el] = False"
+    print "for el in LGalaxiesStruct.names:"
+    print "\tproperties_used[el] = True"
 }

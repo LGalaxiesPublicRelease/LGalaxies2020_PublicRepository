@@ -21,7 +21,7 @@ def make_lgals_dictionary(LABEL, G_samp, PlotDir, COSMOLOGY, SIMULATION, FILE_TY
                           char_lower_redshift, char_upper_redshift, Volume_MRI, Volume_MRII, \
                           FullSnapnumList_MRI, FullSnapnumList_MRII, CALC_SFH_INFO, \
                           RNUM, RingRadii, RingCenRadii, RReRings, RReSFHRings, RingArea,\
-                          SFH_bins_num=None, SFH_bins_lbt_allGals=None) : 
+                          SFH_bins=None, SFH_bins_lbt_allGals=None) : 
     Volumes = np.full(len(G_samp),0.0)
     Volumes[0:MRI_gals] = Volume_MRI
     Volumes[MRI_gals:] = Volume_MRII
@@ -50,7 +50,7 @@ def make_lgals_dictionary(LABEL, G_samp, PlotDir, COSMOLOGY, SIMULATION, FILE_TY
                 "RReRings" : RReRings,
                 "RReSFHRings" : RReSFHRings,
                 "RingArea" : RingArea,
-                "SFH_bins_num" : SFH_bins_num,
+                "SFH_bins" : SFH_bins,
                 "SFH_bins_lbt_allGals" : SFH_bins_lbt_allGals,
                 "Label" : LABEL
                 }

@@ -34,6 +34,7 @@ from read_lgals_outputs import read_lgals_outputs
 from mass_checks import mass_checks
 from make_lgals_sample import make_lgals_sample
 from make_lgals_dictionary import make_lgals_dictionary
+from read_SFH_Bins import read_SFH_Bins
 from plot_lgals import *
 
 #Directories:
@@ -53,6 +54,7 @@ MASS_CHECKS = 0 #If on (and LOAD_SAMPLE is off), key mass properties will be che
 COMBINE_MODELS = 0 #If on, MR-I and MR-II versions of the same model are combined (if the other version has a .npy sample already saved).
 STELLAR_MASS_CUT = 1 #If on, only galaxies above the mass resolution thresholds of log(M*/Msun) >= 8.0 for Millennium-I and log(M*/Msun) >= 7.0 for Millennium-II will be selected.
 CALC_SFH_INFO = 0 #If on, SFH info will be calculated and added to the sample dictionaries
+CALC_SFH_LBT_ALLGALS = 0 #None # If on, an array of dimensions [NumGals,RNUM,MAXSFHBINS] will be populated with the lookback time to each SFH bin (takes a while). If off, this array will just be assigned with NaNs.
 
 GENERAL_PLOTS = 1 #If on, general plots are produced, such as the SMF, MZR, etc.
 PAPER_PLOTS = 0 #If on, the plots presented in Yates+23 are produced.
@@ -67,9 +69,9 @@ COSMOLOGY = 'Planck' #Choose from: 'WMAP1', 'Planck'
 SIMULATION  = 'Mil-I' #Choose from: 'Mil-I', 'Mil-II' 
 FILE_TYPE = 'snapshots' #Choose from: 'snapshots', 'galtree'
 REDSHIFT = 0.00 #Only used if MULTI_REDSHIFT_PLOTS is off
-STRUCT_TYPE = 'liteOutput' #Choose from: 'normal', 'liteOutput', 'ringSFHs', liteOutput_noDust'
+STRUCT_TYPE = 'auto' #Choose from: 'auto', 'normal', 'liteOutput', 'ringSFHs', liteOutput_noDust'
 MODEL = 'modified' #Choose from: 'default', 'modified'
-VERSION = 'test1' #Pick a memorable name
+VERSION = 'test3' #Name of output file (minus prefixes). E.g. see FileNameGalaxies in the relevant input.par file
 LABEL = MODEL+' model '+VERSION #NEEDS TO BE IN SIMPLE ASCII (so it can be used in a filename ok in Linux, and read by latex). White space is ok [removed later]). A label that wll be added to plots to denote this model if MULTIPLE_MODELS is on.
 
 SOLAR_ABUNDANCE_SET = 'A09' #'GAS07' #'AG89_phot' #'AG89_mete' #Sets which solar abundances are assumed when normalising abundances and enhancements inplots
@@ -98,7 +100,7 @@ else :
 
 #################  
 #Plot suffix:
-mark = 'mk3'
+mark = 'mk5'
 
 
 #################
@@ -179,7 +181,7 @@ if not os.path.exists(OutputDir+"/samples/") :
   print('n/output/samples/ directory created')
   
 if LOAD_SAMPLE == 0 :
-    G_lgal, SFH_bins = read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
+    G_lgal = read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
                                           FirstFile, LastFile, FullRedshiftList, RedshiftsToRead)
 
     if MASS_CHECKS == 1 :
@@ -280,7 +282,7 @@ RingCenRadii = np.empty(RNUM)
 RReRings = np.empty((NumGals,RNUM))    
 RReSFHRings  = np.empty((NumGals,RNUM,RBINS))
 #Calculate standard ring areas and central radii:
-if ("liteOutput" in (STRUCT_TYPE)) :
+if 'StellarHalfLightRadius' not in G_samp1.dtype.names:
     print("NOTE: Using StellarHalfMassRadius as effective radius (Re)\n")
 else :
     print("NOTE: Using StellarHalfLightRadius as effective radius (Re)\n")
@@ -292,7 +294,7 @@ for ii in range(RNUM) :
         RingArea[ii] = np.pi * (RingRadii[ii]**2 - RingRadii[ii-1]**2)
         RingCenRadii[ii] = RingRadii[ii-1] + ((RingRadii[ii] - RingRadii[ii-1])/2.)      
 #Calculate R/Re for every ring of every galaxy:
-    if ("liteOutput" in (STRUCT_TYPE)) :
+    if 'StellarHalfLightRadius' not in G_samp1.dtype.names:
         RReRings[:,ii] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfMassRadius'][:])
         for jj in range(RBINS) :
             RReSFHRings[:,ii,jj] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfMassRadius'][:])      
@@ -301,23 +303,25 @@ for ii in range(RNUM) :
         for jj in range(RBINS) :
             RReSFHRings[:,ii,jj] = RingCenRadii[ii]/(1.e+3*G_samp1['StellarHalfLightRadius'][:])
                 
-if CALC_SFH_INFO == 1 :        
+if CALC_SFH_INFO == 1 :
+    MAXSFHBINS = 20 #Max number of SFH bins allowed in L-Galaxies.        
     #Calculate SFH properties:
-    #N.B. If making new samples, SFH_bins IS ALREADY STORED IN THE DICTIONARY BELOW
-    SFH_bins = astropy.io.fits.open(BaseDir+'AuxCode/Python/'+'Database_SFH_table.fits')
-    SFH_bins = SFH_bins[1].data    
+    SFH_bins = read_SFH_Bins(OutputDir, SIMULATION)
+
+    # Calc lbt_allGals: 
     if FILE_TYPE == 'snapshots' :
         theSnap = G_samp1['SnapNum'][0] #The snapshot number corresponding to this snapshot file
     elif FILE_TYPE == 'galtree' :
         theSnap = snap_z0
-    SFH_bins_lbt = SFH_bins.LOOKBACKTIME[SFH_bins.SNAPNUM == theSnap]/1.e9 #Gyr #Lookback times from z=theSnap to centre of each z=theSnap SFH bin
-    SFH_bins_dt = SFH_bins.DT[SFH_bins.SNAPNUM == theSnap] #yr #Width of bins from the z=theSnap SFH
-    SFH_bins_num = SFH_bins.BIN[SFH_bins.SNAPNUM == theSnap][-1] #Number of bins active in the z=theSnap SFH
-    SFH_bins_lbt_allGals = np.empty([NumGals,RNUM,RBINS])
+    num = SFH_bins['bin'][SFH_bins['snapnum'] == theSnap][-1]
+    lbt = SFH_bins['lookbacktime'][SFH_bins['snapnum'] == theSnap]/1.e9 #Gyr #Lookback times from z=theSnap to centre of each z=theSnap SFH bin
+    SFH_bins_lbt_allGals = np.empty([NumGals,RNUM,MAXSFHBINS])
     SFH_bins_lbt_allGals[:] = np.nan
-    for ii in range(NumGals) :
-        for jj in range(RNUM) :
-            SFH_bins_lbt_allGals[ii][jj][0:SFH_bins_num] = SFH_bins_lbt
+    if CALC_SFH_LBT_ALLGALS :
+        for ii in range(NumGals) :
+            for jj in range(RNUM) :
+                SFH_bins_lbt_allGals[ii][jj][0:num] = lbt
+
 
 #################
 #################
@@ -341,7 +345,7 @@ if CALC_SFH_INFO == 1 :
     Samp1 = make_lgals_dictionary(LABEL, G_samp1, PlotDir, COSMOLOGY, SIMULATION, FILE_TYPE, MODEL, \
                                   VERSION, MRI_cutoff, NumGals, MRI_gals, MRII_gals, SAMPLE_TYPE, char_z_low, char_z_high, \
                                   Volume_MRI, Volume_MRII, FullSnapnumList_MRI, FullSnapnumList_MRII, CALC_SFH_INFO, \
-                                  RNUM, RingRadii, RingCenRadii, RReRings, RReSFHRings, RingArea, SFH_bins_num, SFH_bins_lbt_allGals)
+                                  RNUM, RingRadii, RingCenRadii, RReRings, RReSFHRings, RingArea, SFH_bins, SFH_bins_lbt_allGals)
 else :
     Samp1 = make_lgals_dictionary(LABEL, G_samp1, PlotDir, COSMOLOGY, SIMULATION, FILE_TYPE, MODEL, \
                                   VERSION, MRI_cutoff, NumGals, MRI_gals, MRII_gals, SAMPLE_TYPE, char_z_low, char_z_high, \

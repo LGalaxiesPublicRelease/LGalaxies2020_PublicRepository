@@ -89,7 +89,7 @@
 #ifdef DETAILED_DUST
 //Dust rate array dimensionality:
 #ifdef FULL_DUST_RATES
-#define NUM_COLDGAS_DUST_RATES 5 // [AGB, SNII, SNIa, GrainGrowth, SNShockDestruction] // Needed for HDF5 table creation
+#define NUM_COLDGAS_DUST_RATES 5 // [AGB, SNII, SNIa, GrainGrowth, SNShockDestruction]
 #define NUM_HOTGAS_DUST_RATES 4 // [AGB, SNII, SNIa, SputteringDestruction] // Dust production in the bulge and halo, plus destruction in the HotGas via sputtering
 #endif //FULL_DUST_RATES
 

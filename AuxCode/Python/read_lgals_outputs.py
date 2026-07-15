@@ -16,6 +16,7 @@ read_lgals_outputs.py
   ;08-11-22: Adapted for use at the L-Galaxies workshop 2022
   ;12-10-23: Adapted for use with the Yates+23 version of L-Galaxies
   ;07-12-23: Adapted to enable reading of GALAXYTREE outputs too
+  ;15-07-26: Adapted to enable the use of the automatically-generated struct
   ;
 """
 
@@ -49,7 +50,10 @@ def read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRU
     print('\n-------------')
     
     if FILE_TYPE == 'snapshots' :
-        if STRUCT_TYPE == 'liteOutput' :
+        if STRUCT_TYPE == 'auto' :
+            from auto_LGalaxy_struct import LGalaxiesStruct
+            from auto_LGalaxy_struct import properties_used
+        elif STRUCT_TYPE == 'liteOutput' :
             from LGalaxy_snapshots_liteOutput import LGalaxiesStruct
             from LGalaxy_snapshots_liteOutput import properties_used
         elif STRUCT_TYPE == 'normal' :
@@ -74,7 +78,10 @@ def read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRU
                                                properties_used, LGalaxiesStruct, \
                                                RedshiftsToRead, FullRedshiftList, model_suffix)
     elif FILE_TYPE == 'galtree' :  
-        if STRUCT_TYPE == 'liteOutput' :
+        if STRUCT_TYPE == 'auto' :
+            from auto_LGalaxy_struct import LGalaxiesStruct
+            from auto_LGalaxy_struct import properties_used
+        elif STRUCT_TYPE == 'liteOutput' :
             from LGalaxy_galtree_liteOutput import LGalaxiesStruct
             from LGalaxy_galtree_liteOutput import properties_used
         elif STRUCT_TYPE == 'normal' :
@@ -95,83 +102,39 @@ def read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRU
     
     print('\nReading done')
     
-    
-    
-    
-    
+        
     #################
     #Convert properties to common units:
     #Masses [Msun]:
-    G_lgal['Mvir'] = (G_lgal['Mvir']*1.e10)/Hubble_h 
-    G_lgal['CentralMvir'] = (G_lgal['CentralMvir']*1.e10)/Hubble_h 
-    G_lgal['HaloM_Crit200'] = (G_lgal['HaloM_Crit200']*1.e10)/Hubble_h 
-    if not ("liteOutput" in (STRUCT_TYPE)) :
-        G_lgal['HaloM_TopHat'] = (G_lgal['HaloM_TopHat']*1.e10)/Hubble_h 
-        G_lgal['MassFromInSitu'] = (G_lgal['MassFromInSitu']*1.e10)/Hubble_h 
-        G_lgal['MassFromMergers'] = (G_lgal['MassFromMergers']*1.e10)/Hubble_h 
-        G_lgal['MassFromBursts'] = (G_lgal['MassFromBursts']*1.e10)/Hubble_h 
-    G_lgal['ColdGas'] = (G_lgal['ColdGas']*1.e10)/Hubble_h 
-    G_lgal['HotGas'] = (G_lgal['HotGas']*1.e10)/Hubble_h 
-    G_lgal['StellarMass'] = (G_lgal['StellarMass']*1.e10)/Hubble_h 
-    G_lgal['DiskMass'] = (G_lgal['DiskMass']*1.e10)/Hubble_h 
-    G_lgal['BulgeMass'] = (G_lgal['BulgeMass']*1.e10)/Hubble_h 
-    G_lgal['EjectedMass'] = (G_lgal['EjectedMass']*1.e10)/Hubble_h 
-    G_lgal['BlackHoleMass'] = (G_lgal['BlackHoleMass']*1.e10)/Hubble_h 
-    G_lgal['ICM'] = (G_lgal['ICM']*1.e10)/Hubble_h #N.B. this is actually the mass of the stellar halo (called 'ICM' for legacy reasons)
-    G_lgal['ColdGasRings'] = (G_lgal['ColdGasRings']*1.e10)/Hubble_h 
-    G_lgal['DiskMassRings'] = (G_lgal['DiskMassRings']*1.e10)/Hubble_h 
-    G_lgal['BulgeMassRings'] = (G_lgal['BulgeMassRings']*1.e10)/Hubble_h 
-    G_lgal['MetalsColdGas'] = (G_lgal['MetalsColdGas']*1.e10)/Hubble_h 
-    G_lgal['MetalsHotGas'] = (G_lgal['MetalsHotGas']*1.e10)/Hubble_h 
-    G_lgal['MetalsDiskMass'] = (G_lgal['MetalsDiskMass']*1.e10)/Hubble_h 
-    G_lgal['MetalsBulgeMass'] = (G_lgal['MetalsBulgeMass']*1.e10)/Hubble_h 
-    G_lgal['MetalsEjectedMass'] = (G_lgal['MetalsEjectedMass']*1.e10)/Hubble_h 
-    G_lgal['MetalsICM'] = (G_lgal['MetalsICM']*1.e10)/Hubble_h #N.B. this is actually the mass of metals in the stellar halo (called 'MetalsICM' for legacy reasons)
-    G_lgal['MetalsColdGasRings'] = (G_lgal['MetalsColdGasRings']*1.e10)/Hubble_h 
-    G_lgal['MetalsDiskMassRings'] = (G_lgal['MetalsDiskMassRings']*1.e10)/Hubble_h 
-    G_lgal['MetalsBulgeMassRings'] = (G_lgal['MetalsBulgeMassRings']*1.e10)/Hubble_h 
-    if not ("liteOutput" in (STRUCT_TYPE)) :
-        G_lgal['sfh_DiskMass'] = (G_lgal['sfh_DiskMass']*1.e10)/Hubble_h 
-        G_lgal['sfh_BulgeMass'] = (G_lgal['sfh_BulgeMass']*1.e10)/Hubble_h 
-        G_lgal['sfh_ICM'] = (G_lgal['sfh_ICM']*1.e10)/Hubble_h #N.B. this is actually the SFH for the stellar halo (called 'sfh_ICM' for legacy reasons)
-        G_lgal['sfh_MetalsDiskMass'] = (G_lgal['sfh_MetalsDiskMass']*1.e10)/Hubble_h 
-        G_lgal['sfh_MetalsBulgeMass'] = (G_lgal['sfh_MetalsBulgeMass']*1.e10)/Hubble_h 
-        G_lgal['sfh_MetalsICM'] = (G_lgal['sfh_MetalsICM']*1.e10)/Hubble_h #N.B. this is actually the metal enrichment history for the stellar halo (called 'sfh_MetalsICM' for legacy reasons)
-        if ("ringSFHs" in (STRUCT_TYPE)) :
-            G_lgal['sfh_MetalsDiskMassRings'] = (G_lgal['sfh_MetalsDiskMassRings']*1.e10)/Hubble_h
-            G_lgal['sfh_MetalsBulgeMassRings'] = (G_lgal['sfh_MetalsBulgeMassRings']*1.e10)/Hubble_h
-    #N.B. Chemical element and dust masses are actually outputted in units of Msun (i.e. with Hubble_h already factored in, according to the COSMOLOGY L-Galaxies was run with).    
-    
+    mass_props = ['Mvir', 'CentralMvir', 'HaloM_Crit200', 'HaloM_TopHat', 'MassFromInSitu', 'MassFromMergers', \
+                  'MassFromBursts', 'ColdGas', 'HotGas', 'StellarMass', 'DiskMass', 'BulgeMass', 'EjectedMass', \
+                  'BlackHoleMass', 'ICM', 'ColdGasRings', 'DiskMassRings', 'BulgeMassRings', 'MetalsColdGas', \
+                  'MetalsHotGas', 'MetalsDiskMass', 'MetalsBulgeMass', 'MetalsEjectedMass', 'MetalsICM', \
+                  'MetalsColdGasRings', 'MetalsDiskMassRings', 'MetalsBulgeMassRings', 'sfh_DiskMass', \
+                  'sfh_BulgeMass', 'sfh_ICM', 'sfh_MetalsDiskMass', 'sfh_MetalsBulgeMass', 'sfh_MetalsICM',\
+                  'sfh_DiskMassRings', 'sfh_BulgeMassRings', 'sfh_MetalsDiskMassRings', 'sfh_MetalsBulgeMassRings']
+    for prop in mass_props:
+        if prop in G_lgal.dtype.names:
+            G_lgal[prop] = (G_lgal[prop]*1.e10)/Hubble_h  
+            
     #Lengths & positions [Mpc]:
-    G_lgal['Rvir'] = G_lgal['Rvir']/Hubble_h
-    G_lgal['Pos'] = G_lgal['Pos']/Hubble_h #positions are in comoving Mpc, so divide by (1+z) when comparing galaxy separations from their positions (delta_pos) to e.g. Rvir.
-    G_lgal['DiskRadius'] = G_lgal['DiskRadius']/Hubble_h    
-    G_lgal['ColdGasRadius'] = G_lgal['ColdGasRadius']/Hubble_h
-    G_lgal['StellarHalfMassRadius'] = G_lgal['StellarHalfMassRadius']/Hubble_h
-    if not ("liteOutput" in (STRUCT_TYPE)) :
-        G_lgal['StellarHalfLightRadius'] = G_lgal['StellarHalfLightRadius']/Hubble_h
-      
-    #Spins [Mpc/h km/s] (unmodified)
-    
-    #Mass rates [Msun/yr] (unmodified)
-    
-    #Velocities [km/s] (unmodified)
+    len_pos_props = ['Rvir', 'Pos', 'DiskRadius', 'ColdGasRadius', 'StellarHalfMassRadius', 'StellarHalfLightRadius']
+    for prop in len_pos_props:
+        if prop in G_lgal.dtype.names:
+            G_lgal[prop] = G_lgal[prop]/Hubble_h 
     
     print('Unit conversions done')
     
     
+    # #################
+    # #Read-in SFH bin info:
+    # SFH_bins = astropy.io.fits.open(BaseDir+'AuxCode/Python/'+'Database_SFH_table.fits')
+    # SFH_bins = SFH_bins[1].data
+    
+    # print('SFH bins read')
+    # print('-------------\n')
     
     
     #################
-    #Read-in SFH bin info:
-    SFH_bins = astropy.io.fits.open(BaseDir+'AuxCode/Python/'+'Database_SFH_table.fits')
-    SFH_bins = SFH_bins[1].data
-    
-    print('SFH bins read')
-    print('-------------\n')
-    
-    
-    
-    
-    return G_lgal, SFH_bins
+    return G_lgal #, SFH_bins
     

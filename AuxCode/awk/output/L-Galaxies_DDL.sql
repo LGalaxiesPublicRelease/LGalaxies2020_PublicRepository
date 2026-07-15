@@ -42,6 +42,7 @@ CREATE TABLE GALAXIES (
 ,  bulgeSNIaRate REAL NOT NULL 
 ,  iCMSNIaRate REAL NOT NULL 
 ,  sfr REAL NOT NULL 
+,  sfrInst REAL NOT NULL 
 ,  sfrBulge REAL NOT NULL 
 ,  bulgeSize REAL NOT NULL 
 ,  diskRadius REAL NOT NULL 
