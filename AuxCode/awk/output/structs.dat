@@ -59,7 +59,7 @@ GALAXY_OUTPUT {
  // Mpc/h // Size of the stellar disk, 3x the scale length.     float ColdGasRadius
  // Mpc/h // Size of the gas disk, 3x the scale length.     float StellarHalfMassRadius
  // Mpc/h // stellar Half mass radius        /* magnitudes in various bands */     float MassWeightAge
- //10^9yr //The age of this galaxy weighted by mass of its components.     //All: [H][He][Cb][N][O][Ne][Mg][Si][S][Ca][Fe] or //Only [H][He][O][Mg][Fe]     float DiskMass_elements[NUM_ELEMENTS]
+ //10^9yr //The age of this galaxy weighted by mass of its components.     float DiskMass_elements[NUM_ELEMENTS]
  // Msun // Mass of elements locked up in stars in disk.     float BulgeMass_elements[NUM_ELEMENTS]
  // Msun // Mass of elements locked up in stars in bulge.     float DiskMassRings_elements[RNUM][NUM_ELEMENTS]
  // Msun // Mass of elements locked up in stars in each annular ring.     float BulgeMassRings_elements[RNUM][NUM_ELEMENTS]
@@ -70,14 +70,14 @@ GALAXY_OUTPUT {
  // Msun // Mass of elements locked up in reheated gas. */     float ICM_elements[NUM_ELEMENTS]
  // Msun // Mass of elements locked up in stars in the ICM     float EjectedMass_elements[NUM_ELEMENTS]
  // Msun // Mass of elements locked up in ejected gas.   float t_des[RNUM]
-   float t_sput_HotGas
-   float t_sput_EjectedMass
-   //struct DustRates DustColdGasRates
+ // yr // Dust destruction timescale from SN shocks (at the final timestep?) for each ring   float t_sput_HotGas
+ // yr // Dust sputtering timescale in the HotGas   float t_sput_EjectedMass
+ // yr // Dust sputtering timescale in the EjectedMass   //struct DustRates DustColdGasRates
  // ? // Rates of creation and destruction of dust   float DustColdGasRates[NUM_COLDGAS_DUST_RATES]
- // ? // Rates of creation and destruction of dust in the ColdGas   float DustHotGasRates[NUM_HOTGAS_DUST_RATES]
- // ? // Rates of creation and destruction of dust in the Hotgas   float DustEjectedMassRates
- // Rate of destruction of dust in the EjectedMass   float t_acc[RNUM]
-   float f_cmax[RNUM][NUM_ELEMENTS]
+ // Msun/yr // Rates of dust production & destruction in the ColdGas   float DustHotGasRates[NUM_HOTGAS_DUST_RATES]
+ // Msun/yr // Rates of dust destruction in the HotGas   float DustEjectedMassRates
+ // Msun/yr // Rates of dust destruction in the EjectedMass   float t_acc[RNUM]
+ // yr // Dust accretion timescale from  grain growth for each ring   float f_cmax[RNUM][NUM_ELEMENTS]
  // unitless // max fraction of molecular media //ROB: I think this is actually the maximum mass fraction of element ee in clouds that is in dust.   float ColdGasDiff_elements[NUM_ELEMENTS]
  // Msun // Mass of elements in the diffused phase (in ColdGas)   float ColdGasClouds_elements[NUM_ELEMENTS]
  // Msun // Mass of elements in the cloud phase (in ColdGas)   float DustColdGasDiff_elements[NUM_ELEMENTS]

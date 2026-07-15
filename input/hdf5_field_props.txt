@@ -1,83 +1,83 @@
-Type, None ,Galaxy type: 0 for central galaxies of a main halo, 1 for central galaxies in sub-halos, 2 for satellites without halo.
-HaloIndex, None , ?Unique ID of MPA halo containing this galaxy
-HaloM_Crit200, 1e10 Msun/h , M200 cf critical last time this halo was a type 0
-SnapNum, None ,The snapshot number where this galaxy was identified.
-LookBackTimeToSnap, yr , The time from a given snapshot to z=0
-CentralMvir, 10^10/h Msun , virial mass of background (FOF) halo containing this galaxy
-CentralRvir, Mpc/h , Proper[?] R200 cf critical of background (FOF) halo containing this galaxy
-DistanceToCentralGal, Mpc/h , Proper[?] components of the distance between this galaxy and the galaxy at the centre of the FoF group.
-Pos, 1/h Mpc , Comoving galaxy/subhalo position
-Vel, km/s , Galaxy/subhalo peculiar velocity
-Len, None , Number of particles in the associated subhalo  
-Mvir, 10^10/h Msun , M200 cf critical of the halo last time galaxy was type 0
-Rvir, Mpc/h , R200 cf critical of the halo last time galaxy was type 0
-Vvir, km/s , Virial velocity of the halo last time galaxy was type 0
-Vmax, km/s ,Maximum rotational velocity of the subhalo, or the last value for type 2's galaxies.
-ColdGasSpin, Mpc/h km/s , The specific angular momentum of the cold gas disk
-DiskSpin, Mpc/h km/s , The specific angular momentum of the stellar disk
-ColdGas, 10^10/h Msun , Mass in cold gas.
-ColdGasRings, 1e10 Msun/h ,  Mass of clod gas in each annulur ring.
-H2fraction, None ,  Fraction of ColdGas in the form of H_2
-H2fractionRings, None ,  H2 fraction within each annular ring.
-StellarMass, 10^10/h Msun , Total mass in stars in the disk and the bulge combined
-DiskMass, 10^10/h Msun , Mass of stars in the disk
-BulgeMass, 10^10/h Msun , Mass of stars in the bulge
-DiskMassRings, 1e10 Msun/h , Mass of stars within each annular ring
-BulgeMassRings, 1e10 Msun/h , Mass of stars within each annular ring
-HotGas, 10^10/h Msun , Mass in hot gas
-EjectedMass, 10^10/h Msun , Mass in ejected gas
-BlackHoleMass, 10^10/h Msun , Mass of central black hole
-ICM,10^10/h Msun ,Total mass in metals in intra-cluster stars, for type 0,1
-MetalsColdGas, 10^10/h Msun , Mass in metals in cold gas.
-MetalsColdGasRings, 10^10/h Msun , Mass in metals in cold gas in each annular ring
-MetalsStellarMass, 10^10/h Msun , Mass in metals in the disk
-MetalsDiskMass, 10^10/h Msun , Mass in metals in the disk
-MetalsBulgeMass, 10^10/h Msun , Mass in metals in the bulge
-MetalsDiskMassRings, 10^10/h Msun , Mass in metals in stars in each annular ring
-MetalsBulgeMassRings, 10^10/h Msun , Mass in metals in stars in each annular ring
-MetalsHotGas, 10^10/h Msun , Mass in metals in the hot gas
-MetalsEjectedMass, 10^10/h Msun , Mass in metals in the ejected gas
-MetalsICM, 10^10/h Msun , Mass in metals in intra-cluster stars, for type 0,1
-DiskSNIIRate,yr^-1 ,Rate of SN-II explosions from the disc (averaged over a whole snapshot)
-BulgeSNIIRate,yr^-1 ,Rate of SN-II explosions from the bulge (averaged over a whole snapshot)
-ICMSNIIRate,yr^-1 ,Rate of SN-II explosions from the halo stars (averaged over a whole snapshot)
-DiskSNIaRate,yr^-1 ,Rate of SN-Ia explosions from the disc (averaged over a whole snapshot)
-BulgeSNIaRate,yr^-1 ,Rate of SN-Ia explosions from the bulge (averaged over a whole snapshot)
-ICMSNIaRate,yr^-1 ,Rate of SN-Ia explosions from the halo stars (averaged over a whole snapshot)
-Sfr, Msun/yr , Star formation rate
-SfrRings, Msun/yr , Star formation rate within each annular ring
-SfrBulge, Msun/yr , Star formation rate in bulge.
-BulgeSize, Mpc/h , Half mass radius of bulge
-DiskRadius, Mpc/h , Size of the stellar disk, 3x the scale length.
-ColdGasRadius, Mpc/h , Size of the gas disk, 3x the scale length.
-StellarHalfMassRadius, Mpc/h , stellar Half mass radius
-MassWeightAge,10^9yr ,The age of this galaxy weighted by mass of its components.
-,All: [H][He][Cb][N][O][Ne][Mg][Si][S][Ca][Fe] or ,Only [H][He][O][Mg][Fe]
-DiskMass_elements, Msun , Mass of elements locked up in stars in disk.
-BulgeMass_elements, Msun , Mass of elements locked up in stars in bulge.
-DiskMassRings_elements, Msun , Mass of elements locked up in stars in each annular ring.
-BulgeMassRings_elements, Msun , Mass of elements locked up in stars in each annular ring.
-ColdGas_elements, Msun , Mass of elements locked up in stars in cold gas.
-ColdGasRings_elements, Msun , Mass of elements locked up in cold gas in each annular ring.
-HotGas_elements, Msun , Mass of elements locked up in hot gas.
-ICM_elements, Msun , Mass of elements locked up in stars in the ICM
-EjectedMass_elements, Msun , Mass of elements locked up in ejected gas.
-t_des, ,
-t_sput_HotGas, ,
-t_sput_EjectedMass, ,
-,struct DustRates DustColdGasRates; , ? // Rates of creation and destruction of dust
-DustColdGasRates, ? , Rates of creation and destruction of dust in the ColdGas
-DustHotGasRates, ? , Rates of creation and destruction of dust in the Hotgas
-DustEjectedMassRates,,Rate of destruction of dust in the EjectedMass
-t_acc, ,
-f_cmax, unitless , max fraction of molecular media //ROB: I think this is actually the maximum mass fraction of element ee in clouds that is in dust.
-ColdGasDiff_elements, Msun , Mass of elements in the diffused phase (in ColdGas)
-ColdGasClouds_elements, Msun , Mass of elements in the cloud phase (in ColdGas)
-DustColdGasDiff_elements, Msun , Mass of elements in the diffuse phase locked up in dust (in ColdGas)
-DustColdGasClouds_elements, Msun , Mass of elements in the cloud phase locked up in dust (in ColdGas)
-DustHotGas_elements, Msun , Mass of elements locked up in dust (in HotGas)
-DustEjectedMass_elements, Msun , Mass of elements locked up in dust (in EjectedMass)
-ColdGasDiffRings_elements, Msun , Mass of elements in diffuse gas in each annular ring
-ColdGasCloudsRings_elements, Msun , Mass of elements in clouds in each annular ring
-DustColdGasDiffRings_elements, Msun , Mass of elements in diffuse gas locked up in dust in each annular ring
-DustColdGasCloudsRings_elements, Msun , Mass of elements in diffuse gas locked up in dust in each annular ring
+Type , None , Galaxy type: 0 for central galaxies of a main halo, 1 for central galaxies in sub-halos, 2 for satellites without halo.
+HaloIndex , None , ?Unique ID of MPA halo containing this galaxy
+HaloM_Crit200 , 1e10 Msun , M200 cf critical last time this halo was a type 0
+SnapNum , None , The snapshot number where this galaxy was identified.
+LookBackTimeToSnap , yr , The time from a given snapshot to z=0
+CentralMvir , 10^10 , virial mass of background (FOF) halo containing this galaxy
+CentralRvir , Mpc , Proper[?] R200 cf critical of background (FOF) halo containing this galaxy
+DistanceToCentralGal , Mpc , Proper[?] components of the distance between this galaxy and the galaxy at the centre of the FoF group.
+Pos , 1 , Comoving galaxy/subhalo position
+Vel , km , Galaxy/subhalo peculiar velocity
+Len , None , Number of particles in the associated subhalo
+Mvir , 10^10 , M200 cf critical of the halo last time galaxy was type 0
+Rvir , Mpc , R200 cf critical of the halo last time galaxy was type 0
+Vvir , km , Virial velocity of the halo last time galaxy was type 0
+Vmax , km , Maximum rotational velocity of the subhalo, or the last value for type 2's galaxies.
+ColdGasSpin , Mpc , The specific angular momentum of the cold gas disk
+DiskSpin , Mpc , The specific angular momentum of the stellar disk
+ColdGas , 10^10 , Mass in cold gas.
+ColdGasRings , 1e10 Msun , Mass of clod gas in each annulur ring.
+H2fraction , None , Fraction of ColdGas in the form of H_2
+H2fractionRings , None , H2 fraction within each annular ring.
+StellarMass , 10^10 , Total mass in stars in the disk and the bulge combined
+DiskMass , 10^10 , Mass of stars in the disk
+BulgeMass , 10^10 , Mass of stars in the bulge
+DiskMassRings , 1e10 Msun , Mass of stars within each annular ring
+BulgeMassRings , 1e10 Msun , Mass of stars within each annular ring
+HotGas , 10^10 , Mass in hot gas
+EjectedMass , 10^10 , Mass in ejected gas
+BlackHoleMass , 10^10 , Mass of central black hole
+ICM , 10^10 , Total mass in metals in intra-cluster stars, for type 0,1
+MetalsColdGas , 10^10 , Mass in metals in cold gas.
+MetalsColdGasRings , 10^10 , Mass in metals in cold gas in each annular ring
+MetalsStellarMass , 10^10 , Mass in metals in the disk
+MetalsDiskMass , 10^10 , Mass in metals in the disk
+MetalsBulgeMass , 10^10 , Mass in metals in the bulge
+MetalsDiskMassRings , 10^10 , Mass in metals in stars in each annular ring
+MetalsBulgeMassRings , 10^10 , Mass in metals in stars in each annular ring
+MetalsHotGas , 10^10 , Mass in metals in the hot gas
+MetalsEjectedMass , 10^10 , Mass in metals in the ejected gas
+MetalsICM , 10^10 , Mass in metals in intra-cluster stars, for type 0,1
+DiskSNIIRate , yr^-1 , Rate of SN-II explosions from the disc (averaged over a whole snapshot)
+BulgeSNIIRate , yr^-1 , Rate of SN-II explosions from the bulge (averaged over a whole snapshot)
+ICMSNIIRate , yr^-1 , Rate of SN-II explosions from the halo stars (averaged over a whole snapshot)
+DiskSNIaRate , yr^-1 , Rate of SN-Ia explosions from the disc (averaged over a whole snapshot)
+BulgeSNIaRate , yr^-1 , Rate of SN-Ia explosions from the bulge (averaged over a whole snapshot)
+ICMSNIaRate , yr^-1 , Rate of SN-Ia explosions from the halo stars (averaged over a whole snapshot)
+Sfr , Msun , Star formation rate
+SfrInst , Msun , Instantaneous star formation rate (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts) //*****ROB*****//
+SfrRings , Msun , Star formation rate within each annular ring
+SfrInstRings , Msun , Instantaneous star formation rate within each annular ring (i.e. the sfr in the final timestep of each snapshot) considering secular SF only (i.e. not including starbursts) //*****ROB*****//
+SfrBulge , Msun , Star formation rate in bulge.
+BulgeSize , Mpc , Half mass radius of bulge
+DiskRadius , Mpc , Size of the stellar disk, 3x the scale length.
+ColdGasRadius , Mpc , Size of the gas disk, 3x the scale length.
+StellarHalfMassRadius , Mpc , stellar Half mass radius
+MassWeightAge , 10^9yr , The age of this galaxy weighted by mass of its components.
+DiskMass_elements , Msun , Mass of elements locked up in stars in disk.
+BulgeMass_elements , Msun , Mass of elements locked up in stars in bulge.
+DiskMassRings_elements , Msun , Mass of elements locked up in stars in each annular ring.
+BulgeMassRings_elements , Msun , Mass of elements locked up in stars in each annular ring.
+ColdGas_elements , Msun , Mass of elements locked up in stars in cold gas.
+ColdGasRings_elements , Msun , Mass of elements locked up in cold gas in each annular ring.
+HotGas_elements , Msun , Mass of elements locked up in hot gas.
+ICM_elements , Msun , Mass of elements locked up in stars in the ICM
+EjectedMass_elements , Msun , Mass of elements locked up in ejected gas.
+t_des , yr , Dust destruction timescale from SN shocks (at the final timestep?) for each ring
+t_sput_HotGas , yr , Dust sputtering timescale in the HotGas
+t_sput_EjectedMass , yr , Dust sputtering timescale in the EjectedMass
+DustColdGasRates , Msun , Rates of dust production & destruction in the ColdGas
+DustHotGasRates , Msun , Rates of dust destruction in the HotGas
+DustEjectedMassRates , Msun , Rates of dust destruction in the EjectedMass
+t_acc , yr , Dust accretion timescale from  grain growth for each ring
+f_cmax , unitless , max fraction of molecular media //ROB: I think this is actually the maximum mass fraction of element ee in clouds that is in dust.
+ColdGasDiff_elements , Msun , Mass of elements in the diffused phase (in ColdGas)
+ColdGasClouds_elements , Msun , Mass of elements in the cloud phase (in ColdGas)
+DustColdGasDiff_elements , Msun , Mass of elements in the diffuse phase locked up in dust (in ColdGas)
+DustColdGasClouds_elements , Msun , Mass of elements in the cloud phase locked up in dust (in ColdGas)
+DustHotGas_elements , Msun , Mass of elements locked up in dust (in HotGas)
+DustEjectedMass_elements , Msun , Mass of elements locked up in dust (in EjectedMass)
+ColdGasDiffRings_elements , Msun , Mass of elements in diffuse gas in each annular ring
+ColdGasCloudsRings_elements , Msun , Mass of elements in clouds in each annular ring
+DustColdGasDiffRings_elements , Msun , Mass of elements in diffuse gas locked up in dust in each annular ring
+DustColdGasCloudsRings_elements , Msun , Mass of elements in diffuse gas locked up in dust in each annular ring

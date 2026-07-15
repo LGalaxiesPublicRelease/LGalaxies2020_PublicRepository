@@ -16,11 +16,13 @@ if(flag == 0 && line ~ /\{/) {
 if(line ~ /\}/) {
 	ic=index(line,"}")
 	if(ic > 0)
-	line=substr(line,0,ic-1)
+	line=substr(line,1,ic-1)
 }
-if(flag==1 && line != "" && line !~ /^#/ && line !~ /\*\// && line !~ /"GALAXY_OUTPUT"/) 
-{
-    print line
+if (flag==1) {
 
+    # remove preprocessor leftovers
+    if (line ~ /^#/ || line ~ /^\s*$/) next
+
+    if (line != "") print line
 }
 }

@@ -317,7 +317,6 @@ struct GALAXY_OUTPUT {
 #endif   //OUTPUT_SFH
 
 #ifdef OUTPUT_ELEMENTS
-    //All: [H][He][Cb][N][O][Ne][Mg][Si][S][Ca][Fe] or //Only [H][He][O][Mg][Fe]
 #ifndef LITE_OUTPUT
 #ifdef OUTPUT_SFH
     float sfh_DiskMass_elements[SFH_NBIN][NUM_ELEMENTS]; // Msun // History of mass of elements locked up in stars in disk.
@@ -354,26 +353,26 @@ struct GALAXY_OUTPUT {
 
 #ifdef DETAILED_DUST
 #ifdef FULL_DUST_RATES
-  float t_des[RNUM];
+  float t_des[RNUM]; // yr // Dust destruction timescale from SN shocks (at the final timestep?) for each ring
 #ifdef DUST_HOTGAS
-  float t_sput_HotGas;
+  float t_sput_HotGas; // yr // Dust sputtering timescale in the HotGas
 #endif //DUST_HOTGAS
 #ifdef DUST_EJECTEDMASS
-  float t_sput_EjectedMass;
+  float t_sput_EjectedMass; // yr // Dust sputtering timescale in the EjectedMass
 #endif //DUST_EJECTEDMASS
   //struct DustRates DustColdGasRates; // ? // Rates of creation and destruction of dust
-  float DustColdGasRates[NUM_COLDGAS_DUST_RATES]; // ? // Rates of creation and destruction of dust in the ColdGas
+  float DustColdGasRates[NUM_COLDGAS_DUST_RATES]; // Msun/yr // Rates of dust production & destruction in the ColdGas
 #ifdef DUST_HOTGAS
-  float DustHotGasRates[NUM_HOTGAS_DUST_RATES]; // ? // Rates of creation and destruction of dust in the Hotgas
+  float DustHotGasRates[NUM_HOTGAS_DUST_RATES]; // Msun/yr // Rates of dust destruction in the HotGas
 #endif //DUST_HOTGAS
-#ifdef DUST_EJECTEDMASS
-  float DustEjectedMassRates; // Rate of destruction of dust in the EjectedMass
+#ifdef DUST_EJECTEDMASS // Msun/yr // Rates of dust destruction in the EjectedMass
+  float DustEjectedMassRates; // Msun/yr // Rates of dust destruction in the EjectedMass
 #endif //DUST_EJECTEDMASS
 #endif //FULL_DUST_RATES
 #ifdef TAU_RINGS
-  float t_acc[RNUM];
+  float t_acc[RNUM]; // yr // Dust accretion timescale from  grain growth for each ring
 #else //TAU_RINGS
-  float t_acc; // ? // dust growth rate
+  float t_acc; // yr // dust growth rate
 #endif //TAU_RINGS
 #ifdef H2_AND_RINGS
 #ifdef OUTPUT_DUST_RINGS

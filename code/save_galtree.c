@@ -15,7 +15,8 @@ void create_galaxy_tree_file(int filenr)
 
 #ifdef HDF5_OUTPUT
 
-  open_hdf5_file(filenr);
+  setup_hdf5_field_types();
+  open_hdf5_file(filenr,0);
   create_hdf5_table(0);
 
 #else //HDF5_OUTPUT
@@ -52,7 +53,9 @@ void close_galaxy_tree_file(void)
 #ifdef HDF5_OUTPUT
 
   hdf5_append_data(0,galaxy_output_hdf5[0],b[0]); // Output the final galaxies 
-  hdf5_close();
+  b[0] = 0;
+  hdf5_close(0);
+  cleanup_hdf5_fields();
 
 #else //HDF5_OUTPUT
 
@@ -111,7 +114,8 @@ void save_galaxy_tree_append(int i)
   }
   else {
       hdf5_append_data(0,galaxy_output_hdf5[0],NRECORDS_APP);
-      b[0]=0;
+      galaxy_output_hdf5[0][0] = galaxy_output; //Make sure the final galaxy in this chunk is still wirtten to the HDF5 file next
+      b[0] = 1;
   }
 
 #else //HDF5_OUTPUT

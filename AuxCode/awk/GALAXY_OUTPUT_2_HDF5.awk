@@ -19,9 +19,10 @@ BEGIN{
     print "/* File to set all the HDF5 table properties */ "
     print "int ifield;"
     print "int rowsize=0;"
+    print "int * is_array_type;"
     print "hsize_t chunk_size=CHUNK_SIZE;"
     print "int * fill_data=NULL;"
-    print "hid_t file_id;"
+    print "hid_t file_id[NOUT];"
     print "size_t * output_offsets;"
     print "hid_t field_type;"
     print "hid_t * field_types;"
@@ -49,7 +50,7 @@ BEGIN{
     if(type[n] == "float") {type[n]= "f"} 
     else if(type[n] == "int"){type[n]= "i"}
     else if(type[n] == "long" && name[n] == "long") {
-    	type[n]="'l"
+    	type[n]="l"
     	name[n]=fields[3]
     }
 # Is this a metal struct?
@@ -77,6 +78,12 @@ BEGIN{
 # Flag to decide whether or not this entry contains an element array
     flagElements[n]=match(name[n],/\[NUM_ELEMENTS\]/)
     if (flagElements[n]>0) flagElements[n]=1
+# Flag to decide whether or not this entry contains a DustColdGasRates array
+    flagDustColdGasRates[n]=match(name[n],/\[NUM_COLDGAS_DUST_RATES\]/)
+    if (flagDustColdGasRates[n]>0) flagDustColdGasRates[n]=1
+# Flag to decide whether or not this entry contains a DustHotGasRates array
+    flagDustHotGasRates[n]=match(name[n],/\[NUM_HOTGAS_DUST_RATES\]/)
+    if (flagDustHotGasRates[n]>0) flagDustHotGasRates[n]=1
 # Flag to see if this has an array of size 3
     flag3[n]=match(line,/\[3\]/)
     if (flag3[n]>0) flag3[n]=1
@@ -144,6 +151,14 @@ END{
 
     print "int flagElements[]={"
     for(i=0;i<n;i++) print flagElements[i] ","
+    print "}; "
+    
+    print "int flagDustColdGasRates[]={"
+    for(i=0;i<n;i++) print flagDustColdGasRates[i] ","
+    print "}; "
+    
+        print "int flagDustHotGasRates[]={"
+    for(i=0;i<n;i++) print flagDustHotGasRates[i] ","
     print "}; "
 
 }

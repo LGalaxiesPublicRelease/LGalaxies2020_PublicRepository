@@ -118,9 +118,7 @@ struct GALAXY_OUTPUT {
        /* magnitudes in various bands */
 # 280 "./code/h_galaxy_output.h"
     float MassWeightAge; //10^9yr //The age of this galaxy weighted by mass of its components.
-# 320 "./code/h_galaxy_output.h"
-    //All: [H][He][Cb][N][O][Ne][Mg][Si][S][Ca][Fe] or //Only [H][He][O][Mg][Fe]
-# 332 "./code/h_galaxy_output.h"
+# 331 "./code/h_galaxy_output.h"
     float DiskMass_elements[NUM_ELEMENTS]; // Msun // Mass of elements locked up in stars in disk.
     float BulgeMass_elements[NUM_ELEMENTS]; // Msun // Mass of elements locked up in stars in bulge.
 
@@ -146,24 +144,24 @@ struct GALAXY_OUTPUT {
 
 
 
-  float t_des[RNUM];
+  float t_des[RNUM]; // yr // Dust destruction timescale from SN shocks (at the final timestep?) for each ring
 
-  float t_sput_HotGas;
+  float t_sput_HotGas; // yr // Dust sputtering timescale in the HotGas
 
 
-  float t_sput_EjectedMass;
+  float t_sput_EjectedMass; // yr // Dust sputtering timescale in the EjectedMass
 
   //struct DustRates DustColdGasRates; // ? // Rates of creation and destruction of dust
-  float DustColdGasRates[NUM_COLDGAS_DUST_RATES]; // ? // Rates of creation and destruction of dust in the ColdGas
+  float DustColdGasRates[NUM_COLDGAS_DUST_RATES]; // Msun/yr // Rates of dust production & destruction in the ColdGas
 
-  float DustHotGasRates[NUM_HOTGAS_DUST_RATES]; // ? // Rates of creation and destruction of dust in the Hotgas
-
-
-  float DustEjectedMassRates; // Rate of destruction of dust in the EjectedMass
+  float DustHotGasRates[NUM_HOTGAS_DUST_RATES]; // Msun/yr // Rates of dust destruction in the HotGas
 
 
+  float DustEjectedMassRates; // Msun/yr // Rates of dust destruction in the EjectedMass
 
-  float t_acc[RNUM];
+
+
+  float t_acc[RNUM]; // yr // Dust accretion timescale from  grain growth for each ring
 
 
 
@@ -208,7 +206,7 @@ struct SFH_BIN {
     float sfh_BulgeMassRings[RNUM]; // 10^10 Msun/h // Star formation history in the bulge RINGS.
 
     float sfh_ICM; // 1e10 Msun/h // SFH of ICM
-# 427 "./code/h_galaxy_output.h"
+# 426 "./code/h_galaxy_output.h"
     float sfh_MetalsDiskMass[NUM_METAL_CHANNELS]; // 1e10 Msun/h // Metals locked up in stars in disk.
     float sfh_MetalsBulgeMass[NUM_METAL_CHANNELS]; // 1e10 Msun/h // Metals locked up in stars in bulge.
     float sfh_MetalsICM[NUM_METAL_CHANNELS]; // 1e10 Msun/h // Metals locked up in stars in ICM.

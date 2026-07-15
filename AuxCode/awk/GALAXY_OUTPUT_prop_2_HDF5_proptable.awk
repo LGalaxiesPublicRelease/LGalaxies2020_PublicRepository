@@ -1,34 +1,69 @@
 # from a cleaned list of variables defining the GALAXY_OUPUT C struct, create a .h file containing the
-# LGalaxy and (if relevant) MOMAF output structs.
-BEGIN{
+# LGalaxy struct required for HDF5 output.
+BEGIN {
+    # recognised C declaration types
+    types["float"]=1
+    types["double"]=1
+    types["int"]=1
+    types["short"]=1
+    types["long"]=1
+    types["char"]=1
+    types["struct"]=1
 }
+
 {
-	line=$0
-	split(line,fields)
-	type=fields[1]
-	if(type=="//")
-	    next
+    line = $0
 
-	fieldname=fields[2]
-	if(type == "long" && fieldname == "long") 
-	    fieldname=fields[3]
-	if(type == "struct")
-	    fieldname=fields[3]	    
-	ia=index(fieldname,";")
-	fieldname=substr(fieldname,0,ia-1)
-	ib=index(fieldname,"[")
-	if(ib!=0)
-	    fieldname=substr(fieldname,0,ib-1)
+    # trim leading/trailing whitespace
+    gsub(/^[ \t]+|[ \t]+$/, "", line)
 
-	unitidx=match(line,"//")
-	if(unitidx!=0){
-	    slice_line=substr(line,unitidx+2)
-	    descidx=match(slice_line,"//")
-	    unit=substr(slice_line,0,descidx-1)
-	    desc=substr(slice_line,descidx+2)
-	    print fieldname "," unit "," desc
-	}
-	else
-	    print fieldname ", ," 
-    
+    # ignore blank lines
+    if (line == "")
+        next
+
+    # ignore comments
+    if (line ~ /^\/\//)
+        next
+    if (line ~ /^\/\*/)
+        next
+    if (line ~ /^\*/)
+        next
+
+    split(line, fields)
+
+    type = fields[1]
+
+    # only accept genuine C declarations
+    if (!(type in types))
+        next
+
+    if (type == "struct")
+        fieldname = fields[3]
+    else if (type == "long" && fields[2] == "long")
+        fieldname = fields[3]
+    else
+        fieldname = fields[2]
+
+    # remove array dimensions
+    sub(/\[.*/, "", fieldname)
+
+    # remove trailing semicolon
+    sub(/;.*/, "", fieldname)
+
+    unit = ""
+    desc = ""
+
+    if (match(line, /\/\/[^\/]*/)) {
+        unit = substr(line, RSTART+2, RLENGTH-2)
+
+        rest = substr(line, RSTART+RLENGTH)
+
+        if (match(rest, /\/\/.*/))
+            desc = substr(rest, RSTART+2)
+    }
+
+    gsub(/^[ \t]+|[ \t]+$/, "", unit)
+    gsub(/^[ \t]+|[ \t]+$/, "", desc)
+
+    print fieldname " , " unit " , " desc
 }

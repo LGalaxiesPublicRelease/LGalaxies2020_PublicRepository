@@ -17,6 +17,17 @@ OPT += -DREORDER_ON_DISK    # Default: on. This will read/write to disk to re-or
 
 OPT += -DLITE_OUTPUT       # ROB: If on, only a minimal number of parameters are outputted (suitable for basic dust+binaries studies) (NOTE: This is different to the more extreme LIGHT_OUTPUT option) (15-09-22)
 
+###################
+### HDF5 OUTPUT ###
+###################
+OPT += -DHDF5_OUTPUT        # Output the data in HDF5 format
+ifeq (HDF5_OUTPUT,$(findstring HDF5_OUTPUT,$(OPT)))
+OBJS += ./code/io_hdf5.o
+OPT += -DNRECORDS_APP=1000  # Number of galaxies to append at a time
+OPT += -DCOMPRESS=0         # 1 to turn compression on and 0 to turn it off
+OPT += -DCHUNK_SIZE=1000    # size of chunk for hdf5 to output the data (optimised)
+endif
+
 # To run with different dark matter simulation
 #OPT += -DMRII      
 #OPT += -DCATERPILLAR

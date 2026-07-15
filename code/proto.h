@@ -553,10 +553,12 @@ void print_rings(char string[], int p);
 void print_check_rings_and_total(char string[], int p);
 
 #ifdef HDF5_OUTPUT
-void open_hdf5_file(int filenr);
-void write_input_table(char *name);
-void write_prop_table(void );
+void setup_hdf5_field_types();
+void open_hdf5_file(int filenr, int n);
+void write_input_table(char *name, int n);
+void write_prop_table(int n);
 void create_hdf5_table(int n);
 void hdf5_append_data(int n,struct GALAXY_OUTPUT * galaxy_output,int nrecords_app);
-void hdf5_close();
+void hdf5_close(int n);
+void cleanup_hdf5_fields();
 #endif

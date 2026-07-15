@@ -52,6 +52,8 @@ PlotDir = BaseDir+'figures/' #where plots created by this script are sent
 LOAD_SAMPLE = 0 #If on, a pre-made sample of galaxies is loaded from the pickeled save file (quicker). If off, L-Galaxies outputs are read in and a sample is made (slower).
 MASS_CHECKS = 0 #If on (and LOAD_SAMPLE is off), key mass properties will be checked for Nans, negatives, and whether sub-components add up to component masses properly.
 COMBINE_MODELS = 0 #If on, MR-I and MR-II versions of the same model are combined (if the other version has a .npy sample already saved).
+HDF5_OUTPUT = 1 #If on (and LOAD_SAMPLE is off), then HDF5 output file(s) form L-Galaxies will be read. If off, standard bianaries will be read. HDF5 output requires the HDF5_OUTPUT switch in L-Galaxies to have been on when it was compiled and run.
+
 STELLAR_MASS_CUT = 1 #If on, only galaxies above the mass resolution thresholds of log(M*/Msun) >= 8.0 for Millennium-I and log(M*/Msun) >= 7.0 for Millennium-II will be selected.
 CALC_SFH_INFO = 0 #If on, SFH info will be calculated and added to the sample dictionaries
 CALC_SFH_LBT_ALLGALS = 0 #None # If on, an array of dimensions [NumGals,RNUM,MAXSFHBINS] will be populated with the lookback time to each SFH bin (takes a while). If off, this array will just be assigned with NaNs.
@@ -61,7 +63,7 @@ PAPER_PLOTS = 0 #If on, the plots presented in Yates+23 are produced.
 MULTI_REDSHIFT_PLOTS = 0 #If on, in combination with either GENERAL_PLOTS or PAPER_PLOTS, plots requiring multiple redshift outputs will be calculated and made.
 
 SELECT_MAIN_PROGENITORS = 1 #Only works if FILE_TYPE = 'galtree'. If on, galaxies will be selected at a fixed redshift (the one given by REDSHIFT below) using the selection criteria determined by SAMPLE_TYPE, and then all their progenitors & descendents will be included in the sample too. If off, galaxies at all redshifts will be selected under the same selection criteria.
-GALTREE_REDSHIFT_TO_PLOT = 0.00 #Only works if FILE_TYPE = 'galtree and MULTI_REDSHIFT_PLOTS is off. If on, only galaxies at this redshift will plotted. Choose from: 0.00,1.04,2.07,3.11,3.95,5.03,5.92,6.97,8.22,8.93
+GALTREE_REDSHIFT_TO_PLOT = 0.00 #Only works if FILE_TYPE = 'galtree and MULTI_REDSHIFT_PLOTS is off. If on, only galaxies at this redshift will plotted. If HDF5_OUTPUT is also on, then only galaxies at this readshift will be loaded form the L-Galaxies HDF5 output file (more efficient). Choose from: 0.00,1.04,2.07,3.11,3.95,5.03,5.92,6.97,8.22,8.93
 
 #################
 #Sample info:
@@ -71,7 +73,7 @@ FILE_TYPE = 'snapshots' #Choose from: 'snapshots', 'galtree'
 REDSHIFT = 0.00 #Only used if MULTI_REDSHIFT_PLOTS is off
 STRUCT_TYPE = 'auto' #Choose from: 'auto', 'normal', 'liteOutput', 'ringSFHs', liteOutput_noDust'
 MODEL = 'modified' #Choose from: 'default', 'modified'
-VERSION = 'test3' #Name of output file (minus prefixes). E.g. see FileNameGalaxies in the relevant input.par file
+VERSION = 'test1' #Name of output file (minus prefixes). E.g. see FileNameGalaxies in the relevant input.par file
 LABEL = MODEL+' model '+VERSION #NEEDS TO BE IN SIMPLE ASCII (so it can be used in a filename ok in Linux, and read by latex). White space is ok [removed later]). A label that wll be added to plots to denote this model if MULTIPLE_MODELS is on.
 
 SOLAR_ABUNDANCE_SET = 'A09' #'GAS07' #'AG89_phot' #'AG89_mete' #Sets which solar abundances are assumed when normalising abundances and enhancements inplots
@@ -100,7 +102,7 @@ else :
 
 #################  
 #Plot suffix:
-mark = 'mk5'
+mark = 'mk1'
 
 
 #################
@@ -181,8 +183,9 @@ if not os.path.exists(OutputDir+"/samples/") :
   print('n/output/samples/ directory created')
   
 if LOAD_SAMPLE == 0 :
-    G_lgal = read_lgals_outputs(BaseDir, OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
-                                          FirstFile, LastFile, FullRedshiftList, RedshiftsToRead)
+    G_lgal = read_lgals_outputs(OutputDir, Hubble_h, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, \
+                                COSMOLOGY, HDF5_OUTPUT, MULTI_REDSHIFT_PLOTS, GENERAL_PLOTS, PAPER_PLOTS, GALTREE_REDSHIFT_TO_PLOT, \
+                                FirstFile, LastFile, FullRedshiftList, RedshiftsToRead)
 
     if MASS_CHECKS == 1 :
         mass_checks(G_lgal, COSMOLOGY, SIMULATION, FILE_TYPE, STRUCT_TYPE, MODEL, VERSION, SAMPLE_TYPE, plots=1)

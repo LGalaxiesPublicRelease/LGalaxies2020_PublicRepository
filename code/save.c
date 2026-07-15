@@ -50,19 +50,16 @@ void create_galaxy_files(int filenr)
   int n, i;
 
 #ifdef HDF5_OUTPUT
-
-  open_hdf5_file(filenr);
-
+  setup_hdf5_field_types();
 #else //HDF5_OUTPUT
-
   // create output files - snapshot option
   char buf[1000];
-
 #endif //HDF5_OUTPUT
 
   for(n = 0; n < NOUT; n++) {
       for(i = 0; i < Ntrees; i++) TreeNgals[n][i] = 0;
 #ifdef HDF5_OUTPUT
+      open_hdf5_file(filenr,n);
       create_hdf5_table(n);
 #else
       sprintf(buf, "%s/%s_z%1.2f_%d", OutputDir, FileNameGalaxies, ZZ[ListOutputSnaps[n]], filenr);
@@ -82,9 +79,12 @@ void close_galaxy_files(void)
   int n;
 
 #ifdef HDF5_OUTPUT
-  for(n=0;n < NOUT; n++)
-      hdf5_append_data(n,galaxy_output_hdf5[n],b[n]); // Output the final galaxies
-  hdf5_close();
+  for(n=0;n < NOUT; n++) {
+	  hdf5_append_data(n,galaxy_output_hdf5[n],b[n]); // Output the final galaxies
+	  b[n] = 0;
+  	  hdf5_close(n);
+  }
+  cleanup_hdf5_fields();
 #else //HDF5_OUTPUT
   for(n = 0; n < NOUT; n++) {
       fseek(FdGalDumps[n], 0, SEEK_SET);
@@ -120,14 +120,14 @@ void save_galaxy_append(int tree, int i, int n)
 
 #ifdef HDF5_OUTPUT
   if(b[n]<NRECORDS_APP ){
-      //printf("%d  %d \n",n,b[n]);
       galaxy_output_hdf5[n][b[n]]=galaxy_output;
       b[n]++;
   }
   else {
       // Append the data to the HDF5 table if b[n]==NRECORDS_APP
       hdf5_append_data(n,galaxy_output_hdf5[n],NRECORDS_APP);
-      b[n]=0;
+      galaxy_output_hdf5[n][0] = galaxy_output; //Make sure the final galaxy in this chunk is still wirtten to the HDF5 file next
+      b[n] = 1;
   }
 #else //HDF5_OUTPUT
   myfwrite(&galaxy_output, sizeof(struct GALAXY_OUTPUT), 1, FdGalDumps[n]);
