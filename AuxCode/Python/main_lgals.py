@@ -17,6 +17,7 @@ main_lgals.py
   ;12-10-23: Adapted for use with the Yates+23 version of L-Galaxies
   ;07-12-23: Adapted to enable reading/plotting of GALAXYTREE outputs too
   ;09-06-26: Adapted to work with noDust structures too
+  ;15-07-26: Adapted to work with automatically-generated python structures & HDF5 output
   ;
 """
 
