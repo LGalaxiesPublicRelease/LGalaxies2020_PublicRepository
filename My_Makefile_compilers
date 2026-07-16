@@ -38,30 +38,32 @@ endif
 
 
 ifeq ($(SYSTYPE),"Standard") # Runs with CC and optimization options above
-GSL_INCL = -I/usr/include/gsl/
-GSL_LIBS = -L/usr/lib 
-HDF5_LIBS = -L/usr/local/hdf5/lib
-HDF5_INCL = -I/usr/local/hdf5/include 
+GSL_INCL = -I/usr/local/include
+GSL_LIBS = -L/usr/local/lib
+#GSL_INCL = -I/usr/include/gsl/
+#GSL_LIBS = -L/usr/lib 
+HDF5_LIBS = -L/usr/hdf5/lib -lhdf5 -lhdf5_hl
+HDF5_INCL = -I/usr/hdf5/include 
 endif
 
 
 ifeq ($(SYSTYPE),"Linux")
 CC       =   gcc
-GSL_INCL = -I/usr/local/include
-GSL_LIBS = -L/usr/local/lib -static
+HDF5_LIBS = -L/usr/hdf5/lib -lhdf5 -lhdf5_hl
+HDF5_INCL = -I/usr/hdf5/include 
 endif
 
 
 ifeq ($(SYSTYPE),"Mac")
 CC       =   gcc
-GSL_INCL = -I/usr/local/include
-GSL_LIBS = -L/usr/local/lib
+HDF5_LIBS = -L/usr/hdf5/lib -lhdf5 -lhdf5_hl
+HDF5_INCL = -I/usr/hdf5/include 
 endif
 
 
 ifeq ($(SYSTYPE),"cygwin")
 CC       =   gcc -fcommon  # sets the C-compiler
-HDF5_LIBS =  -lhdf5 -lhdf5_hl -lsz -laec -lz -lm
+HDF5_LIBS =  -lhdf5 -lhdf5_hl
 endif
 
 
@@ -70,7 +72,9 @@ CC       =   gcc -fcommon
 GSL_INCL = -I/usr/local/include
 GSL_LIBS = -L/usr/local/lib -static
 #HDF5_INCL = -I/usr/local/hdf5/include
-#HDF5_LIBS = -L/usr/local/hdf5/lib -lhdf5 -lhdf5_hl -lsz -laec -lz -lm
+#HDF5_LIBS = -L/usr/local/hdf5/lib -lhdf5 -lhdf5_hl -lsz -laec -lz -ldl -lm
+#HDF5_INCL = -I/usr/hdf5/include 
+#HDF5_LIBS = -L/usr/hdf5/lib -lhdf5 -lhdf5_hl -lsz -laec -lz -ldl -lm
 endif
 
 
@@ -84,6 +88,15 @@ CC       =   cc
 GSL_INCL = -I/usr/local/include
 GSL_LIBS = -L/usr/local/lib
 endif
+endif
+
+
+ifeq ($(SYSTYPE),"Linux_old")
+CC       =   gcc
+GSL_INCL = -I/usr/local/include
+GSL_LIBS = -L/usr/local/lib -static
+HDF5_LIBS = -L/usr/hdf5/lib -lhdf5 -lhdf5_hl
+HDF5_INCL = -I/usr/hdf5/include 
 endif
 
 
