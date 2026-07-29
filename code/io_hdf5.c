@@ -22,6 +22,7 @@ rowsize=0;
 output_offsets=(size_t*)calloc(nfields,sizeof(output_offsets));
 output_sizes=(size_t*)calloc(nfields,sizeof(output_sizes));
 field_types=(hid_t*)calloc(nfields,sizeof(field_types));
+is_array_type = (int*)calloc(nfields, sizeof(int));
 
 printf("\n nfields=%d\n",nfields);
  
@@ -109,7 +110,7 @@ for(ifield=0;ifield<nfields;ifield++){
 	printf("output_size = %d\n",(int)output_size);
 #endif
 
-	is_array_type = (int*)calloc(nfields, sizeof(int));
+	//is_array_type = (int*)calloc(nfields, sizeof(int));
 
     if (field_ndim==0) {
 	field_types[ifield]=field_type;
@@ -140,7 +141,7 @@ void open_hdf5_file(int filenr, int n) {
 
 void create_hdf5_table(int n){
 
-    printf("\n Entering create_hdf5_table");
+  //printf("\nEntering create_hdf5_table");
 
   char table_name[20];
   const hsize_t nrecords=0 ; // Don't write any records on table creation
@@ -150,10 +151,11 @@ void create_hdf5_table(int n){
   struct GALAXY_OUTPUT galaxy_output;
 
 #ifdef GALAXYTREE
-  sprintf(table_name,"GalTree"); 
+  sprintf(table_name,"GalTree");
+  printf("\nio_hdf5.c: Making galtree table\n");
 #else
   sprintf(table_name,"%d",ListOutputSnaps[n]);
-  printf("\n Making table %s\n",table_name);
+  printf("\nio_hdf5.c: Making table for snapshot %s\n",table_name);
 #endif
 #ifdef DEBUG_HDF5
   printf("table_name=%s\n",table_name);
@@ -172,7 +174,7 @@ void create_hdf5_table(int n){
            output_size, field_names, output_offsets, field_types,
            chunk_size, fill_data, COMPRESS, &galaxy_output);
 
-    printf("Leaving create_hdf5_table\n");
+  //printf("Leaving create_hdf5_table\n");
 }
 
 
@@ -224,6 +226,11 @@ void cleanup_hdf5_fields(void){
   free(output_offsets);
   free(field_types);
   free(output_sizes);
+  free(is_array_type);
+  output_offsets = NULL;
+  field_types    = NULL;
+  output_sizes   = NULL;
+  is_array_type = NULL;
 }
 
 

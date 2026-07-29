@@ -72,11 +72,11 @@ tidy:
 	rm -f $(OBJS) .$(EXEC)
 
 # Collect values of array dimensions for writing the python script below:
-RNUM := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_params.h | awk '/^#define[ \t]+RNUM/ {print $$3}')
-NUM_METAL_CHANNELS := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_metals.h | awk '/^#define[ \t]+NUM_METAL_CHANNELS/ {print $$3}')
-NUM_ELEMENTS := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_metals.h | awk '/^#define[ \t]+NUM_ELEMENTS/ {print $$3}')
-NUM_COLDGAS_DUST_RATES := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_params.h | awk '/^#define[ \t]+NUM_COLDGAS_DUST_RATES/ {print $$3}')
-NUM_HOTGAS_DUST_RATES := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_params.h | awk '/^#define[ \t]+NUM_HOTGAS_DUST_RATES/ {print $$3}')
+RNUM := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_params.h | awk '$$2 == "RNUM" {print $$3}' | tr -d '\r')
+NUM_METAL_CHANNELS := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_metals.h | awk '$$2 == "NUM_METAL_CHANNELS" {print $$3}' | tr -d '\r')
+NUM_ELEMENTS := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_metals.h | awk '$$2 == "NUM_ELEMENTS" {print $$3}' | tr -d '\r')
+NUM_COLDGAS_DUST_RATES := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_params.h | awk '$$2 == "NUM_COLDGAS_DUST_RATES" {print $$3}' | tr -d '\r')
+NUM_HOTGAS_DUST_RATES := $(shell ${CC} -E -dM $(CFLAGS) ./code/h_params.h | awk '$$2 == "NUM_HOTGAS_DUST_RATES" {print $$3}' | tr -d '\r')
 
 # use next target to generate metadata about the result files
 # uses -E compiler option to preprocess the allvars.h file, stores result in allvars.i
