@@ -169,6 +169,7 @@ double calc_sputtering(int p, double TotDustMass, double dt, char comp[]) {
 #endif //USE_BETA_MODEL
 
 	//*****
+#ifdef FULL_DUST_RATES
 	//Update tau_sput:
 	if (strcmp(comp,"HotGas")==0) {
 #ifdef DUST_HOTGAS
@@ -180,6 +181,7 @@ double calc_sputtering(int p, double TotDustMass, double dt, char comp[]) {
 		Gal[p].t_sput_EjectedMass = tau_sput; //[Gyr]
 #endif //DUST_EJECTEDMASS
 	}
+#endif //FULL_DUST_RATES
 
 	//*****
 	//Calculate dMsput:
@@ -278,7 +280,9 @@ void update_dust_mass(int p, int centralgal, double dt, int nstep, int halonr) {
 #else //MAINELEMENTS
 		tdes = (Gal[p].ColdGasRings[j]*(1.0e10/Hubble_h))/(M_CLEARED * F_SN * R_SN); //Use old default estimate of tdes, which doesn't depend on C or Si, if MAINELEMENTS is on.
 #endif //MAINELEMENTS
+#ifdef FULL_DUST_RATES
 		Gal[p].t_des[j] = tdes; //Storing the destruction timescale for each ring as a galaxy property, for output.
+#endif //FULL_DUST_RATES
 #else //H2_AND_RINGS
 		R_SN = (DiskSNIIRate_current_ts + DiskSNIaRate_current_ts) / (UnitTime_in_s / SEC_PER_YEAR); //To convert from 1/code_time_units to 1/yr
 #ifndef MAINELEMENTS
@@ -288,7 +292,9 @@ void update_dust_mass(int p, int centralgal, double dt, int nstep, int halonr) {
 #else //MAINELEMENTS
 		tdes = (Gal[p].ColdGas*(1.0e10/Hubble_h))/(M_CLEARED * F_SN * R_SN);
 #endif //MAINLELEMENTS
+#ifdef FULL_DUST_RATES
 		Gal[p].t_des = tdes; //Note, this will be the destruction timescale of the last timestep of each snapshot, rather than the average across the whole snapshot. (09-02-22)
+#endif //FULL_DUST_RATES
 #endif //H2_AND_RINGS
 
 		if (tdes != tdes)
@@ -1027,11 +1033,7 @@ for (j=Rings) {
 
 			//interpolates yields from lookup tables we produced in dust_yield_integrals.c
 			for (k=0;k<AGB_DUST_TYPE_NUM;k++) {
-#ifdef H2_AND_RINGS
-				NormAGBDustYieldRate_actual[k] = NormAGBDustYieldRate[TimeBin][i][Zi_ICM_saved[j][i]][k] + ((NormAGBDustYieldRate[TimeBin][i][Zi_ICM_saved[j][i]+1][k] - NormAGBDustYieldRate[TimeBin][i][Zi_ICM_saved[j][i]][k])*Zi_ICM_disp_saved[j][i]);
-#else
 				NormAGBDustYieldRate_actual[k] = NormAGBDustYieldRate[TimeBin][i][Zi_ICM_saved[i]][k] + ((NormAGBDustYieldRate[TimeBin][i][Zi_ICM_saved[i]+1][k] - NormAGBDustYieldRate[TimeBin][i][Zi_ICM_saved[i]][k])*Zi_ICM_disp_saved[i]);
-#endif
 #ifdef FULL_DUST_RATES
 				Gal[p].DustHotGasRates[0] +=  NormAGBDustYieldRate_actual[k] * ICMSFR_physical_units*dt / (deltaT*UnitTime_in_years);
 #endif
@@ -1081,11 +1083,7 @@ for (j=Rings) {
 
 				//Check how much gas there is actually available to form dust:
 				HotGasDiff_avail = Gal[p].HotGas_elements[ee] - Gal[p].DustHotGas_elements[ee]; //Total HotGas available to form dust
-#ifdef H2_AND_RINGS
 				AGBAllElementsDiff_avail = ICMAGBAllElements_ts[ee]; //Newly-ejected element mass into HotGas available to form dust
-#else
-				AGBAllElementsDiff_avail = ICMAGBAllElements_ts[ee]; //Newly-ejected element mass into HotGas available to form dust
-#endif //H2_AND_RINGS
 				//Add newly-formed dust from this particular ring to HotGas:
 				Gal[p].DustHotGas_elements[ee]  += min(New_dust_diff, min(HotGasDiff_avail, AGBAllElementsDiff_avail));
 			} //for (ee=0; ee<NUM_ELEMENTS; ee++)
@@ -1100,18 +1098,8 @@ for (j=Rings) {
 
 #ifdef DUST_SNII
 		if ((Gal[p].sfh_ICM[i] > 0.0) && (Gal[p].MetalsHotGas[0] > 0.0)) {
-#ifdef H2_AND_RINGS
 #ifdef FULL_DUST_RATES
     		//This is estimating the dust in various compounds (say silicates) using the amount of the particular element (say silicon) produced in a process:
-#ifndef MAINELEMENTS
-			Gal[p].DustHotGasRates[1] += (SNII_prevstep_Hot_ICM_Si[j][i] * eta_SNII_Sil * A_Sil_dust/A_Si)/(deltaT * UnitTime_in_years);
-			Gal[p].DustHotGasRates[1] += (SNII_prevstep_Hot_ICM_Si[j][i] * eta_SNII_SiC * A_SiC_dust/A_Si)/(deltaT * UnitTime_in_years);
-			Gal[p].DustHotGasRates[1] += (SNII_prevstep_Hot_ICM_Cb[j][i] * eta_SNII_Cb  * A_Cb_dust/A_Cb) /(deltaT * UnitTime_in_years);
-#endif //MAINELEMENTS
-			Gal[p].DustHotGasRates[1] += (SNII_prevstep_Hot_ICM_Fe[j][i] * eta_SNII_Fe  * A_Fe_dust/A_Fe )/(deltaT * UnitTime_in_years);
-#endif //FULL_DUST_RATES
-#else //H2_AND_RINGS
-#ifdef FULL_DUST_RATES
 #ifndef MAINELEMENTS
 			Gal[p].DustHotGasRates[1] += (SNII_prevstep_Hot_ICM_Si[i] * eta_SNII_Sil * A_Sil_dust/A_Si)/(deltaT * UnitTime_in_years);
 			Gal[p].DustHotGasRates[1] += (SNII_prevstep_Hot_ICM_Si[i] * eta_SNII_SiC * A_SiC_dust/A_Si)/(deltaT * UnitTime_in_years);
@@ -1119,33 +1107,18 @@ for (j=Rings) {
 #endif //MAINELEMENTS
 			Gal[p].DustHotGasRates[1] += (SNII_prevstep_Hot_ICM_Fe[i] * eta_SNII_Fe  * A_Fe_dust/A_Fe )/(deltaT * UnitTime_in_years);
 #endif //FULL_DUST_RATES
-#endif //H2_AND_RINGS
 
 		//Mass of newly-formed dust is determined by the mass of the "key element" that has just been returned by SNe:
 #ifndef MAINELEMENTS
-#ifdef H2_AND_RINGS
-			double Dust_Silicates = SNII_prevstep_Hot_ICM_Si[j][i] * eta_SNII_Sil * A_Sil_dust/A_Si;
-			double Dust_Iron      = SNII_prevstep_Hot_ICM_Fe[j][i] * eta_SNII_Fe  * A_Fe_dust/A_Fe;
-			double Dust_SiC	      = SNII_prevstep_Hot_ICM_Si[j][i] * eta_SNII_SiC * A_SiC_dust/A_Si;
-			double Dust_Carbon    = SNII_prevstep_Hot_ICM_Cb[j][i] * eta_SNII_Cb  * A_Cb_dust/A_Cb;
-#else
 			double Dust_Silicates = SNII_prevstep_Hot_ICM_Si[i] * eta_SNII_Sil * A_Sil_dust/A_Si;
 			double Dust_Iron      = SNII_prevstep_Hot_ICM_Fe[i] * eta_SNII_Fe  * A_Fe_dust/A_Fe;
 			double Dust_SiC	      = SNII_prevstep_Hot_ICM_Si[i] * eta_SNII_SiC * A_SiC_dust/A_Si;
 			double Dust_Carbon    = SNII_prevstep_Hot_ICM_Cb[i] * eta_SNII_Cb  * A_Cb_dust/A_Cb;
-#endif //H2_AND_RINGS
 #else //MAINELEMENTS
-#ifdef H2_AND_RINGS
-			double Dust_Silicates = 0.0;
-			double Dust_Iron      = SNII_prevstep_Hot_ICM_Fe[j][i] * eta_SNII_Fe  * A_Fe_dust/A_Fe;
-			double Dust_SiC	      = 0.0;
-			double Dust_Carbon    = 0.0;
-#else
 			double Dust_Silicates = 0.0;
 			double Dust_Iron      = SNII_prevstep_Hot_ICM_Fe[i] * eta_SNII_Fe  * A_Fe_dust/A_Fe;
 			double Dust_SiC	      = 0.0;
 			double Dust_Carbon    = 0.0;
-#endif //H2_AND_RINGS
 #endif //MAINELEMENTS
 
 			//Element conversion -----------------------------------------------------------------
@@ -1188,26 +1161,15 @@ for (j=Rings) {
 //Halo SNe-Ia:
 #ifdef DUST_SNIA
 		if ((Gal[p].sfh_ICM[i] > 0.0) && (Gal[p].MetalsHotGas[1] > 0.0)) {
-#ifdef H2_AND_RINGS
-			double Dust_Iron = SNIa_prevstep_Hot_ICM_Fe[j][i] * eta_SNIa_Fe  * A_Fe_dust/A_Fe;
-			#ifdef FULL_DUST_RATES
-				Gal[p].DustHotGasRates[2]  += (SNIa_prevstep_Hot_ICM_Fe[j][i] * eta_SNIa_Fe  * A_Fe_dust/A_Fe)/(deltaT * UnitTime_in_years);
-			#endif
-#else
 			double Dust_Iron = SNIa_prevstep_Hot_ICM_Fe[i] * eta_SNIa_Fe  * A_Fe_dust/A_Fe;
 			#ifdef FULL_DUST_RATES
 				Gal[p].DustHotGasRates[2]  += (SNIa_prevstep_Hot_ICM_Fe[i] * eta_SNIa_Fe  * A_Fe_dust/A_Fe)/(deltaT * UnitTime_in_years);
 			#endif
-#endif //H2_AND_RINGS
 
 			//Extra condition added here - that the newly-added dust doesn't exceed the newly-added metals from this enrichment channel: (28-01-22):
 			New_dust_diff = Dust_Iron * 1.0;
 			HotGasDiff_avail = Gal[p].HotGas_elements[Fe_NUM] - Gal[p].DustHotGas_elements[Fe_NUM]; //Total HotGas available to form dust
-#ifdef H2_AND_RINGS
-			SNIaAllElementsDiff_avail = ICMSNIaAllElements_ts[Fe_NUM]; //Newly-ejected element mass into HotGas available to form dust
-#else //H2_AND_RINGS
 			SNIaAllElementsDiff_avail = ICMSNIaAllElements_ts[Fe_NUM];
-#endif //H2_AND_RINGS
 			Gal[p].DustHotGas_elements[Fe_NUM] += min(New_dust_diff, min(HotGasDiff_avail, SNIaAllElementsDiff_avail));
 
 			mass_checks(p,"Dust from SNe-Ia: model_dust_yields.c",__LINE__);

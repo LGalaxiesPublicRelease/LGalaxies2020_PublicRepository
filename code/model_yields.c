@@ -148,12 +148,8 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 			SNII_prevstep_Hot_bulge_Fe[jj][ii] = 0.0;
 			SNII_prevstep_Hot_bulge_Cb[jj][ii] = 0.0;
 			SNIa_prevstep_Hot_bulge_Fe[jj][ii] = 0.0;
-			SNII_prevstep_Hot_ICM_Si[jj][ii] = 0.0;
-			SNII_prevstep_Hot_ICM_Fe[jj][ii] = 0.0;
-			SNII_prevstep_Hot_ICM_Cb[jj][ii] = 0.0;
-			SNIa_prevstep_Hot_ICM_Fe[jj][ii] = 0.0;
     	}
-#else
+#else //H2_AND_RINGS
     	SNII_prevstep_Cold_Si[ii] = 0.0;
 		SNII_prevstep_Cold_Fe[ii] = 0.0;
 		SNII_prevstep_Cold_Cb[ii] = 0.0;
@@ -162,11 +158,11 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
 		SNII_prevstep_Hot_bulge_Fe[ii] = 0.0;
 		SNII_prevstep_Hot_bulge_Cb[ii] = 0.0;
 		SNIa_prevstep_Hot_bulge_Fe[ii] = 0.0;
+#endif //H2_AND_RINGS
 		SNII_prevstep_Hot_ICM_Si[ii] = 0.0;
 		SNII_prevstep_Hot_ICM_Fe[ii] = 0.0;
 		SNII_prevstep_Hot_ICM_Cb[ii] = 0.0;
 		SNIa_prevstep_Hot_ICM_Fe[ii] = 0.0;
-#endif //H2_AND_RINGS
 #endif //DETAILED_DUST
 
     	mass_checks(p,"model_yields.c",__LINE__);
@@ -724,13 +720,8 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	if (Zi_disp < 0.0) Zi_disp = 0.0; //Don't want to extrapolate yields down below lifetimeMetallicities[0]=0.0004. Instead, assume constant yield below this metallicity.
 
 #ifdef DETAILED_DUST //For use in update_dust_mass() later on
-#ifdef H2_AND_RINGS
-    	Zi_ICM_saved[jj][ii] = Zi;
-		Zi_ICM_disp_saved[jj][ii] = Zi_disp;
-#else
 		Zi_ICM_saved[ii] = Zi;
 		Zi_ICM_disp_saved[ii] = Zi_disp;
-#endif //H2_AND_RINGS
 #endif
 
 #ifndef INDIVIDUAL_ELEMENTS
@@ -826,21 +817,12 @@ void update_yields_and_return_mass(int p, int centralgal, double dt, int nstep)
     	  Gal[igal].HotGas_elements[ee] += SNIIAllElements[ee] + SNIaAllElements[ee] + AGBAllElements[ee];
 
 #ifdef DETAILED_DUST
-#ifdef H2_AND_RINGS
-#ifndef MAINELEMENTS
-     		SNII_prevstep_Hot_ICM_Cb[jj][ii] += SNIIAllElements[Cb_NUM];
-     		SNII_prevstep_Hot_ICM_Si[jj][ii] += SNIIAllElements[Si_NUM];
-#endif //MAINELEMENTS
-     		SNII_prevstep_Hot_ICM_Fe[jj][ii] += SNIIAllElements[Fe_NUM];
-     		SNIa_prevstep_Hot_ICM_Fe[jj][ii] += SNIaAllElements[Fe_NUM];
-#else //H2_AND_RINGS
 #ifndef MAINELEMENTS
      		SNII_prevstep_Hot_ICM_Cb[ii] += SNIIAllElements[Cb_NUM];
      		SNII_prevstep_Hot_ICM_Si[ii] += SNIIAllElements[Si_NUM];
 #endif //MAINELEMENTS
      		SNII_prevstep_Hot_ICM_Fe[ii] += SNIIAllElements[Fe_NUM];
      		SNIa_prevstep_Hot_ICM_Fe[ii] += SNIaAllElements[Fe_NUM];
-#endif //H2_AND_RINGS
 #endif //DETAILED_DUST
 #endif //INDIVIDUAL_ELEMENTS
 

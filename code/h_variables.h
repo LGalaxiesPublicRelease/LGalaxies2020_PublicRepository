@@ -570,8 +570,6 @@ double fwind_AGB; //Required for AGB metal-rich wind implementation
 	double Zi_disk_disp_saved[RNUM][SFH_NBIN];
 	int Zi_bulge_saved[RNUM][SFH_NBIN];
 	double Zi_bulge_disp_saved[RNUM][SFH_NBIN];
-	int Zi_ICM_saved[RNUM][SFH_NBIN];
-	double Zi_ICM_disp_saved[RNUM][SFH_NBIN];
 	// Variables to hold amount of metals created in prev time step in model_yields.c
 	float SNII_prevstep_Cold_Cb[RNUM][SFH_NBIN];
 	float SNII_prevstep_Cold_Si[RNUM][SFH_NBIN];
@@ -581,17 +579,11 @@ double fwind_AGB; //Required for AGB metal-rich wind implementation
 	float SNII_prevstep_Hot_bulge_Si[RNUM][SFH_NBIN];
 	float SNII_prevstep_Hot_bulge_Fe[RNUM][SFH_NBIN];
 	float SNIa_prevstep_Hot_bulge_Fe[RNUM][SFH_NBIN];
-	float SNII_prevstep_Hot_ICM_Cb[RNUM][SFH_NBIN];
-	float SNII_prevstep_Hot_ICM_Si[RNUM][SFH_NBIN];
-	float SNII_prevstep_Hot_ICM_Fe[RNUM][SFH_NBIN];
-	float SNIa_prevstep_Hot_ICM_Fe[RNUM][SFH_NBIN];
-#else
+#else //H2_AND_RINGS
 	int Zi_disk_saved[SFH_NBIN];
 	double Zi_disk_disp_saved[SFH_NBIN];
 	int Zi_bulge_saved[SFH_NBIN];
 	double Zi_bulge_disp_saved[SFH_NBIN];
-	int Zi_ICM_saved[SFH_NBIN];
-	double Zi_ICM_disp_saved[SFH_NBIN];
 	float SNII_prevstep_Cold_Cb[SFH_NBIN];
 	float SNII_prevstep_Cold_Si[SFH_NBIN];
 	float SNII_prevstep_Cold_Fe[SFH_NBIN];
@@ -600,11 +592,13 @@ double fwind_AGB; //Required for AGB metal-rich wind implementation
 	float SNII_prevstep_Hot_bulge_Si[SFH_NBIN];
 	float SNII_prevstep_Hot_bulge_Fe[SFH_NBIN];
 	float SNIa_prevstep_Hot_bulge_Fe[SFH_NBIN];
+#endif //H2_AND_RINGS
+	int Zi_ICM_saved[SFH_NBIN];
+	double Zi_ICM_disp_saved[SFH_NBIN];
 	float SNII_prevstep_Hot_ICM_Cb[SFH_NBIN];
 	float SNII_prevstep_Hot_ICM_Si[SFH_NBIN];
 	float SNII_prevstep_Hot_ICM_Fe[SFH_NBIN];
 	float SNIa_prevstep_Hot_ICM_Fe[SFH_NBIN];
-#endif //H2_AND_RINGS
 #endif //DETAILED_DUST
 
 #ifdef COMPUTE_SPECPHOT_PROPERTIES
