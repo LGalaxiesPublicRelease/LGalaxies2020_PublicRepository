@@ -510,6 +510,8 @@ for (j=Rings) {
 #else
 			H2frac = Gal[p].H2fraction;
 #endif //H2_AND_RINGS
+			New_dust_diff = 0.0;
+			New_dust_clouds = 0.0;
 #ifndef MAINELEMENTS
 			if (ee == Cb_NUM) { //Cb
 				New_dust_diff = ((Dust_SiC * SILICONCARBIDE_Cb_FRAC) + (Dust_Carbon * 1.0)) * (1.0 - H2frac);
@@ -535,10 +537,6 @@ for (j=Rings) {
 			else if (ee == Fe_NUM) { //Fe
 				New_dust_diff = ((Dust_Fayalite * FAYALITE_Fe_FRAC) + (Dust_Ferrosilite * FERROSILITE_Fe_FRAC) + (Dust_Iron * 1.0)) * (1.0 - H2frac);
 				New_dust_clouds = ((Dust_Fayalite * FAYALITE_Fe_FRAC) + (Dust_Ferrosilite * FERROSILITE_Fe_FRAC) + (Dust_Iron * 1.0)) * H2frac;
-			}
-			else {
-				New_dust_diff = 0.0;
-				New_dust_clouds = 0.0;
 			}
 
 #ifdef H2_AND_RINGS
@@ -659,6 +657,8 @@ for (j=Rings) {
 #else
 			H2frac = Gal[p].H2fraction;
 #endif //H2_AND_RINGS
+			New_dust_diff = 0.0;
+			New_dust_clouds = 0.0;
 #ifndef MAINELEMENTS
 				if (ee == Cb_NUM) { //Cb
 					New_dust_diff = ((Dust_SiC * SILICONCARBIDE_Cb_FRAC) + (Dust_Carbon * 1.0)) * (1.0 - H2frac);
@@ -682,10 +682,7 @@ for (j=Rings) {
 					New_dust_diff = ((Dust_Silicates * SILICATES_Fe_FRAC) + (Dust_Iron * 1.0)) * (1.0 - H2frac);
 					New_dust_clouds = ((Dust_Silicates * SILICATES_Fe_FRAC) + (Dust_Iron * 1.0)) * H2frac;
 				}
-				else {
-					New_dust_diff = 0.0;
-					New_dust_clouds = 0.0;
-				}
+
 #ifdef H2_AND_RINGS
 				//Check how much gas there is actually available to form dust:
 				ColdGasDiff_avail = Gal[p].ColdGasDiffRings_elements[j][ee] - Gal[p].DustColdGasDiffRings_elements[j][ee]; //Total diffuse gas available to host dust
@@ -844,6 +841,7 @@ for (j=Rings) {
 
 			//Element Conversion -----------------------------------------------------------------------------------
 			for (ee=0; ee<NUM_ELEMENTS; ee++) {
+				New_dust_diff = 0.0;
 #ifndef MAINELEMENTS
 				if (ee == Cb_NUM) { //Cb
 					New_dust_diff = ((Dust_SiC * SILICONCARBIDE_Cb_FRAC) + (Dust_Carbon * 1.0));
@@ -862,9 +860,6 @@ for (j=Rings) {
 				}
 				else if (ee == Fe_NUM) { //Fe
 					New_dust_diff = ((Dust_Fayalite * FAYALITE_Fe_FRAC) + (Dust_Ferrosilite * FERROSILITE_Fe_FRAC) + (Dust_Iron * 1.0));
-				}
-				else {
-					New_dust_diff = 0.0;
 				}
 
 				//Check how much gas there is actually available to form dust:
@@ -939,6 +934,7 @@ for (j=Rings) {
 
 			//Element conversion -----------------------------------------------------------------
 			for (ee=0; ee<NUM_ELEMENTS; ee++) {
+				New_dust_diff = 0.0;
 #ifndef MAINELEMENTS
 				if (ee == Cb_NUM) { //Cb
 					New_dust_diff = ((Dust_SiC * SILICONCARBIDE_Cb_FRAC) + (Dust_Carbon * 1.0));
@@ -955,9 +951,6 @@ for (j=Rings) {
 				}
 				else if (ee == Fe_NUM) { //Fe
 					New_dust_diff = ((Dust_Silicates * SILICATES_Fe_FRAC) + (Dust_Iron * 1.0));
-				}
-				else {
-					New_dust_diff = 0.0;
 				}
 
 				//Check how much gas there is actually available to form dust:
@@ -1058,6 +1051,7 @@ for (j=Rings) {
 
 			//Element Conversion -----------------------------------------------------------------------------------
 			for (ee=0; ee<NUM_ELEMENTS; ee++) {
+				New_dust_diff = 0.0;
 #ifndef MAINELEMENTS
 				if (ee == Cb_NUM) { //Cb
 					New_dust_diff = ((Dust_SiC * SILICONCARBIDE_Cb_FRAC) + (Dust_Carbon * 1.0));
@@ -1076,9 +1070,6 @@ for (j=Rings) {
 				}
 				else if (ee == Fe_NUM) { //Fe
 					New_dust_diff = ((Dust_Fayalite * FAYALITE_Fe_FRAC) + (Dust_Ferrosilite * FERROSILITE_Fe_FRAC) + (Dust_Iron * 1.0));
-				}
-				else {
-					New_dust_diff = 0.0;
 				}
 
 				//Check how much gas there is actually available to form dust:
@@ -1123,6 +1114,7 @@ for (j=Rings) {
 
 			//Element conversion -----------------------------------------------------------------
 			for (ee=0; ee<NUM_ELEMENTS; ee++) {
+				New_dust_diff = 0.0;
 #ifndef MAINELEMENTS
 				if (ee == Cb_NUM) { //Cb
 					New_dust_diff = ((Dust_SiC * SILICONCARBIDE_Cb_FRAC) + (Dust_Carbon * 1.0));
@@ -1139,9 +1131,6 @@ for (j=Rings) {
 				}
 				else if (ee == Fe_NUM) { //Fe
 					New_dust_diff = ((Dust_Silicates * SILICATES_Fe_FRAC) + (Dust_Iron * 1.0));
-				}
-				else {
-					New_dust_diff = 0.0;
 				}
 
 				//Check how much gas there is actually available to form dust:
