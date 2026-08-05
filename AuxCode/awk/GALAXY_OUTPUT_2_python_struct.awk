@@ -12,6 +12,7 @@ BEGIN {
     sizes["NUM_ELEMENTS"] = NUM_ELEMENTS
     sizes["NUM_COLDGAS_DUST_RATES"] = NUM_COLDGAS_DUST_RATES
     sizes["NUM_HOTGAS_DUST_RATES"] = NUM_HOTGAS_DUST_RATES
+    sizes["SFH_NBIN"] = SFH_NBIN
 }
 
 function resolve_dim(x) {
