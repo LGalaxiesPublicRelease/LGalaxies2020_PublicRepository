@@ -154,12 +154,12 @@ struct GALAXY_OUTPUT {
     float ICM; //10^10/h Msun //Total mass in metals in intra-cluster stars, for type 0,1
 #ifndef LITE_OUTPUT
 #ifdef TRACK_MASSGROWTH_CHANNELS
-    float MassFromInSitu; // 1e10 Msun/h // Mass formed in situ.
-    float MassFromMergers; // 1e10 Msun/h // Mass accreted from mergers.
-    float MassFromBursts; // 1e10 Msun/h // Mass formed in starbursts
+    float MassFromInSitu; // 1e10 Msun/h // Mass formed in situ. NOTE: (22-08-26) This has been modified to represent the *total* mass formed from in situ SF (not an approximation of the *long-lived* mass formed from in-situ SF)
+    float MassFromMergers; // 1e10 Msun/h // Mass accreted from mergers. NOTE: (22-08-26) This has been modified to represent the *total* mass accreted from mergers (not an approximation of the *long-lived* mass accreted from mergers)
+    float MassFromBursts; // 1e10 Msun/h // Mass formed in starbursts. NOTE: (22-08-26) This has been modified to represent the *total* mass formed in starbursts (not an approximation of the *long-lived* mass formed in starbursts)
 #endif
 #ifdef TRACK_BURST
-    float BurstMass; // 1e10 Msun/h // Mass formed in starbursts
+    float BurstMass; // 1e10 Msun/h // Mass formed in starbursts. NOTE: (22-08-26) This was already representing the *total* mass formed in starbursts (not an approximation of the *long-lived* mass formed in starbursts)
 #endif //TRACK_BURST
 #endif //LITE_OUTPUT
     float MetalsColdGas[NUM_METAL_CHANNELS]; // 10^10/h Msun // Mass in metals in cold gas.
@@ -305,12 +305,12 @@ struct GALAXY_OUTPUT {
 #endif //OUTPUT_RINGS_EXTRA
     float sfh_MetalsICM[SFH_NBIN][NUM_METAL_CHANNELS]; // 10^10 Msun/h // Metal formation history in the ICM.
 #ifdef TRACK_SFH_MASSGROWTH_CHANNELS
-    float sfh_MassFromInSitu[SFH_NBIN]; // 10^10 Msun/h // Star formation history of stars formed in situ.
-    float sfh_MassFromMergers[SFH_NBIN]; // 10^10 Msun/h // Star formation history of stars accreted from mergers.
-    float sfh_MassFromBursts[SFH_NBIN]; // 10^10 Msun/h // Star formation history of stars formed in starbursts.
+    float sfh_MassFromInSitu[SFH_NBIN]; // 10^10 Msun/h // Star formation history of stars formed in situ. NOTE: (22-08-26) This has been modified to represent the *total* mass formed from in situ SF (not an approximation of the *long-lived* mass formed from in-situ SF)
+    float sfh_MassFromMergers[SFH_NBIN]; // 10^10 Msun/h // Star formation history of stars accreted from mergers. NOTE: (22-08-26) This has been modified to represent the *total* mass accreted from mergers (not an approximation of the *long-lived* mass accreted from mergers)
+    float sfh_MassFromBursts[SFH_NBIN]; // 10^10 Msun/h // Star formation history of stars formed in starbursts. NOTE: (22-08-26) This has been modified to represent the *total* mass formed in starbursts (not an approximation of the *long-lived* mass formed in starbursts)
 #endif
 #ifdef TRACK_BURST
-    float sfh_BurstMass[SFH_NBIN]; // 10^10 Msun/h // Star formation history of stars formed in starbursts.
+    float sfh_BurstMass[SFH_NBIN]; // 10^10 Msun/h // Star formation history of stars formed in starbursts. NOTE: (22-08-26) This was already representing the *total* mass formed in starbursts (not an approximation of the *long-lived* mass formed in starbursts)
 #endif //TRACK_BURST
 #endif     //NORMALIZEDDB
 #endif //LITE_OUTPUT

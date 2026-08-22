@@ -549,32 +549,29 @@ void update_from_star_formation(int p, double stars, double starsRings[], char t
 
 
 #ifdef TRACK_MASSGROWTH_CHANNELS
-  //for this calculation we want just the long lived mass and
-  //take the instantaneous recycling aproximation even
-  //for the detailed chemical enrichment because it is not
-  //possible to know which component to eject mass from afterwards
-  double long_lived_mass;
-  long_lived_mass=stars_to_add;
-#ifdef DETAILED_METALS_AND_MASS_RETURN
-  long_lived_mass*=(1 - RecycleFraction);
-#endif
-
+  //NOTE: (22-08-26) This part has been modified to calculate the *total* mass formed
+  //from these three channels (not an approximation of the *long-lived* mass formed),
+  //because for the detailed chemical enrichment because it is not
+  //possible to know which component (i.e. MassFromInSitu or MassFromBursts)
+  //to eject mass from afterwards, and using (1.-RecycleFraction) is not self consistent.
+  //The sum of MassFromInSitu + MassFromBursts + MassFromMergers in the output will now equal
+  //the sum of the mass formed in the SFH or each galaxy (i.e. sfh_DiskMass + sfh_BulgeMass).
   if(strcmp(type_of_event,"insitu")==0)
       {
-        Gal[p].MassFromInSitu+=long_lived_mass;
+        Gal[p].MassFromInSitu+=stars_to_add;
 #ifdef STAR_FORMATION_HISTORY
 #ifdef TRACK_SFH_MASSGROWTH_CHANNELS
-        Gal[p].sfh_MassFromInSitu[Gal[p].sfh_ibin]+=long_lived_mass;
+        Gal[p].sfh_MassFromInSitu[Gal[p].sfh_ibin]+=stars_to_add;
 #endif
 #endif
       }
 
   if(strcmp(type_of_event,"merger")==0)
     {
-      Gal[p].MassFromBursts+=long_lived_mass;
+      Gal[p].MassFromBursts+=stars_to_add;
 #ifdef STAR_FORMATION_HISTORY
 #ifdef TRACK_SFH_MASSGROWTH_CHANNELS
-      Gal[p].sfh_MassFromBursts[Gal[p].sfh_ibin]+=long_lived_mass;
+      Gal[p].sfh_MassFromBursts[Gal[p].sfh_ibin]+=stars_to_add;
 #endif
 #endif
     }
