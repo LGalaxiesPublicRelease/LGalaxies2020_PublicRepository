@@ -47,6 +47,14 @@ def make_lgals_sample(G_lgal, FILE_TYPE, SampType, Simulation, Cosmology, Hubble
                           & (G_lgal['StellarMass'] > 0.0) \
                           & (G_lgal['Type'] < 2) \
                           & (G_lgal['MassWeightAge'] >= 0.0)]
+        elif SampType == 'MWAs' :
+            G_samp = G_lgal[(np.log10(G_lgal['StellarMass']) >= 10.2) \
+                          & (np.log10(G_lgal['StellarMass']) <= 10.8) \
+                          & (G_lgal['BulgeMass']/G_lgal['StellarMass'] < 0.3) \
+                          & (G_lgal['Type'] == 0) \
+                          & (G_lgal['Sfr'] >= 0.5) \
+                          & (G_lgal['Sfr'] <= 2.5) \
+                          & (G_lgal['MassWeightAge'] >= 0.0)]
         else : print("***** ERROR: Sample type not chosen. Please enter a valid string for SampType *****") 
     elif ((FILE_TYPE == 'galtree') & (select_main_progenitors == 1)) :  
         #Sample selection criteria:

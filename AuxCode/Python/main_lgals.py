@@ -78,7 +78,7 @@ VERSION = 'test1' #Name of output file (minus prefixes). E.g. see FileNameGalaxi
 LABEL = MODEL+' model '+VERSION #NEEDS TO BE IN SIMPLE ASCII (so it can be used in a filename ok in Linux, and read by latex). White space is ok [removed later]). A label that wll be added to plots to denote this model if MULTIPLE_MODELS is on.
 
 SOLAR_ABUNDANCE_SET = 'A09' #'GAS07' #'AG89_phot' #'AG89_mete' #Sets which solar abundances are assumed when normalising abundances and enhancements inplots
-SAMPLE_TYPE = 'All' #Select from: 'All', 'Discs', 'ETGs', 'Dwarfs'
+SAMPLE_TYPE = 'All' #Select from: 'All', 'Discs', 'ETGs', 'Dwarfs', 'MWAs'
 
 #################       
 #Files to load:
