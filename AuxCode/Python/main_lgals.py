@@ -378,6 +378,8 @@ if GENERAL_PLOTS == 1 :
         plot_mzgr_general(Samp1, struct1, char_z_low, pdf=pdf)
         plot_mzsr_general(Samp1, char_z_low, pdf=pdf)
         plot_sfrd_prof(Samp1, struct1, char_z_low, MassBins, pdf=pdf)
+        # plot_profs_multiplot(Samp1, struct1, Hubble_h, Omega_M, Omega_Lambda, \
+        #                           MassBins, props='All', SolarNorm=SOLAR_ABUNDANCE_SET, stellarComp='Disc+Bulge')
         if CALC_SFH_INFO == 1 :
             if not ("liteOutput" in (STRUCT_TYPE)) :
                 plot_sfhs(Samp1, SFH_bins, snap_z0, char_z_low, pdf=pdf)
