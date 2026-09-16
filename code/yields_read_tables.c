@@ -20,7 +20,11 @@ void read_yield_tables(void)
 
 #ifdef BINARYC
 	static char *bc_yields_filename = "ensemble_output_";
+#ifdef USE_NEW_YIELDS
+	static char *bc_yields_directory = "./YieldTables/binary_c_yields/new/binaryStars/";
+#else //#ifdef USE_NEW_YIELDS
 	static char *bc_yields_directory = "./YieldTables/binary_c_yields/default/binaryStars/";
+#endif //#ifdef USE_NEW_YIELDS
 	static char *bc_SNIa_yields_directory = "/";
 
 	//------------------------------------------

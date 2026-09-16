@@ -15,6 +15,7 @@ import pandas as pd
 import numpy as np
 import os
 import shutil
+import re
 from datetime import datetime
 now = datetime.now()
 
@@ -133,6 +134,12 @@ for zz in range(0,len(ensemble_file_metallicities)) :
     
     sn_data = ensemble_data['scalars']
     sn_rates = {}
+    
+    # Get a lists of all isotopes and all elements:
+    isotopes_all = sorted(list(set(df['isotope'])))
+    elements_all = sorted(set([re.sub(r'\d+', '', iso) for iso in isotopes_all]))
+    print("\nIsotopes included: ", isotopes_all)
+    print("\nElements included: ", elements_all)
 
 
 ##############
@@ -150,22 +157,25 @@ for zz in range(0,len(ensemble_file_metallicities)) :
 
         #(a) element yields for each channel (AGB, SNe-II, SNe_Ia):
         for element in elements : 
+            # Add element masses to the ejected element yield arrays:
             ele = (source_df["isotope"].str.contains(element)) \
                 & (((source_df["isotope"].str.replace(element,'')).str.isnumeric()) | (source_df["isotope"].str.replace(element,'') == '')) #Selects entries where the isotope name contains only the given element name (e.g. H, He, etc) plus numbers, or contains only the given isotope name (e.g. Al26, H34, etc).
             element_df = source_df[ele]
             grouped_by_time = element_df.groupby(by='time')['yield_per_solarmass'].sum()           
             the_yield_array = np.nan_to_num(np.array(df_blank+grouped_by_time))
             the_yield_list = list(np.array(the_yield_array, dtype=str))
-            if (element == elements[0]) : 
-                writemode = 'w'
-                tot_ej_masses_array = the_yield_array
-            else : 
-                writemode = 'a'
-                tot_ej_masses_array += the_yield_array
-                if (element == elements[2]) :
-                    tot_metal_masses_array = the_yield_array              
-                elif (element != elements[1]) :
-                    tot_metal_masses_array += the_yield_array                        
+            # Add element masses to the ejected mass and metals arrays:
+            if element.isalpha(): # Only add elements (i.e. sum of all an element's isotopes) to metals and mass arrays (not separately considered isotopes)
+                if (element == elements[0]) : 
+                    writemode = 'w'
+                    tot_ej_masses_array = the_yield_array
+                else : 
+                    writemode = 'a'
+                    tot_ej_masses_array += the_yield_array
+                    if (element == elements[2]) :
+                        tot_metal_masses_array = the_yield_array              
+                    elif (element != elements[1]) :
+                        tot_metal_masses_array += the_yield_array                        
             with open(outputdir+'ensemble_output_'+group+'_'+'Z'+bc_metallicity+'_'+'Yields.txt', writemode) as f:
                 f.write(' '.join(the_yield_list)+' ')
         

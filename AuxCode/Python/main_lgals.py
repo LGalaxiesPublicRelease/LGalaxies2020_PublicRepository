@@ -18,6 +18,7 @@ main_lgals.py
   ;07-12-23: Adapted to enable reading/plotting of GALAXYTREE outputs too
   ;09-06-26: Adapted to work with noDust structures too
   ;15-07-26: Adapted to work with automatically-generated python structures & HDF5 output
+  ;15-09-26: Adapted to include a Milky Way Analogues (MWAs) sample selection
   ;
 """
 
